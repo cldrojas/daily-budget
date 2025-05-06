@@ -1,6 +1,6 @@
-"use client"
+'use client'
 
-import { useState } from "react"
+import { useState } from 'react'
 import {
   PlusCircle,
   Wallet,
@@ -18,17 +18,30 @@ import {
   Plane,
   ShoppingBag,
   Smartphone,
-  Utensils,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
-import { useLanguage } from "@/contexts/language-context"
-import { useCurrency } from "@/contexts/currency-context"
-import { AccountEditModal } from "./account-edit-modal"
+  Utensils
+} from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { useToast } from '@/hooks/use-toast'
+import { useLanguage } from '@/contexts/language-context'
+import { useCurrency } from '@/contexts/currency-context'
+import { AccountEditModal } from './account-edit-modal'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,11 +50,11 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+  AlertDialogTitle
+} from '@/components/ui/alert-dialog'
 
 // Default account IDs that cannot be deleted
-const DEFAULT_ACCOUNT_IDS = ["daily", "savings", "investment"]
+const DEFAULT_ACCOUNT_IDS = ['daily', 'savings', 'investment']
 
 // Map of icon IDs to icon components
 const iconMap = {
@@ -58,17 +71,22 @@ const iconMap = {
   plane: Plane,
   shopping: ShoppingBag,
   smartphone: Smartphone,
-  utensils: Utensils,
+  utensils: Utensils
 }
 
-export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDeleteAccount }) {
+export function AccountsList({
+  accounts,
+  onAddAccount,
+  onUpdateAccount,
+  onDeleteAccount
+}) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
   const [isAddingAccount, setIsAddingAccount] = useState(false)
-  const [newAccountName, setNewAccountName] = useState("")
-  const [newAccountType, setNewAccountType] = useState("savings")
-  const [newAccountIcon, setNewAccountIcon] = useState("piggybank")
+  const [newAccountName, setNewAccountName] = useState('')
+  const [newAccountType, setNewAccountType] = useState('savings')
+  const [newAccountIcon, setNewAccountIcon] = useState('piggybank')
   const [editingAccount, setEditingAccount] = useState(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState(null)
@@ -79,9 +97,9 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
 
     if (!newAccountName.trim()) {
       toast({
-        title: t("invalidAccountName"),
-        description: t("invalidAccountNameDescription"),
-        variant: "destructive",
+        title: t('invalidAccountName'),
+        description: t('invalidAccountNameDescription'),
+        variant: 'destructive'
       })
       return
     }
@@ -90,19 +108,19 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
       name: newAccountName,
       type: newAccountType,
       icon: newAccountIcon,
-      balance: 0,
+      balance: 0
     })
 
     // Reset form
-    setNewAccountName("")
-    setNewAccountType("savings")
-    setNewAccountIcon("piggybank")
+    setNewAccountName('')
+    setNewAccountType('savings')
+    setNewAccountIcon('piggybank')
     setIsAddingAccount(false)
 
     // Show toast
     toast({
-      title: t("accountAdded"),
-      description: t("accountAddedDescription", { name: newAccountName }),
+      title: t('accountAdded'),
+      description: t('accountAddedDescription', { name: newAccountName })
     })
   }
 
@@ -121,8 +139,8 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
       const success = onDeleteAccount(accountToDelete.id)
       if (success) {
         toast({
-          title: t("accountDeleted"),
-          description: t("accountDeletedDescription", { name: accountToDelete.name }),
+          title: t('accountDeleted'),
+          description: t('accountDeletedDescription', { name: accountToDelete.name })
         })
       }
     }
@@ -151,13 +169,15 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
               <div className="flex items-center space-x-2">
-                <div className="h-5 w-5 text-muted-foreground">{getAccountIcon(account)}</div>
+                <div className="h-5 w-5 text-muted-foreground">
+                  {getAccountIcon(account)}
+                </div>
                 <Button
                   variant="ghost"
                   size="icon"
                   className="h-6 w-6"
                   onClick={() => handleEditClick(account)}
-                  title={t("editAccount")}
+                  title={t('editAccount')}
                 >
                   <Edit className="h-3.5 w-3.5" />
                 </Button>
@@ -167,7 +187,7 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
                     size="icon"
                     className="h-6 w-6 text-destructive"
                     onClick={() => handleDeleteClick(account)}
-                    title={t("deleteAccount")}
+                    title={t('deleteAccount')}
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </Button>
@@ -177,7 +197,7 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(account.balance)}</div>
               <p className="text-xs text-muted-foreground">
-                {t(account.type)} {t("account")}
+                {t(account.type)} {t('account')}
               </p>
             </CardContent>
           </Card>
@@ -187,13 +207,13 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
       {isAddingAccount ? (
         <Card>
           <CardHeader>
-            <CardTitle>{t("addNewAccount")}</CardTitle>
-            <CardDescription>{t("createNewAccount")}</CardDescription>
+            <CardTitle>{t('addNewAccount')}</CardTitle>
+            <CardDescription>{t('createNewAccount')}</CardDescription>
           </CardHeader>
           <form onSubmit={handleAddAccount}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="accountName">{t("accountName")}</Label>
+                <Label htmlFor="accountName">{t('accountName')}</Label>
                 <Input
                   id="accountName"
                   placeholder="Vacation Fund"
@@ -204,27 +224,30 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="accountType">{t("accountType")}</Label>
-                <Select value={newAccountType} onValueChange={setNewAccountType}>
+                <Label htmlFor="accountType">{t('accountType')}</Label>
+                <Select
+                  value={newAccountType}
+                  onValueChange={setNewAccountType}
+                >
                   <SelectTrigger>
-                    <SelectValue placeholder={t("selectAccountType")} />
+                    <SelectValue placeholder={t('selectAccountType')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="savings">{t("savings")}</SelectItem>
-                    <SelectItem value="investment">{t("investment")}</SelectItem>
-                    <SelectItem value="expense">{t("expense")}</SelectItem>
+                    <SelectItem value="savings">{t('savings')}</SelectItem>
+                    <SelectItem value="investment">{t('investment')}</SelectItem>
+                    <SelectItem value="expense">{t('expense')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label>{t("accountIcon")}</Label>
+                <Label>{t('accountIcon')}</Label>
                 <div className="grid grid-cols-7 gap-2">
                   {Object.entries(iconMap).map(([id, Icon]) => (
                     <Button
                       key={id}
                       type="button"
-                      variant={newAccountIcon === id ? "default" : "outline"}
+                      variant={newAccountIcon === id ? 'default' : 'outline'}
                       className="h-10 w-10 p-0"
                       onClick={() => setNewAccountIcon(id)}
                     >
@@ -235,21 +258,23 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={() => setIsAddingAccount(false)}>
-                {t("cancel")}
+              <Button
+                variant="outline"
+                onClick={() => setIsAddingAccount(false)}
+              >
+                {t('cancel')}
               </Button>
-              <Button type="submit">{t("createAccount")}</Button>
+              <Button type="submit">{t('createAccount')}</Button>
             </CardFooter>
           </form>
         </Card>
       ) : (
         <Button onClick={() => setIsAddingAccount(true)}>
           <PlusCircle className="mr-2 h-4 w-4" />
-          {t("addNewAccount")}
+          {t('addNewAccount')}
         </Button>
       )}
 
-      {/* Edit Account Modal */}
       {editingAccount && (
         <AccountEditModal
           account={editingAccount}
@@ -260,26 +285,32 @@ export function AccountsList({ accounts, onAddAccount, onUpdateAccount, onDelete
       )}
 
       {/* Delete Account Confirmation Dialog */}
-      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{t("deleteAccount")}</AlertDialogTitle>
+            <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("deleteAccountConfirmation", { name: accountToDelete?.name })}
+              {t('deleteAccountConfirmation', { name: accountToDelete?.name })}
               {accountToDelete?.balance > 0 && (
                 <p className="mt-2 font-medium">
-                  {t("deleteAccountBalance", {
+                  {t('deleteAccountBalance', {
                     balance: formatCurrency(accountToDelete?.balance),
-                    savings: t("savings"),
+                    savings: t('savings')
                   })}
                 </p>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground">
-              {t("delete")}
+            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
+              {t('delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
