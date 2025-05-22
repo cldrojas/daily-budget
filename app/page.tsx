@@ -1,25 +1,33 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useTheme } from "next-themes"
-import { Moon, Sun, Plus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { DatePicker } from "@/components/date-picker"
-import { ExpensesList } from "@/components/expenses-list"
-import { ExpenseModal } from "@/components/expense-modal"
-import { AccountsList } from "@/components/accounts-list"
-import { TransactionHistory } from "@/components/transaction-history"
-import { useBudget } from "@/hooks/use-budget"
-import { CircularProgress } from "@/components/circular-progress"
-import { ConfigForm } from "@/components/config-form"
-import { TransferForm } from "@/components/transfer-form"
-import { LanguageCurrencySelector } from "@/components/language-currency-selector"
-import { useLanguage } from "@/contexts/language-context"
-import { useCurrency } from "@/contexts/currency-context"
+import { useState } from 'react'
+import { useTheme } from 'next-themes'
+import { Moon, Sun, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { DatePicker } from '@/components/date-picker'
+import { ExpensesList } from '@/components/expenses-list'
+import { ExpenseModal } from '@/components/expense-modal'
+import { AccountsList } from '@/components/accounts-list'
+import { TransactionHistory } from '@/components/transaction-history'
+import { useBudget } from '@/hooks/use-budget'
+import { CircularProgress } from '@/components/circular-progress'
+import { ConfigForm } from '@/components/config-form'
+import { TransferForm } from '@/components/transfer-form'
+import { LanguageCurrencySelector } from '@/components/language-currency-selector'
+import { useLanguage } from '@/contexts/language-context'
+import { useCurrency } from '@/contexts/currency-context'
+import { AddButton } from '@/components/ui/AddButton'
 
 export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
@@ -42,23 +50,27 @@ export default function DailyBudgetApp() {
     isSetup,
     transferFunds,
     updateConfig,
-    getRemainingDays,
+    getRemainingDays
   } = useBudget()
 
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b">
         <div className="container flex items-center justify-between h-16 px-4">
-          <h1 className="text-xl font-bold">{t("appName")}</h1>
+          <h1 className="text-xl font-bold">{t('appName')}</h1>
           <div className="flex items-center space-x-2">
             <LanguageCurrencySelector />
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              title={theme === "dark" ? t("lightMode") : t("darkMode")}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              title={theme === 'dark' ? t('lightMode') : t('darkMode')}
             >
-              {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </div>
@@ -78,23 +90,38 @@ export default function DailyBudgetApp() {
             />
 
             <div className="mt-6">
-              <ConfigForm budget={budget} onUpdateConfig={updateConfig} />
+              <ConfigForm
+                budget={budget}
+                onUpdateConfig={updateConfig}
+              />
             </div>
 
             <Tabs defaultValue="expenses">
               <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="expenses">{t("expenses")}</TabsTrigger>
-                <TabsTrigger value="transfer">{t("transfer")}</TabsTrigger>
-                <TabsTrigger value="accounts">{t("accounts")}</TabsTrigger>
-                <TabsTrigger value="history">{t("history")}</TabsTrigger>
+                <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
+                <TabsTrigger value="transfer">{t('transfer')}</TabsTrigger>
+                <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
+                <TabsTrigger value="history">{t('history')}</TabsTrigger>
               </TabsList>
-              <TabsContent value="expenses" className="mt-6">
+              <TabsContent
+                value="expenses"
+                className="mt-6"
+              >
                 <ExpensesList transactions={transactions} />
               </TabsContent>
-              <TabsContent value="transfer" className="mt-6">
-                <TransferForm accounts={accounts} onTransfer={transferFunds} />
+              <TabsContent
+                value="transfer"
+                className="mt-6"
+              >
+                <TransferForm
+                  accounts={accounts}
+                  onTransfer={transferFunds}
+                />
               </TabsContent>
-              <TabsContent value="accounts" className="mt-6">
+              <TabsContent
+                value="accounts"
+                className="mt-6"
+              >
                 <AccountsList
                   accounts={accounts}
                   onAddAccount={addAccount}
@@ -102,7 +129,10 @@ export default function DailyBudgetApp() {
                   onDeleteAccount={deleteAccount}
                 />
               </TabsContent>
-              <TabsContent value="history" className="mt-6">
+              <TabsContent
+                value="history"
+                className="mt-6"
+              >
                 <TransactionHistory transactions={transactions} />
               </TabsContent>
             </Tabs>
@@ -111,10 +141,12 @@ export default function DailyBudgetApp() {
             <Button
               className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg"
               onClick={() => setIsExpenseModalOpen(true)}
-              title={t("addExpense")}
+              title={t('addExpense')}
             >
               <Plus className="h-6 w-6" />
             </Button>
+
+            <AddButton />
 
             {/* Expense Modal */}
             <ExpenseModal
@@ -131,9 +163,13 @@ export default function DailyBudgetApp() {
   )
 }
 
-function SetupForm({ onSetup }: { onSetup: (data: { startAmount: number; endDate: Date | null }) => void }) {
+function SetupForm({
+  onSetup
+}: {
+  onSetup: (data: { startAmount: number; endDate: Date }) => void
+}) {
   const { t } = useLanguage()
-  const [startAmount, setStartAmount] = useState("")
+  const [startAmount, setStartAmount] = useState(0)
   const [endDate, setEndDate] = useState<Date | null>(null)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -141,38 +177,47 @@ function SetupForm({ onSetup }: { onSetup: (data: { startAmount: number; endDate
     if (!startAmount || !endDate) return
 
     onSetup({
-      startAmount: Number.parseFloat(startAmount),
-      endDate,
+      startAmount: startAmount,
+      endDate
     })
   }
 
   return (
     <Card className="max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>{t("setupTitle")}</CardTitle>
-        <CardDescription>{t("setupDescription")}</CardDescription>
+        <CardTitle>{t('setupTitle')}</CardTitle>
+        <CardDescription>{t('setupDescription')}</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="startAmount">{t("startingAmount")}</Label>
+            <Label htmlFor="startAmount">{t('startingAmount')}</Label>
             <Input
               id="startAmount"
               type="number"
               placeholder="1000.00"
               value={startAmount}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setStartAmount(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setStartAmount(e.target.valueAsNumber)
+              }
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="endDate">{t("endDate")}</Label>
-            <DatePicker date={endDate} setDate={setEndDate} className="w-full" />
+            <Label htmlFor="endDate">{t('endDate')}</Label>
+            <DatePicker
+              date={endDate}
+              setDate={setEndDate}
+              className="w-full"
+            />
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
-            {t("startTracking")}
+          <Button
+            type="submit"
+            className="w-full"
+          >
+            {t('startTracking')}
           </Button>
         </CardFooter>
       </form>
@@ -185,7 +230,7 @@ function DailyBudgetStatus({
   remainingToday,
   progress,
   accounts,
-  remainingDays,
+  remainingDays
 }: {
   dailyAllowance: number
   remainingToday: number
@@ -198,7 +243,7 @@ function DailyBudgetStatus({
 
   // Find the daily budget account
   const dailyAccount: { id: string; balance: number } | undefined = accounts.find(
-    (acc: { id: string; balance: number }) => acc.id === "daily"
+    (acc: { id: string; balance: number }) => acc.id === 'daily'
   )
   const totalBudget = dailyAccount ? dailyAccount.balance : 0
 
@@ -206,31 +251,44 @@ function DailyBudgetStatus({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <CardTitle>{t("dailyBudget")}</CardTitle>
-          <CardDescription>{t("budgetForToday")}</CardDescription>
+          <CardTitle>{t('dailyBudget')}</CardTitle>
+          <CardDescription>{t('budgetForToday')}</CardDescription>
         </div>
         <div className="text-right">
-          <p className="text-sm font-medium text-muted-foreground">{t("dailyAllowance")}</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            {t('dailyAllowance')}
+          </p>
           <p className="text-xl font-bold">{formatCurrency(dailyAllowance)}</p>
         </div>
       </CardHeader>
       <CardContent className="flex flex-col items-center space-y-6">
-        <CircularProgress value={progress} size={200} strokeWidth={15} className="my-4">
+        <CircularProgress
+          value={progress}
+          size={200}
+          strokeWidth={15}
+          className="my-4"
+        >
           <div className="text-center">
-            <p className="text-sm font-medium text-muted-foreground">{t("remainingToday")}</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('remainingToday')}
+            </p>
             <p className="text-3xl font-bold">{formatCurrency(remainingToday)}</p>
           </div>
         </CircularProgress>
 
         <div className="grid grid-cols-2 gap-4 w-full">
           <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">{t("remainingDays")}</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('remainingDays')}
+            </p>
             <p className="text-2xl font-bold">
-              {remainingDays} {t("days")}
+              {remainingDays} {t('days')}
             </p>
           </div>
           <div className="space-y-2 text-right">
-            <p className="text-sm font-medium text-muted-foreground">{t("totalBudget")}</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('totalBudget')}
+            </p>
             <p className="text-2xl font-bold">{formatCurrency(totalBudget)}</p>
           </div>
         </div>

@@ -1,32 +1,33 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { differenceInDays, startOfDay, isSameDay } from "date-fns"
-import { v4 as uuidv4 } from "uuid"
+import { useState, useEffect } from 'react'
+import { differenceInDays, startOfDay, isSameDay } from 'date-fns'
+import { v4 as uuidv4 } from 'uuid'
+
+import { Account, Budget, Transaction } from '@/types'
 
 // This would be replaced with actual KV database calls
-const LOCAL_STORAGE_KEY = "daily-budget-data"
+const LOCAL_STORAGE_KEY = 'daily-budget-data'
 
 // Default account IDs that cannot be deleted
-const DEFAULT_ACCOUNT_IDS = ["daily", "savings", "investment"]
+const DEFAULT_ACCOUNT_IDS = ['daily', 'savings', 'investment']
 
 export function useBudget() {
   const [isSetup, setIsSetup] = useState(false)
-  const [budget, setBudget] = useState({
+  const [budget, setBudget] = useState<Budget>({
     startAmount: 0,
     endDate: null,
-    startDate: null,
+    startDate: null
   })
-  const [accounts, setAccounts] = useState([
-    { id: "daily", name: "Daily Budget", type: "daily", balance: 0, icon: "wallet" },
-    { id: "savings", name: "Savings", type: "savings", balance: 0, icon: "piggybank" },
-    { id: "investment", name: "Investment", type: "investment", balance: 0, icon: "trending" },
+  const [accounts, setAccounts] = useState<Account[]>([
+    { id: 'daily', name: 'Daily Budget', type: 'daily', balance: 0, icon: 'wallet' },
+    { id: 'savings', name: 'Savings', type: 'savings', balance: 0, icon: 'piggybank' }
   ])
-  const [transactions, setTransactions] = useState([])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [dailyAllowance, setDailyAllowance] = useState(0)
   const [remainingToday, setRemainingToday] = useState(0)
   const [progress, setProgress] = useState(100)
-  const [lastCheckedDay, setLastCheckedDay] = useState(null)
+  const [lastCheckedDay, setLastCheckedDay] = useState<Date | null>(null)
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -69,11 +70,20 @@ export function useBudget() {
           remainingToday,
           progress,
           lastCheckedDay,
-          isSetup,
-        }),
+          isSetup
+        })
       )
     }
-  }, [budget, accounts, transactions, dailyAllowance, remainingToday, progress, lastCheckedDay, isSetup])
+  }, [
+    budget,
+    accounts,
+    transactions,
+    dailyAllowance,
+    remainingToday,
+    progress,
+    lastCheckedDay,
+    isSetup
+  ])
 
   // Check for day change and update budget
   useEffect(() => {
@@ -87,10 +97,10 @@ export function useBudget() {
       if (lastCheckedDay && remainingToday > 0) {
         // Add remaining amount to savings and discount from daily
         const updatedAccounts = accounts.map((account) => {
-          if (account.id === "savings") {
+          if (account.id === 'savings') {
             return { ...account, balance: account.balance + remainingToday }
           }
-          if(account.id === "daily") {
+          if (account.id === 'daily') {
             return { ...account, balance: account.balance - remainingToday }
           }
           return account
@@ -101,8 +111,8 @@ export function useBudget() {
           id: uuidv4(),
           date: new Date().toISOString(),
           amount: remainingToday,
-          description: "Daily budget savings",
-          account: "savings",
+          description: 'Daily budget savings',
+          account: 'savings'
         }
 
         setAccounts(updatedAccounts)
@@ -132,7 +142,7 @@ export function useBudget() {
     }
 
     // Get total balance from main account
-    const mainAccount = accounts.find((a) => a.id === "daily")
+    const mainAccount = accounts.find((a) => a.id === 'daily')
     const totalBalance = mainAccount ? mainAccount.balance : 0
 
     const newDailyAllowance = totalBalance / daysRemaining
@@ -150,19 +160,25 @@ export function useBudget() {
   }
 
   // Set up initial budget
-  const setupBudget = ({ startAmount, endDate }) => {
+  const setupBudget = ({
+    startAmount,
+    endDate
+  }: {
+    startAmount: number
+    endDate: Date
+  }) => {
     const today = new Date()
 
     // Create initial budget
-    const newBudget = {
+    const newBudget: Budget = {
       startAmount,
       startDate: today,
-      endDate,
+      endDate
     }
 
     // Update daily account with starting amount
     const updatedAccounts = accounts.map((account) => {
-      if (account.id === "daily") {
+      if (account.id === 'daily') {
         return { ...account, balance: startAmount }
       }
       return account
@@ -173,8 +189,8 @@ export function useBudget() {
       id: uuidv4(),
       date: today.toISOString(),
       amount: startAmount,
-      description: "Initial deposit",
-      account: "daily",
+      description: 'Initial deposit',
+      account: 'daily'
     }
 
     setBudget(newBudget)
@@ -192,20 +208,30 @@ export function useBudget() {
   }
 
   // Add a new expense
-  const addExpense = ({ amount, description, account }) => {
+  const addExpense = ({
+    amount,
+    description,
+    account,
+    date = new Date().toISOString()
+  }: {
+    amount: number
+    description: string
+    account: string
+    date?: string
+  }) => {
     // Create transaction record
     const transaction = {
       id: uuidv4(),
-      date: new Date().toISOString(),
+      date,
       amount: -amount, // Negative for expenses
       description,
-      account,
+      account
     }
 
     // Update accounts based on expense logic
     let updatedAccounts = [...accounts]
 
-    if (account === "daily") {
+    if (account === 'daily') {
       // If expense is less than or equal to remaining daily amount
       if (amount <= remainingToday) {
         // Simply reduce the remaining amount for today
@@ -215,7 +241,7 @@ export function useBudget() {
 
         // Update daily account balance
         updatedAccounts = accounts.map((acc) => {
-          if (acc.id === "daily") {
+          if (acc.id === 'daily') {
             return { ...acc, balance: acc.balance - amount }
           }
           return acc
@@ -224,7 +250,7 @@ export function useBudget() {
       // If expense exceeds remaining daily amount
       else {
         const remainingNeeded = amount - remainingToday
-        const savingsAccount = accounts.find((acc) => acc.id === "savings")
+        const savingsAccount = accounts.find((acc) => acc.id === 'savings')
 
         // If savings can cover the difference
         if (savingsAccount && savingsAccount.balance >= remainingNeeded) {
@@ -233,16 +259,16 @@ export function useBudget() {
             id: uuidv4(),
             date: new Date().toISOString(),
             amount: -remainingNeeded,
-            description: "Withdrawal to cover daily expense",
-            account: "savings",
+            description: 'Withdrawal to cover daily expense',
+            account: 'savings'
           }
 
           // Update both accounts
           updatedAccounts = accounts.map((acc) => {
-            if (acc.id === "daily") {
+            if (acc.id === 'daily') {
               return { ...acc, balance: acc.balance - remainingToday }
             }
-            if (acc.id === "savings") {
+            if (acc.id === 'savings') {
               return { ...acc, balance: acc.balance - remainingNeeded }
             }
             return acc
@@ -264,8 +290,8 @@ export function useBudget() {
               id: uuidv4(),
               date: new Date().toISOString(),
               amount: -savingsBalance,
-              description: "Withdrawal to cover daily expense",
-              account: "savings",
+              description: 'Withdrawal to cover daily expense',
+              account: 'savings'
             }
             setTransactions([savingsTransaction, ...transactions, transaction])
           } else {
@@ -274,19 +300,19 @@ export function useBudget() {
 
           // Update accounts
           updatedAccounts = accounts.map((acc) => {
-            if (acc.id === "daily") {
+            if (acc.id === 'daily') {
               return { ...acc, balance: acc.balance - remainingToday - stillNeeded }
             }
-            if (acc.id === "savings" && savingsBalance > 0) {
+            if (acc.id === 'savings' && savingsBalance > 0) {
               return { ...acc, balance: 0 }
             }
             return acc
           })
 
           // Recalculate daily allowance with remaining balance
-          const dailyAccount = updatedAccounts.find((acc) => acc.id === "daily")
+          const dailyAccount = updatedAccounts.find((acc) => acc.id === 'daily')
           const today = new Date()
-          const daysRemaining = differenceInDays(budget.endDate, today) + 1
+          const daysRemaining = differenceInDays(budget.endDate || '', today) + 1
 
           if (daysRemaining > 0 && dailyAccount) {
             const newDailyAllowance = dailyAccount.balance / daysRemaining
@@ -312,13 +338,23 @@ export function useBudget() {
   }
 
   // Add a new account
-  const addAccount = ({ name, type, balance = 0, icon = "wallet" }) => {
+  const addAccount = ({
+    name,
+    type,
+    balance = 0,
+    icon = 'wallet'
+  }: {
+    name: string
+    type: string
+    balance: number
+    icon: string
+  }) => {
     const newAccount = {
       id: uuidv4(),
       name,
       type,
       balance,
-      icon,
+      icon
     }
 
     setAccounts([...accounts, newAccount])
@@ -330,7 +366,7 @@ export function useBudget() {
         date: new Date().toISOString(),
         amount: balance,
         description: `Initial deposit to ${name}`,
-        account: newAccount.id,
+        account: newAccount.id
       }
 
       setTransactions([transaction, ...transactions])
@@ -338,7 +374,7 @@ export function useBudget() {
   }
 
   // Update an existing account
-  const updateAccount = (updatedAccount) => {
+  const updateAccount = (updatedAccount: Account) => {
     const updatedAccounts = accounts.map((account) => {
       if (account.id === updatedAccount.id) {
         return { ...account, ...updatedAccount }
@@ -350,7 +386,7 @@ export function useBudget() {
   }
 
   // Delete an account
-  const deleteAccount = (accountId) => {
+  const deleteAccount = (accountId: string) => {
     // Don't allow deletion of default accounts
     if (DEFAULT_ACCOUNT_IDS.includes(accountId)) {
       return false
@@ -368,7 +404,7 @@ export function useBudget() {
         date: new Date().toISOString(),
         amount: accountToDelete.balance,
         description: `Transfer from deleted account: ${accountToDelete.name}`,
-        account: "savings",
+        account: 'savings'
       }
 
       // Create deletion transaction
@@ -377,14 +413,14 @@ export function useBudget() {
         date: new Date().toISOString(),
         amount: -accountToDelete.balance,
         description: `Account deleted: ${accountToDelete.name}`,
-        account: accountId,
+        account: accountId
       }
 
       // Update savings account balance
       const updatedAccounts = accounts
         .filter((acc) => acc.id !== accountId)
         .map((acc) => {
-          if (acc.id === "savings") {
+          if (acc.id === 'savings') {
             return { ...acc, balance: acc.balance + accountToDelete.balance }
           }
           return acc
@@ -401,14 +437,25 @@ export function useBudget() {
   }
 
   // Transfer funds between accounts
-  const transferFunds = ({ amount, fromAccount, toAccount, description }) => {
+  const transferFunds = ({
+    amount,
+    fromAccount,
+    toAccount,
+    description
+  }: {
+    amount: number
+    fromAccount: string
+    toAccount: string
+    description?: string
+  }) => {
     // Create withdrawal transaction
     const withdrawalTransaction = {
       id: uuidv4(),
       date: new Date().toISOString(),
       amount: -amount,
-      description: description || "Transfer to " + accounts.find((a) => a.id === toAccount)?.name,
-      account: fromAccount,
+      description:
+        description || 'Transfer to ' + accounts.find((a) => a.id === toAccount)?.name,
+      account: fromAccount
     }
 
     // Create deposit transaction
@@ -416,8 +463,10 @@ export function useBudget() {
       id: uuidv4(),
       date: new Date().toISOString(),
       amount: amount,
-      description: description || "Transfer from " + accounts.find((a) => a.id === fromAccount)?.name,
-      account: toAccount,
+      description:
+        description ||
+        'Transfer from ' + accounts.find((a) => a.id === fromAccount)?.name,
+      account: toAccount
     }
 
     // Update account balances
@@ -436,9 +485,15 @@ export function useBudget() {
   }
 
   // Update budget configuration
-  const updateConfig = ({ startAmount, endDate }) => {
+  const updateConfig = ({
+    startAmount,
+    endDate
+  }: {
+    startAmount: number
+    endDate: Date
+  }) => {
     // Get current daily account balance
-    const dailyAccount = accounts.find((a) => a.id === "daily")
+    const dailyAccount = accounts.find((a) => a.id === 'daily')
     const currentBalance = dailyAccount ? dailyAccount.balance : 0
 
     // Calculate difference to add or subtract
@@ -448,12 +503,12 @@ export function useBudget() {
     const updatedBudget = {
       ...budget,
       startAmount,
-      endDate,
+      endDate
     }
 
     // Update daily account balance
     const updatedAccounts = accounts.map((account) => {
-      if (account.id === "daily") {
+      if (account.id === 'daily') {
         return { ...account, balance: currentBalance + balanceDifference }
       }
       return account
@@ -465,8 +520,8 @@ export function useBudget() {
         id: uuidv4(),
         date: new Date().toISOString(),
         amount: balanceDifference,
-        description: "Budget adjustment",
-        account: "daily",
+        description: 'Budget adjustment',
+        account: 'daily'
       }
       setTransactions([transaction, ...transactions])
     }
@@ -501,6 +556,6 @@ export function useBudget() {
     deleteAccount,
     transferFunds,
     updateConfig,
-    getRemainingDays,
+    getRemainingDays
   }
 }
