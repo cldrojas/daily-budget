@@ -246,80 +246,26 @@ export function useBudget() {
           }
           return acc
         })
-      }
-      // If expense exceeds remaining daily amount
-      else {
-        const remainingNeeded = amount - remainingToday
-        const savingsAccount = accounts.find((acc) => acc.id === 'savings')
-
-        // If savings can cover the difference
-        if (savingsAccount && savingsAccount.balance >= remainingNeeded) {
-          // Create additional transaction for savings withdrawal
-          const savingsTransaction = {
-            id: uuidv4(),
-            date: new Date().toISOString(),
-            amount: -remainingNeeded,
-            description: 'Withdrawal to cover daily expense',
-            account: 'savings'
+      } else {
+        // Update accounts
+        updatedAccounts = accounts.map((acc) => {
+          if (acc.id === 'daily') {
+            return { ...acc, balance: acc.balance - amount }
           }
+          return acc
+        })
 
-          // Update both accounts
-          updatedAccounts = accounts.map((acc) => {
-            if (acc.id === 'daily') {
-              return { ...acc, balance: acc.balance - remainingToday }
-            }
-            if (acc.id === 'savings') {
-              return { ...acc, balance: acc.balance - remainingNeeded }
-            }
-            return acc
-          })
+        setTransactions([transaction, ...transactions])
+        // Recalculate daily allowance with remaining balance
+        const dailyAccount = updatedAccounts.find((acc) => acc.id === 'daily')
+        const today = new Date()
+        const daysRemaining = differenceInDays(budget.endDate || '', today) + 1
 
-          setTransactions([savingsTransaction, ...transactions, transaction])
+        if (daysRemaining > 0 && dailyAccount) {
+          const newDailyAllowance = dailyAccount.balance / daysRemaining
+          setDailyAllowance(newDailyAllowance)
           setRemainingToday(0)
           setProgress(0)
-        }
-        // If savings can't cover, recalculate daily allowance
-        else {
-          // Use whatever is in savings
-          const savingsBalance = savingsAccount ? savingsAccount.balance : 0
-          const stillNeeded = remainingNeeded - savingsBalance
-
-          // Create savings withdrawal transaction if needed
-          if (savingsBalance > 0) {
-            const savingsTransaction = {
-              id: uuidv4(),
-              date: new Date().toISOString(),
-              amount: -savingsBalance,
-              description: 'Withdrawal to cover daily expense',
-              account: 'savings'
-            }
-            setTransactions([savingsTransaction, ...transactions, transaction])
-          } else {
-            setTransactions([transaction, ...transactions])
-          }
-
-          // Update accounts
-          updatedAccounts = accounts.map((acc) => {
-            if (acc.id === 'daily') {
-              return { ...acc, balance: acc.balance - remainingToday - stillNeeded }
-            }
-            if (acc.id === 'savings' && savingsBalance > 0) {
-              return { ...acc, balance: 0 }
-            }
-            return acc
-          })
-
-          // Recalculate daily allowance with remaining balance
-          const dailyAccount = updatedAccounts.find((acc) => acc.id === 'daily')
-          const today = new Date()
-          const daysRemaining = differenceInDays(budget.endDate || '', today) + 1
-
-          if (daysRemaining > 0 && dailyAccount) {
-            const newDailyAllowance = dailyAccount.balance / daysRemaining
-            setDailyAllowance(newDailyAllowance)
-            setRemainingToday(0)
-            setProgress(0)
-          }
         }
       }
     } else {
