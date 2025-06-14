@@ -1,0 +1,38 @@
+---
+const links = [
+  {
+    href: '/',
+    text: 'Expenses'
+  },
+  {
+    href: '/about',
+    text: 'Accounts'
+  },
+  {
+    href: '/settings',
+    text: 'Transfers'
+  },
+
+  {
+    href: '/logout',
+    text: 'History'
+  }
+]
+---
+
+<nav class="flex w-full items-center justify-between bg-gray-800 px-4 py-1 rounded-lg my-2">
+  {
+    links.map((link, i) => (
+      <>
+        <a
+          href={link.href}
+          class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-md font-medium"
+          aria-current={i === 0 ? 'page' : undefined}
+        >
+          {link.text}
+        </a>
+        {i < links.length - 1 && <span class="text-gray-500">|</span>}
+      </>
+    ))
+  }
+</nav>

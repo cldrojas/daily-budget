@@ -1,3 +1,7 @@
+---
+import TitleBar from '../components/TitleBar.astro'
+---
+
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -15,13 +19,17 @@
       name="generator"
       content={Astro.generator}
     />
-    <title>Astro Basics</title>
+    <title>Daily Budget</title>
     <link
       rel="stylesheet"
       href="/src/styles/global.css"
     />
   </head>
-  <body>
-    <slot />
+  <!-- TODO: add theme selector -->
+  <body class="bg-gray-900 text-gray-200 flex">
+    <main class="border border-gray-700 rounded-lg w-full mt-8 px-4 py-2">
+      <TitleBar />
+      <slot />
+    </main>
   </body>
 </html>

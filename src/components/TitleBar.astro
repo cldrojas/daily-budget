@@ -1,0 +1,71 @@
+---
+const toggles = [
+  {
+    code: 'language',
+    onclick: () => {
+      console.log('Selecting language')
+    },
+    label: 'Toggle Language',
+    icon: 'language',
+    active: false
+  },
+  {
+    code: 'currency',
+    onclick: () => {
+      console.log('Selecting currency')
+    },
+    label: 'Toggle Currency',
+    icon: 'currency',
+    active: false
+  },
+  {
+    code: 'theme',
+    onclick: () => {
+      console.log('Toggling theme')
+    },
+    label: 'Toggle Theme',
+    icon: 'theme',
+    active: false
+  }
+]
+---
+
+<div class="flex justify-between items-center text-sm">
+  <h1 class="">Daily Budget</h1>
+  <div class="flex items-center gap-4">
+    {
+      toggles.map((toggle) => (
+        <button
+          class="bg-gray-800 text-gray-400 hover:text-white px-2 py-1 rounded-md text-xs font-thin cursor-pointer"
+          aria-label={toggle.label}
+          aria-code={toggle.code}
+        >
+          {toggle.code}
+        </button>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  // This script is intentionally left empty for now.
+  // You can add interactivity later if needed.
+  // For example, you could handle the click events for the toggles here.
+
+  document.querySelectorAll('button').forEach((button) => {
+    const buttonCode = button.getAttribute('aria-code')
+    // Add a click event listener to each button
+    button.addEventListener('click', (event) => {
+      console.log(`DEBUG:buttonCode:`, buttonCode)
+      console.log(`DEBUG:event:`, event)
+      // const code = event.target.getAttribute('aria-code');
+      // console.log(`Button clicked: ${code}`);
+      // // Here you can add the logic to handle the toggle actions
+      // // For example, you could call the onclick function associated with the toggle
+      // const toggle = toggles.find(t => t.code === code);
+      // if (toggle && typeof toggle.onclick === 'function') {
+      //   toggle.onclick();
+      // }
+    })
+  })
+</script>

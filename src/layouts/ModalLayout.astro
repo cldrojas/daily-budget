@@ -1,0 +1,17 @@
+---
+import Layout from './Layout.astro'
+---
+
+<Layout>
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 shadow-lg max-w-md w-full">
+      <slot />
+    </div>
+  </div>
+</Layout>
+
+<style>
+  body {
+    overflow: hidden; /* Prevent scrolling when modal is open */
+  }
+</style>
