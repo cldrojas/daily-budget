@@ -20,23 +20,25 @@ const tabs = [
 ]
 ---
 
-<nav
-  class="flex w-full items-center justify-between bg-gray-800 px-4 py-1 rounded-lg my-2"
->
-  {
-    tabs.map((tab, i) => (
-      <>
-        <a
-          href={tab.href}
-          class={`text-gray-400 hover:text-white px-3 py-2  text-md font-medium ${
-            Astro.url.pathname === tab.href && 'text-white'
-          }`}
-          aria-current={i === 0 ? 'page' : undefined}
-        >
-          {tab.text}
-        </a>
-        {i < tabs.length - 1 && <span class="text-gray-500">|</span>}
-      </>
-    ))
-  }
-</nav>
+<footer class="bg-slate-700">
+  <nav
+    class="flex w-full items-center justify-between bg-gray-800 px-4 py-1 rounded-lg my-2"
+  >
+    {
+      tabs.map((tab, i) => (
+        <>
+          <a
+            href={tab.href}
+            class={`text-gray-400 hover:text-white px-3 py-2  text-md font-medium ${
+              Astro.url.pathname === tab.href && 'text-white'
+            }`}
+            aria-current={i === 0 ? 'page' : undefined}
+          >
+            {tab.text}
+          </a>
+          {i < tabs.length - 1 && <span class="text-gray-500">|</span>}
+        </>
+      ))
+    }
+  </nav>
+</footer>
