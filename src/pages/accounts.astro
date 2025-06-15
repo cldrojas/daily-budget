@@ -1,33 +1,10 @@
 ---
+import ExpensesList from '../components/ExpensesList.astro'
+import OverView from '../components/OverView.astro'
 import Layout from '../layouts/Layout.astro'
 ---
 
 <Layout>
-  <ul>
-    <li class="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
-      <div>
-        <h3 class="text-md font-semibold">Groceries</h3>
-        <p class="text-xs text-gray-400">
-          {new Date('2023-10-01').toLocaleDateString('en-es', { dateStyle: 'medium' })} - Personal
-        </p>
-      </div>
-      <div>
-        <span class="text-red-400">$50.00</span>
-        <button class="text-gray-400 hover:text-white font-semibold pl-1">:</button>
-      </div>
-    </li>
-    <li class="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
-      <div>
-        <h3 class="text-md font-semibold">Utilities</h3>
-        <p class="text-xs text-gray-400">
-          {new Date('2023-10-02').toLocaleDateString('en-es', { dateStyle: 'medium' })} - Household
-        </p>
-      </div>
-      <div>
-        <span class="text-red-400">$75.00</span>
-        <button class="text-gray-400 hover:text-white font-semibold pl-1">:</button>
-      </div>
-    </li>
-    <!-- Add more expenses as needed -->
-  </ul>
+  <OverView asBar={true} />
+  <ExpensesList />
 </Layout>
