@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@astrojs/cloudflare": "^12.5.4",
-    "@cloudflare/workerd-darwin-64": "1.20240327.0",
     "@tailwindcss/vite": "^4.1.8",
     "astro": "^5.9.2",
     "tailwindcss": "^4.1.8"
@@ -20,6 +19,9 @@
   "devDependencies": {
     "@types/node": "^24.0.0",
     "wrangler": "^4.20.0"
+  },
+  "optionalDependencies": {
+    "@cloudflare/workerd-darwin-64": "1.20240327.0"
   },
   "overrides": {
     "@cloudflare/workerd-darwin-64": "1.20240327.0"
