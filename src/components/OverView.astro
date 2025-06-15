@@ -1,39 +1,122 @@
 ---
 import RoundProgressBar from './RoundProgressBar.astro'
+
+const accounts = [
+  { id: 'rut', name: 'Cta RUT' },
+  { id: 'mach', name: 'Mach' },
+  { id: 'mercado', name: 'Mercadopago' },
+  { id: 'coopeuch', name: 'Coopeuch vista' }
+]
+
+const data = [
+  {
+    key: 'daysleft',
+    value: 5,
+    order: 2,
+    name: 'Remaining days',
+    shortName: 'days',
+    class: '',
+    barClass: 'text-blue-500'
+  },
+  {
+    key: 'total',
+    value: 500,
+    order: 1,
+    name: 'Total amount',
+    shortName: 'total',
+    class: 'text-green-500',
+    barClass: 'text-gray-300'
+  },
+  {
+    key: 'remaining',
+    value: 50,
+    order: 4,
+    name: 'Remaining balance',
+    shortName: 'remaining',
+    class: 'text-yellow-500',
+    barClass: 'text-yellow-500',
+    onlyBar: true
+  },
+  {
+    key: 'allowance',
+    value: 100,
+    order: 3,
+    name: 'Daily allowance',
+    shortName: 'allowance',
+    class: 'absolute top-1 right-0',
+    barClass: 'text-red-500'
+  }
+]
+
+const { asBar = false } = Astro.props
 ---
 
-<main class="border border-gray-700 rounded-lg w-full my-2 p-4">
-  <div>
-    <div class="flex items-start justify-between">
-      <div class="">
-        <select
-          class="bg-gray-800 text-gray-400 border border-gray-700 rounded-md px-2 py-1 text-sm cursor-pointer"
+<main class={asBar ? 'px-1' : 'border border-gray-700 rounded-lg w-full my-2 p-4'}>
+  <div
+    class={asBar
+      ? 'flex items-center text-xs justify-between p-2 rounded-lg'
+      : 'flex flex-col gap-4 relative'}
+  >
+    <div class={asBar ? ' flex' : 'flex items-start justify-between'}>
+      <div class="SelectedAccount">
+        <label
+          for="account-selector"
+          class="text-sm text-slate-400"
+          >Selected Account</label
         >
-          <option value="rut">Cta RUT</option>
-          <option value="mach">Mach</option>
-          <option value="mercado">Mercadopago</option>
-          <option value="coopeuch">Coopeuch vista</option>
+        <select
+          id="account-selector"
+          name="account-selector"
+          class="bg-gray-800 text-gray-400 border border-gray-700 rounded-md px-2 text-xs 
+          flex text-center cursor-pointer outline-none"
+        >
+          {
+            accounts.map((account) => (
+              <option
+                value={account.id}
+                selected={account.id === 'rut'}
+              >
+                {account.name}
+              </option>
+            ))
+          }
         </select>
       </div>
-      <div class="flex flex-col items-center">
-        <h2 class="text-gray-400 text-xs">Daily allowance</h2>
-        <h2 class="text-xl font-bold">$100</h2>
-      </div>
     </div>
-    <RoundProgressBar
-      class="mt-4"
-      max={100}
-      current={50}
-    />
-    <div class="flex justify-between items-end-safe text-gray-400">
-      <div class="flex flex-col items-center">
-        <h2>Remainig days</h2>
-        <span class="text-white">5</span>
-      </div>
-      <div class="flex flex-col items-center">
-        <h2 class="">Total ammount</h2>
-        <span class="text-white">$500</span>
-      </div>
+    {
+      !asBar && (
+        <RoundProgressBar
+          class="mt-4"
+          max={100}
+          current={50}
+        />
+      )
+    }
+    <!-- section: ammounts -->
+    <div
+      class={`flex justify-between ${
+        asBar ? 'items-center gap-4 text-gray-500' : 'items-end-safe text-gray-400'
+      }`}
+    >
+      {
+        data.map((item) => {
+          if (!asBar && item.onlyBar) return null
+
+          return (
+            <div
+              class:list={[
+                asBar ? `order-${item.order} text-center` : 'flex flex-col items-center',
+                asBar ? item.barClass : item.class
+              ]}
+            >
+              <h2 class={asBar ? 'text-gray-300' : 'text-gray-400 text-xs'}>
+                {asBar ? item.shortName : item.name}
+              </h2>
+              <span class="text-white">${item.value}</span>
+            </div>
+          )
+        })
+      }
     </div>
   </div>
 </main>
