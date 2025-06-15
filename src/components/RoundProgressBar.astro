@@ -1,0 +1,39 @@
+---
+const { max, current } = Astro.props
+const value = (current / max) * 100
+---
+
+<div class="flex justify-center items-center">
+  <div class="relative w-[192px] h-[192px] rounded-full">
+    <svg class="relative w-full h-full">
+      <circle
+        class="w-full h-full fill-transparent stroke-gray-800 stroke-[8%]"
+        cx="50%"
+        cy="50%"
+        r="46%"
+        stroke-linecap="round"
+      ></circle>
+      <circle
+        class="w-full h-full fill-transparent stroke-gray-500 stroke-[6%]"
+        cx="50%"
+        cy="50%"
+        r="46%"
+        stroke-linecap="round"
+        stroke-dasharray="calc(192 * 0.46 * 2 * 3.1416)"
+        stroke-dashoffset=`calc(192 * 0.46 * 2 * 3.1416 - (192 * 0.46 * 2 * 3.1416 * ${value}) / 100)`
+      ></circle>
+    </svg>
+    <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+      <h2 class="text-5xl font-bold text-slate-500">${value}</h2>
+      <h3 class="text-xs">Remaining Today</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Dasharray length calculation: circumference = radius * 2 * PI 
+ Source:https://css-tricks.com/building-progress-ring-quickly/ 
+ Example: 192 is our diameter (width) and 46% is our radius so (192 * 0.46) * 2 * PI = 554.9 ~= 555 is our circumference and dasharray. 
+ Usage: 
+  1. Change '192' values to your size in HTML. 
+  2. Change '90' values to your percentage in HTML.
+-->

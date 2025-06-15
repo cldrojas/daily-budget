@@ -1,0 +1,107 @@
+---
+const expenses = [
+  {
+    id: 1,
+    description: 'Groceries',
+    amount: -5000,
+    date: new Date('2023-10-01'),
+    account: 'Personal'
+  },
+  {
+    id: 2,
+    description: 'Utilities',
+    amount: -7500,
+    date: new Date('2023-10-02'),
+    account: 'Household'
+  },
+  {
+    id: 3,
+    description: 'Transport',
+    amount: -2000,
+    date: new Date('2023-10-03'),
+    account: 'Travel'
+  },
+  {
+    id: 4,
+    description: 'Salary',
+    amount: 30000,
+    date: new Date('2023-10-04'),
+    account: 'Personal'
+  },
+  {
+    id: 4,
+    description: 'Salary',
+    amount: 30000,
+    date: new Date('2023-10-04'),
+    account: 'Personal'
+  },
+  {
+    id: 4,
+    description: 'Salary',
+    amount: 30000,
+    date: new Date('2023-10-04'),
+    account: 'Personal'
+  },
+  {
+    id: 4,
+    description: 'Salary',
+    amount: 30000,
+    date: new Date('2023-10-04'),
+    account: 'Personal'
+  },
+  {
+    id: 4,
+    description: 'Salary',
+    amount: 30000,
+    date: new Date('2023-10-04'),
+    account: 'Personal'
+  },
+  {
+    id: 4,
+    description: 'Salary',
+    amount: 30000,
+    date: new Date('2023-10-04'),
+    account: 'Personal'
+  },
+  {
+    id: 4,
+    description: 'Salary',
+    amount: 30000,
+    date: new Date('2023-10-04'),
+    account: 'Personal'
+  },
+  {
+    id: 5,
+    description: 'Entertainment',
+    amount: -4000,
+    date: new Date('2023-10-05'),
+    account: 'Leisure'
+  }
+]
+---
+
+<div class="flex flex-col max-h-82 overflow-y-auto">
+  <ul class="space-y-2 my-4">
+    {
+      expenses.map((expense) => (
+        <li class="flex items-center justify-between p-3 bg-gray-800 rounded-lg">
+          <div>
+            <h3 class="text-md font-semibold">{expense.description}</h3>
+            <p class="text-xs text-gray-400">
+              {expense.date.toLocaleDateString('en-es', {
+                dateStyle: 'medium'
+              })}
+              - {expense.account}
+            </p>
+          </div>
+          <div>
+            <span class={expense.amount < 0 ? 'text-red-400' : 'text-green-400'}>
+              ${Math.abs(expense.amount)}
+            </span>
+            <button class="text-gray-400 hover:text-white font-semibold pl-1">:</button>
+          </div>
+        </li>
+      ))
+    }
+  </ul>
+</div>

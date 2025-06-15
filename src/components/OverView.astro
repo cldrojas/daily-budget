@@ -1,0 +1,39 @@
+---
+import RoundProgressBar from './RoundProgressBar.astro'
+---
+
+<main class="border border-gray-700 rounded-lg w-full my-2 p-4">
+  <div>
+    <div class="flex items-start justify-between">
+      <div class="">
+        <select
+          class="bg-gray-800 text-gray-400 border border-gray-700 rounded-md px-2 py-1 text-sm cursor-pointer"
+        >
+          <option value="rut">Cta RUT</option>
+          <option value="mach">Mach</option>
+          <option value="mercado">Mercadopago</option>
+          <option value="coopeuch">Coopeuch vista</option>
+        </select>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2 class="text-gray-400 text-xs">Daily allowance</h2>
+        <h2 class="text-xl font-bold">$100</h2>
+      </div>
+    </div>
+    <RoundProgressBar
+      class="mt-4"
+      max={100}
+      current={50}
+    />
+    <div class="flex justify-between items-end-safe text-gray-400">
+      <div class="flex flex-col items-center">
+        <h2>Remainig days</h2>
+        <span class="text-white">5</span>
+      </div>
+      <div class="flex flex-col items-center">
+        <h2 class="">Total ammount</h2>
+        <span class="text-white">$500</span>
+      </div>
+    </div>
+  </div>
+</main>

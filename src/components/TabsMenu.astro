@@ -1,37 +1,41 @@
 ---
-const links = [
+const tabs = [
   {
     href: '/',
-    text: 'Expenses'
+    text: 'Home'
   },
   {
-    href: '/about',
+    href: '/accounts',
     text: 'Accounts'
   },
   {
-    href: '/settings',
+    href: '/transfers',
     text: 'Transfers'
   },
 
   {
-    href: '/logout',
+    href: '/history',
     text: 'History'
   }
 ]
 ---
 
-<nav class="flex w-full items-center justify-between bg-gray-800 px-4 py-1 rounded-lg my-2">
+<nav
+  class="flex w-full items-center justify-between bg-gray-800 px-4 py-1 rounded-lg my-2"
+>
   {
-    links.map((link, i) => (
+    tabs.map((tab, i) => (
       <>
         <a
-          href={link.href}
-          class="text-gray-400 hover:text-white px-3 py-2 rounded-md text-md font-medium"
+          href={tab.href}
+          class={`text-gray-400 hover:text-white px-3 py-2  text-md font-medium ${
+            Astro.url.pathname === tab.href && 'text-white'
+          }`}
           aria-current={i === 0 ? 'page' : undefined}
         >
-          {link.text}
+          {tab.text}
         </a>
-        {i < links.length - 1 && <span class="text-gray-500">|</span>}
+        {i < tabs.length - 1 && <span class="text-gray-500">|</span>}
       </>
     ))
   }
