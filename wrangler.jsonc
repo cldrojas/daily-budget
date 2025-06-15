@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "daily-budget",
+	"name": "saldo-cero",
 	"compatibility_date": "2025-06-10",
 	"compatibility_flags": [
 		"nodejs_compat"
