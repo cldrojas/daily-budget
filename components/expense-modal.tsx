@@ -150,6 +150,7 @@ export function ExpenseModal({
                 date={date}
                 setDate={setDate}
                 className="w-full"
+                allowPrevious
               />
             </div>
           </div>
