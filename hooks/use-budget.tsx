@@ -283,6 +283,29 @@ export function useBudget() {
     setAccounts(updatedAccounts)
   }
 
+  // Remove an existing transaction
+  const removeTransaction = (id: string) => {
+    // Get transaction object
+    const transaction = transactions.find((t) => t.id === id)
+    if (transaction) {
+      const { account, amount } = transaction
+      // Update accounts based on expense logic
+      let updatedAccounts = [...accounts]
+
+      updatedAccounts = accounts.map((acc) => {
+        if (acc.id === account) {
+          return { ...acc, balance: acc.balance + amount }
+        }
+        return acc
+      })
+
+      setRemainingToday(remainingToday + amount)
+      setProgress(((remainingToday + amount) / dailyAllowance) * 100)
+      setTransactions(transactions.filter((transaction) => transaction.id !== id))
+      setAccounts(updatedAccounts)
+    }
+  }
+
   // Add a new account
   const addAccount = ({
     name,
@@ -497,6 +520,7 @@ export function useBudget() {
     isSetup,
     setupBudget,
     addExpense,
+    removeTransaction,
     addAccount,
     updateAccount,
     deleteAccount,

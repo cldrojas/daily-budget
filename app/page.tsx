@@ -50,7 +50,8 @@ export default function DailyBudgetApp() {
     isSetup,
     transferFunds,
     updateConfig,
-    getRemainingDays
+    getRemainingDays,
+    removeTransaction
   } = useBudget()
 
   return (
@@ -107,7 +108,10 @@ export default function DailyBudgetApp() {
                 value="expenses"
                 className="mt-6"
               >
-                <ExpensesList transactions={transactions} />
+                <ExpensesList
+                  transactions={transactions}
+                  onDelete={removeTransaction}
+                />
               </TabsContent>
               <TabsContent
                 value="transfer"
@@ -170,7 +174,7 @@ function SetupForm({
 }) {
   const { t } = useLanguage()
   const [startAmount, setStartAmount] = useState(0)
-  const [endDate, setEndDate] = useState<Date | null>(null)
+  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

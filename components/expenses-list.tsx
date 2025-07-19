@@ -63,24 +63,26 @@ export function ExpensesList({
               .map((expense) => (
                 <div
                   key={expense.id}
-                  className="flex items-center justify-between p-3 rounded-md border bg-card hover:bg-accent/50 transition-colors"
+                  className="flex items-center justify-between p-2 rounded-md border bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <div className="flex flex-col">
-                    <span className="font-medium">
-                      {getShortName(expense.description)}
-                    </span>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs text-muted-foreground">
-                        {format(new Date(expense.date), 'd MMM', { locale })}
+                  <main className="flex items-center justify-between w-full">
+                    <div className="flex flex-col bg-red-500">
+                      <span className="font-medium">
+                        {getShortName(expense.description)}
                       </span>
-                      <span className="text-xs text-muted-foreground capitalize">
-                        • {t(expense.account)}
-                      </span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-muted-foreground">
+                          {format(new Date(expense.date), 'd MMM', { locale })}
+                        </span>
+                        <span className="text-xs text-muted-foreground capitalize">
+                          • {t(expense.account)}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <span className="font-semibold text-red-500">
-                    {formatCurrency(Math.abs(expense.amount))}
-                  </span>
+                    <span className="font-semibold text-red-500">
+                      {formatCurrency(Math.abs(expense.amount))}
+                    </span>
+                  </main>
                   <Button
                     variant="ghost"
                     size="icon"
