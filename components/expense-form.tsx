@@ -21,9 +21,8 @@ export function ExpenseForm({ onAddExpense, remainingToday }:
   const [amount, setAmount] = useState("")
   const [description, setDescription] = useState("")
   const [account, setAccount] = useState("daily")
-
+console.log(`render`)
   const handleSubmit = (e: any) => {
-
 
     if (!amount || Number.parseFloat(amount) <= 0) {
       toast({
