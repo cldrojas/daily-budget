@@ -36,6 +36,7 @@ export const translations = {
     updateBudgetSettings: 'Update Budget Settings',
     modifyBudgetConfig: 'Modify your budget configuration',
     updateSettings: 'Update Settings',
+    clearData: 'Clear Data',
     cancel: 'Cancel',
 
     // Tabs
@@ -158,6 +159,7 @@ export const translations = {
     updateBudgetSettings: 'Actualizar Configuración',
     modifyBudgetConfig: 'Modifica la configuración de tu presupuesto',
     updateSettings: 'Actualizar Configuración',
+    clearData: "Borrar Datos",
     cancel: 'Cancelar',
 
     // Tabs
@@ -279,7 +281,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   // Function to get translation
   const t = (key: string, params?: Record<string, string | number>) => {
-    const translation = translations[language][key] || key
+    const translation = translations[language][key as keyof typeof translations[Language]] || key
 
     if (params) {
       return Object.entries(params).reduce((acc, [paramKey, paramValue]) => {
