@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { differenceInDays, startOfDay, isSameDay, isToday } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
-import { Budget, Account, Transaction } from '@/next-env'
+import { Account, Budget, Transaction } from '@/types'
+
 
 
 

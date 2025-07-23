@@ -3,7 +3,7 @@ export type Transaction = {
   amount: number
   description: string
   account: string
-  date: string
+  date: Date
 }
 
 export type Budget = {
