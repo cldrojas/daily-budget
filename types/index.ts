@@ -8,8 +8,8 @@ export type Transaction = {
 
 export type Budget = {
   startAmount: number
-  startDate: Date | null
-  endDate: Date | null
+  startDate: Date | undefined
+  endDate: Date | undefined
 }
 
 export type Account = {

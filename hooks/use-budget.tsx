@@ -18,8 +18,8 @@ export function useBudget() {
   const [isSetup, setIsSetup] = useState(false)
   const [budget, setBudget] = useState<Budget>({
     startAmount: 0,
-    endDate: null,
-    startDate: null
+    endDate: undefined,
+    startDate: undefined
   })
   const [accounts, setAccounts] = useState<Account[]>([
     { id: 'daily', name: 'Daily Budget', type: 'daily', balance: 0, icon: 'wallet' },
