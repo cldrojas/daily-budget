@@ -97,11 +97,12 @@ export default function DailyBudgetApp() {
               />
             </div>
 
-            <Tabs defaultValue="expenses">
+            <Tabs defaultValue="accounts">
               <TabsList className="grid w-full grid-cols-4">
+                {/* TODO: add a way to reorder tabs (drag&drop) */}
+                <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
                 <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
                 <TabsTrigger value="transfer">{t('transfer')}</TabsTrigger>
-                <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
                 <TabsTrigger value="history">{t('history')}</TabsTrigger>
               </TabsList>
               <TabsContent

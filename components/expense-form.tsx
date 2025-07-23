@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { FormEventHandler, useState } from "react"
 import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,7 +12,9 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
 
-export function ExpenseForm({ onAddExpense, remainingToday }) {
+export function ExpenseForm({ onAddExpense, remainingToday }:
+   { onAddExpense: ({ amount, description, account }: 
+    { amount: number, description: string, account: string }) => void, remainingToday: number }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
@@ -20,8 +22,8 @@ export function ExpenseForm({ onAddExpense, remainingToday }) {
   const [description, setDescription] = useState("")
   const [account, setAccount] = useState("daily")
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = (e: any) => {
+
 
     if (!amount || Number.parseFloat(amount) <= 0) {
       toast({
@@ -65,8 +67,8 @@ export function ExpenseForm({ onAddExpense, remainingToday }) {
             <Input
               id="amount"
               type="number"
-              step="0.01"
-              placeholder="0.00"
+              step="1"
+              placeholder="0"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               required

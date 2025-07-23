@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { differenceInDays, startOfDay, isSameDay } from 'date-fns'
+import { differenceInDays, startOfDay, isSameDay, isToday } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
+import { Budget, Account, Transaction } from '@/next-env'
 
-import { Account, Budget, Transaction } from '@/types'
+
 
 // This would be replaced with actual KV database calls
 const LOCAL_STORAGE_KEY = 'daily-budget-data'
@@ -109,7 +110,7 @@ export function useBudget() {
         // Record the transaction
         const savingsTransaction = {
           id: uuidv4(),
-          date: new Date().toISOString(),
+          date: new Date(),
           amount: remainingToday,
           description: 'Daily budget savings',
           account: 'savings'
@@ -187,7 +188,7 @@ export function useBudget() {
     // Record the initial deposit transaction
     const initialTransaction = {
       id: uuidv4(),
-      date: today.toISOString(),
+      date: today,
       amount: startAmount,
       description: 'Initial deposit',
       account: 'daily'
@@ -212,12 +213,12 @@ export function useBudget() {
     amount,
     description,
     account,
-    date = new Date().toISOString()
+    date = new Date()
   }: {
     amount: number
     description: string
     account: string
-    date?: string
+    date?: Date
   }) => {
     // Create transaction record
     const transaction = {
@@ -294,13 +295,16 @@ export function useBudget() {
 
       updatedAccounts = accounts.map((acc) => {
         if (acc.id === account) {
-          return { ...acc, balance: acc.balance + amount }
+          return { ...acc, balance: acc.balance + Math.abs(amount) }
         }
         return acc
       })
 
-      setRemainingToday(remainingToday + amount)
-      setProgress(((remainingToday + amount) / dailyAllowance) * 100)
+      if (isToday(transaction.date)) {
+        console.log(`DEBUG:transaction.date:`, transaction.date)
+        setRemainingToday(remainingToday + Math.abs(amount))
+        setProgress(((remainingToday + Math.abs(amount)) / dailyAllowance) * 100)
+      }
       setTransactions(transactions.filter((transaction) => transaction.id !== id))
       setAccounts(updatedAccounts)
     }
@@ -332,7 +336,7 @@ export function useBudget() {
     if (balance > 0) {
       const transaction = {
         id: uuidv4(),
-        date: new Date().toISOString(),
+        date: new Date(),
         amount: balance,
         description: `Initial deposit to ${name}`,
         account: newAccount.id
@@ -366,11 +370,12 @@ export function useBudget() {
     if (!accountToDelete) return false
 
     // If account has balance, transfer it to savings
+    // TODO: If account has balance, ask for save/discard and choose where to save
     if (accountToDelete.balance > 0) {
       // Create transfer transaction
       const transferTransaction = {
         id: uuidv4(),
-        date: new Date().toISOString(),
+        date: new Date(),
         amount: accountToDelete.balance,
         description: `Transfer from deleted account: ${accountToDelete.name}`,
         account: 'savings'
@@ -379,7 +384,7 @@ export function useBudget() {
       // Create deletion transaction
       const deletionTransaction = {
         id: uuidv4(),
-        date: new Date().toISOString(),
+        date: new Date(),
         amount: -accountToDelete.balance,
         description: `Account deleted: ${accountToDelete.name}`,
         account: accountId
@@ -420,7 +425,7 @@ export function useBudget() {
     // Create withdrawal transaction
     const withdrawalTransaction = {
       id: uuidv4(),
-      date: new Date().toISOString(),
+      date: new Date(),
       amount: -amount,
       description:
         description || 'Transfer to ' + accounts.find((a) => a.id === toAccount)?.name,
@@ -430,7 +435,7 @@ export function useBudget() {
     // Create deposit transaction
     const depositTransaction = {
       id: uuidv4(),
-      date: new Date().toISOString(),
+      date: new Date(),
       amount: amount,
       description:
         description ||
@@ -487,7 +492,7 @@ export function useBudget() {
     if (balanceDifference !== 0) {
       const transaction = {
         id: uuidv4(),
-        date: new Date().toISOString(),
+        date: new Date(),
         amount: balanceDifference,
         description: 'Budget adjustment',
         account: 'daily'
