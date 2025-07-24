@@ -12,6 +12,7 @@ export const translations = {
     appName: 'Daily Budget',
     darkMode: 'Dark Mode',
     lightMode: 'Light Mode',
+    youSure: 'Are you sure?',
 
     // Setup
     setupTitle: 'Set Up Your Budget',
@@ -135,6 +136,7 @@ export const translations = {
     appName: 'Presupuesto Diario',
     darkMode: 'Modo Oscuro',
     lightMode: 'Modo Claro',
+    youSure: 'Confirmas?',
 
     // Setup
     setupTitle: 'Configura tu Presupuesto',
