@@ -213,7 +213,7 @@ export function useBudget() {
   const addExpense = ({
     amount,
     description,
-    account,
+    account, // accountId
     date = new Date()
   }: {
     amount: number
@@ -459,6 +459,12 @@ export function useBudget() {
     setTransactions([depositTransaction, withdrawalTransaction, ...transactions])
   }
 
+  // Clear data from localstorage
+  const clearData = () => {
+    setIsSetup(false)
+    localStorage.removeItem(LOCAL_STORAGE_KEY)
+  }
+
   // Update budget configuration
   const updateConfig = ({
     startAmount,
@@ -528,6 +534,7 @@ export function useBudget() {
     addExpense,
     removeTransaction,
     addAccount,
+    clearData,
     updateAccount,
     deleteAccount,
     transferFunds,

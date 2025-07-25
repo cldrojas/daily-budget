@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEventHandler, useState } from "react"
+import { FormEvent, useState } from "react"
 import { PlusCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,8 +13,10 @@ import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
 
 export function ExpenseForm({ onAddExpense, remainingToday }:
-   { onAddExpense: ({ amount, description, account }: 
-    { amount: number, description: string, account: string }) => void, remainingToday: number }) {
+  {
+    onAddExpense: ({ amount, description, account }:
+      { amount: number, description: string, account: string }) => void, remainingToday: number
+  }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
@@ -22,9 +24,8 @@ export function ExpenseForm({ onAddExpense, remainingToday }:
   const [description, setDescription] = useState("")
   const [account, setAccount] = useState("daily")
 
-  const handleSubmit = (e: any) => {
-
-
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault()
     if (!amount || Number.parseFloat(amount) <= 0) {
       toast({
         title: t("invalidAmount"),

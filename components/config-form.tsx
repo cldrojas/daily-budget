@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { FormEvent, useState } from "react"
 import { Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,15 +10,23 @@ import { DatePicker } from "@/components/date-picker"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
+import { Budget } from "@/types"
+import ConfirmDialog from "./confirm-dialog"
 
-export function ConfigForm({ budget, onUpdateConfig }) {
+export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
+  budget: Budget, onClearData: () => void, onUpdateConfig: ({ startAmount, endDate }: {
+    startAmount: number;
+    endDate: Date;
+  }) => void
+}) {
   const { t } = useLanguage()
   const { toast } = useToast()
   const [isOpen, setIsOpen] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [startAmount, setStartAmount] = useState(budget.startAmount.toString())
   const [endDate, setEndDate] = useState(budget.endDate)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
 
     if (!startAmount || !endDate) {
@@ -75,8 +83,8 @@ export function ConfigForm({ budget, onUpdateConfig }) {
                 <Input
                   id="startAmount"
                   type="number"
-                  step="0.01"
-                  placeholder="1000.00"
+                  step="1"
+                  placeholder="1000"
                   value={startAmount}
                   onChange={(e) => setStartAmount(e.target.value)}
                   required
@@ -86,6 +94,12 @@ export function ConfigForm({ budget, onUpdateConfig }) {
                 <Label htmlFor="endDate">{t("endDate")}</Label>
                 <DatePicker date={endDate} setDate={setEndDate} className="w-full" />
               </div>
+              <div>
+                <Button variant="destructive" onClick={(e) => {
+                  e.preventDefault()
+                  setShowConfirm(true)
+                }}>{t("clearData")}</Button>
+              </div>
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button variant="outline" onClick={() => setIsOpen(false)}>
@@ -93,6 +107,15 @@ export function ConfigForm({ budget, onUpdateConfig }) {
               </Button>
               <Button type="submit">{t("updateSettings")}</Button>
             </CardFooter>
+            <ConfirmDialog
+              open={showConfirm}
+              onOpenChange={setShowConfirm}
+              onConfirm={onClearData}
+              title={t('youSure')}
+              description={t("undoable")}
+              confirmText={t("confirm")}
+              cancelText={t("cancel")}
+            />
           </form>
         </Card>
       </CollapsibleContent>

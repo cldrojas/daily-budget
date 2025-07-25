@@ -48,6 +48,7 @@ export default function DailyBudgetApp() {
     updateAccount,
     deleteAccount,
     isSetup,
+    clearData,
     transferFunds,
     updateConfig,
     getRemainingDays,
@@ -94,6 +95,7 @@ export default function DailyBudgetApp() {
               <ConfigForm
                 budget={budget}
                 onUpdateConfig={updateConfig}
+                onClearData={clearData}
               />
             </div>
 
