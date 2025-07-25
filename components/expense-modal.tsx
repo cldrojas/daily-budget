@@ -103,7 +103,7 @@ export function ExpenseModal({
               step="0.01"
               placeholder="0.00"
               value={amount}
-              onChange={(e) => setAmount(e.target.valueAsNumber)}
+              onChange={(e) => setAmount(e.target.valueAsNumber || 0)}
               required
             />
             {amount > remainingToday && (
