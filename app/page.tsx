@@ -16,8 +16,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DatePicker } from '@/components/date-picker'
-import { ExpensesList } from '@/components/expenses-list'
-import { ExpenseModal } from '@/components/expense-modal'
+import { TransactionList } from '@/components/transactions-list'
+import { TransactionModal } from '@/components/transaction-modal'
 import { AccountsList } from '@/components/accounts-list'
 import { TransactionHistory } from '@/components/transaction-history'
 import { useBudget } from '@/hooks/use-budget'
@@ -111,7 +111,7 @@ export default function DailyBudgetApp() {
                 value="expenses"
                 className="mt-6"
               >
-                <ExpensesList
+                <TransactionList
                   transactions={transactions}
                   onDelete={removeTransaction}
                 />
@@ -156,7 +156,7 @@ export default function DailyBudgetApp() {
             <AddButton />
 
             {/* Expense Modal */}
-            <ExpenseModal
+            <TransactionModal
               isOpen={isExpenseModalOpen}
               onClose={() => setIsExpenseModalOpen(false)}
               onAddExpense={addExpense}

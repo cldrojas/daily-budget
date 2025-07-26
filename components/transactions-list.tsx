@@ -15,7 +15,7 @@ import { Transaction } from '@/types'
 import { Button } from './ui/button'
 import { Trash2 } from 'lucide-react'
 
-export function ExpensesList({
+export function TransactionList({
   transactions,
   onDelete
 }: {

@@ -25,7 +25,7 @@ import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { DatePicker } from './date-picker'
 
-export function ExpenseModal({
+export function TransactionModal({
   isOpen,
   onClose,
   onAddExpense,

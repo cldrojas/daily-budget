@@ -11,11 +11,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
+import { Transaction } from "@/types"
 
-export function ExpenseForm({ onAddExpense, remainingToday }:
+export function TransactionForm({ onAddExpense, remainingToday }:
   {
-    onAddExpense: ({ amount, description, account }:
-      { amount: number, description: string, account: string }) => void, remainingToday: number
+    onAddExpense: (transaction: Transaction) => void,
+    remainingToday: number
   }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
@@ -41,7 +42,7 @@ export function ExpenseForm({ onAddExpense, remainingToday }:
       amount: expenseAmount,
       description,
       account,
-    })
+    } as Transaction)
 
     // Reset form
     setAmount("")
