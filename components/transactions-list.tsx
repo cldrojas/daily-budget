@@ -14,13 +14,16 @@ import { useCurrency } from '@/contexts/currency-context'
 import { Transaction } from '@/types'
 import { Button } from './ui/button'
 import { Trash2 } from 'lucide-react'
+import { TransactionModal } from './transaction-modal'
 
 export function TransactionList({
   transactions,
-  onDelete
+  onDelete,
+  openTransactionModal
 }: {
   transactions: Transaction[]
-  onDelete: (id: string) => void
+  onDelete: (transactionId: string) => void
+  openTransactionModal: (transactionId: string) => void
 }) {
   const { t, language } = useLanguage()
   const { formatCurrency } = useCurrency()
@@ -60,34 +63,34 @@ export function TransactionList({
           <div className="space-y-2">
             {expenses
               .toSorted((a, b) => time(b.date) - time(a.date))
-              .map((expense) => (
+              .map((transaction) => (
                 <div
-                  key={expense.id}
+                  key={transaction.id}
                   className="flex items-center justify-between p-2 rounded-md border bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <main className="flex items-center justify-between w-full">
-                    <div className="flex flex-col bg-red-500">
+                  <main className="flex items-center justify-between w-full bg-blue-400 cursor-pointer" onClick={() => openTransactionModal(transaction.id)}>
+                    <div className="flex flex-col ">
                       <span className="font-medium">
-                        {getShortName(expense.description)}
+                        {getShortName(transaction.description)}
                       </span>
                       <div className="flex items-center space-x-2">
                         <span className="text-xs text-muted-foreground">
-                          {format(new Date(expense.date), 'd MMM', { locale })}
+                          {format(new Date(transaction.date), 'd MMM', { locale })}
                         </span>
                         <span className="text-xs text-muted-foreground capitalize">
-                          • {t(expense.account)}
+                          • {t(transaction.account)}
                         </span>
                       </div>
                     </div>
                     <span className="font-semibold text-red-500">
-                      {formatCurrency(Math.abs(expense.amount))}
+                      {formatCurrency(Math.abs(transaction.amount))}
                     </span>
                   </main>
                   <Button
                     variant="ghost"
                     size="icon"
                     className="h-6 w-6 text-destructive"
-                    onClick={() => onDelete(expense.id)}
+                    onClick={() => onDelete(transaction.id)}
                     title={t('deleteAccount')}
                   >
                     <Trash2 className="h-3.5 w-3.5" />

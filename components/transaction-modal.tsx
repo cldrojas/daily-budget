@@ -24,21 +24,20 @@ import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { DatePicker } from './date-picker'
+import { Transaction, TransactionType } from '@/types'
 
 export function TransactionModal({
   isOpen,
   onClose,
-  onAddExpense,
+  onAddTransaction,
+  onUpdateTransaction,
   accounts,
   remainingToday
 }: {
   isOpen: boolean
   onClose: () => void
-  onAddExpense: (expense: {
-    amount: number
-    description: string
-    account: string
-  }) => void
+  onAddTransaction: (transaction: Omit<Transaction, 'id'>) => void
+  onUpdateTransaction: (transaction: Transaction) => void
   accounts: { id: string; name: string }[]
   remainingToday: number
 }) {
@@ -49,6 +48,7 @@ export function TransactionModal({
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(new Date())
   const [account, setAccount] = useState('daily')
+  const [type, setType] = useState<TransactionType>('expense')
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -62,10 +62,12 @@ export function TransactionModal({
       return
     }
 
-    onAddExpense({
+    onAddTransaction({
+      type,
       amount,
       description,
-      account
+      account,
+      date
     })
 
     // Reset form

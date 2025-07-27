@@ -33,7 +33,7 @@ export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
-  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
 
   const {
     budget,
@@ -43,7 +43,8 @@ export default function DailyBudgetApp() {
     remainingToday,
     progress,
     setupBudget,
-    addExpense,
+    addTransaction,
+    updateTransaction,
     addAccount,
     updateAccount,
     deleteAccount,
@@ -114,6 +115,10 @@ export default function DailyBudgetApp() {
                 <TransactionList
                   transactions={transactions}
                   onDelete={removeTransaction}
+                  openTransactionModal={(transactionId: string) => {
+                    console.log(`DEBUG:transactionId:`, transactionId)
+                    setIsTransactionModalOpen(true)
+                  }}
                 />
               </TabsContent>
               <TabsContent
@@ -147,7 +152,7 @@ export default function DailyBudgetApp() {
             {/* Floating Action Button for adding expenses */}
             <Button
               className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg"
-              onClick={() => setIsExpenseModalOpen(true)}
+              onClick={() => setIsTransactionModalOpen(true)}
               title={t('addExpense')}
             >
               <Plus className="h-6 w-6" />
@@ -157,9 +162,10 @@ export default function DailyBudgetApp() {
 
             {/* Expense Modal */}
             <TransactionModal
-              isOpen={isExpenseModalOpen}
-              onClose={() => setIsExpenseModalOpen(false)}
-              onAddExpense={addExpense}
+              isOpen={isTransactionModalOpen}
+              onClose={() => setIsTransactionModalOpen(false)}
+              onAddTransaction={addTransaction}
+              onUpdateTransaction={updateTransaction}
               accounts={accounts}
               remainingToday={remainingToday}
             />
