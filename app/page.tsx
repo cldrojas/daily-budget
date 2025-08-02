@@ -118,7 +118,6 @@ export default function DailyBudgetApp() {
                   transactions={transactions}
                   onDelete={removeTransaction}
                   openTransactionModal={(transactionId: string) => {
-                    console.log(`DEBUG:transactionId:`, transactionId)
                     const transaction = transactions.find(t => t.id === transactionId)
                     setEditingTransaction(transaction || null)
                     setIsTransactionModalOpen(true)

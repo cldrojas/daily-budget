@@ -311,7 +311,6 @@ export function useBudget() {
       })
 
       if (isToday(transaction.date)) {
-        console.log(`DEBUG:transaction.date:`, transaction.date)
         setRemainingToday(remainingToday + Math.abs(amount))
         setProgress(((remainingToday + Math.abs(amount)) / dailyAllowance) * 100)
       }
@@ -326,7 +325,7 @@ export function useBudget() {
     if (!originalTransaction) return
 
     // Update the transaction in the list
-    const updatedTransactions = transactions.map(t => 
+    const updatedTransactions = transactions.map(t =>
       t.id === updatedTransaction.id ? updatedTransaction : t
     )
 
@@ -358,7 +357,7 @@ export function useBudget() {
       const todayExpenses = updatedTransactions
         .filter(t => t.account === 'daily' && t.amount < 0 && isToday(t.date))
         .reduce((sum, t) => sum + Math.abs(t.amount), 0)
-      
+
       setRemainingToday(Math.max(0, dailyAllowance - todayExpenses))
       setProgress(Math.max(0, ((dailyAllowance - todayExpenses) / dailyAllowance) * 100))
     }
