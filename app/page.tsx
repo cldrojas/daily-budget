@@ -28,12 +28,14 @@ import { LanguageCurrencySelector } from '@/components/language-currency-selecto
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AddButton } from '@/components/ui/AddButton'
+import { Transaction } from '@/types'
 
 export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
   const {
     budget,
@@ -117,6 +119,8 @@ export default function DailyBudgetApp() {
                   onDelete={removeTransaction}
                   openTransactionModal={(transactionId: string) => {
                     console.log(`DEBUG:transactionId:`, transactionId)
+                    const transaction = transactions.find(t => t.id === transactionId)
+                    setEditingTransaction(transaction || null)
                     setIsTransactionModalOpen(true)
                   }}
                 />
@@ -152,7 +156,10 @@ export default function DailyBudgetApp() {
             {/* Floating Action Button for adding expenses */}
             <Button
               className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg"
-              onClick={() => setIsTransactionModalOpen(true)}
+              onClick={() => {
+                setEditingTransaction(null)
+                setIsTransactionModalOpen(true)
+              }}
               title={t('addExpense')}
             >
               <Plus className="h-6 w-6" />
@@ -163,11 +170,15 @@ export default function DailyBudgetApp() {
             {/* Expense Modal */}
             <TransactionModal
               isOpen={isTransactionModalOpen}
-              onClose={() => setIsTransactionModalOpen(false)}
+              onClose={() => {
+                setIsTransactionModalOpen(false)
+                setEditingTransaction(null)
+              }}
               onAddTransaction={addTransaction}
               onUpdateTransaction={updateTransaction}
               accounts={accounts}
               remainingToday={remainingToday}
+              transaction={editingTransaction}
             />
           </>
         )}

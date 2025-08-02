@@ -106,6 +106,7 @@ export function TransactionForm({ onAddExpense, remainingToday }:
           </div>
 
           <div className="space-y-2">
+            {/* <Label htmlFor="account">{t("transactionType")}</Label> */}
             <Label htmlFor="account">{t("transactionType")}</Label>
             <Select value={account} onValueChange={setAccount}>
               <SelectTrigger>

@@ -320,20 +320,48 @@ export function useBudget() {
     }
   }
 
-  const updateTransaction = ({
-    type,
-    amount,
-    description,
-    account, // accountId
-    date = new Date()
-  }: {
-    type: TransactionType
-    amount: number
-    description: string
-    account: string
-    date?: Date
-  }) => {
-    // get transaction
+  const updateTransaction = (updatedTransaction: Transaction) => {
+    // Find the original transaction
+    const originalTransaction = transactions.find(t => t.id === updatedTransaction.id)
+    if (!originalTransaction) return
+
+    // Update the transaction in the list
+    const updatedTransactions = transactions.map(t => 
+      t.id === updatedTransaction.id ? updatedTransaction : t
+    )
+
+    // Recalculate account balances
+    let updatedAccounts = [...accounts]
+
+    // First, reverse the original transaction's effect
+    updatedAccounts = updatedAccounts.map(acc => {
+      if (acc.id === originalTransaction.account) {
+        return { ...acc, balance: acc.balance - originalTransaction.amount }
+      }
+      return acc
+    })
+
+    // Then apply the updated transaction's effect
+    updatedAccounts = updatedAccounts.map(acc => {
+      if (acc.id === updatedTransaction.account) {
+        return { ...acc, balance: acc.balance + updatedTransaction.amount }
+      }
+      return acc
+    })
+
+    setTransactions(updatedTransactions)
+    setAccounts(updatedAccounts)
+
+    // If this affects today's remaining amount, recalculate it
+    if (isToday(updatedTransaction.date) && updatedTransaction.account === 'daily') {
+      // This is a simplified recalculation - in a real app you'd want more sophisticated logic
+      const todayExpenses = updatedTransactions
+        .filter(t => t.account === 'daily' && t.amount < 0 && isToday(t.date))
+        .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+      
+      setRemainingToday(Math.max(0, dailyAllowance - todayExpenses))
+      setProgress(Math.max(0, ((dailyAllowance - todayExpenses) / dailyAllowance) * 100))
+    }
   }
 
   // Add a new account

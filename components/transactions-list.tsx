@@ -68,7 +68,7 @@ export function TransactionList({
                   key={transaction.id}
                   className="flex items-center justify-between p-2 rounded-md border bg-card hover:bg-accent/50 transition-colors"
                 >
-                  <main className="flex items-center justify-between w-full bg-blue-400 cursor-pointer" onClick={() => openTransactionModal(transaction.id)}>
+                  <main className="flex items-center justify-between w-full cursor-pointer" onClick={() => openTransactionModal(transaction.id)}>
                     <div className="flex flex-col ">
                       <span className="font-medium">
                         {getShortName(transaction.description)}
