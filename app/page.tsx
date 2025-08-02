@@ -16,8 +16,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DatePicker } from '@/components/date-picker'
-import { ExpensesList } from '@/components/expenses-list'
-import { ExpenseModal } from '@/components/expense-modal'
+import { TransactionList } from '@/components/transactions-list'
+import { TransactionModal } from '@/components/transaction-modal'
 import { AccountsList } from '@/components/accounts-list'
 import { TransactionHistory } from '@/components/transaction-history'
 import { useBudget } from '@/hooks/use-budget'
@@ -28,12 +28,14 @@ import { LanguageCurrencySelector } from '@/components/language-currency-selecto
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AddButton } from '@/components/ui/AddButton'
+import { Transaction } from '@/types'
 
 export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
-  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
   const {
     budget,
@@ -43,7 +45,8 @@ export default function DailyBudgetApp() {
     remainingToday,
     progress,
     setupBudget,
-    addExpense,
+    addTransaction,
+    updateTransaction,
     addAccount,
     updateAccount,
     deleteAccount,
@@ -111,9 +114,14 @@ export default function DailyBudgetApp() {
                 value="expenses"
                 className="mt-6"
               >
-                <ExpensesList
+                <TransactionList
                   transactions={transactions}
                   onDelete={removeTransaction}
+                  openTransactionModal={(transactionId: string) => {
+                    const transaction = transactions.find(t => t.id === transactionId)
+                    setEditingTransaction(transaction || null)
+                    setIsTransactionModalOpen(true)
+                  }}
                 />
               </TabsContent>
               <TabsContent
@@ -147,7 +155,10 @@ export default function DailyBudgetApp() {
             {/* Floating Action Button for adding expenses */}
             <Button
               className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg"
-              onClick={() => setIsExpenseModalOpen(true)}
+              onClick={() => {
+                setEditingTransaction(null)
+                setIsTransactionModalOpen(true)
+              }}
               title={t('addExpense')}
             >
               <Plus className="h-6 w-6" />
@@ -156,12 +167,17 @@ export default function DailyBudgetApp() {
             <AddButton />
 
             {/* Expense Modal */}
-            <ExpenseModal
-              isOpen={isExpenseModalOpen}
-              onClose={() => setIsExpenseModalOpen(false)}
-              onAddExpense={addExpense}
+            <TransactionModal
+              isOpen={isTransactionModalOpen}
+              onClose={() => {
+                setIsTransactionModalOpen(false)
+                setEditingTransaction(null)
+              }}
+              onAddTransaction={addTransaction}
+              onUpdateTransaction={updateTransaction}
               accounts={accounts}
               remainingToday={remainingToday}
+              transaction={editingTransaction}
             />
           </>
         )}

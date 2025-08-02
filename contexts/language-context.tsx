@@ -47,11 +47,14 @@ export const translations = {
     accounts: 'Accounts',
     history: 'History',
 
-    // Expense Form
+    // Transaction Form
     addIncome: 'Add Income',
     addIncomeDescription: 'Record a new income',
     addExpense: 'Add Expense',
     addExpenseDescription: 'Record a new expense',
+    editTransaction: 'Edit Transaction',
+    editTransactionDescription: 'Modify transaction details',
+    updateTransaction: 'Update Transaction',
     amount: 'Amount',
     description: 'Description',
     account: 'Account',
@@ -62,6 +65,7 @@ export const translations = {
     recentExpenses: 'Recent Expenses',
     recentExpensesDescription: 'Your latest recorded expenses',
     noExpenses: 'No expenses yet',
+    transactionType: 'Transaction Type',
 
     // Transfer Form
     transferFunds: 'Transfer Funds',
@@ -108,6 +112,8 @@ export const translations = {
     // Toasts
     expenseAdded: 'Expense Added',
     expenseAddedDescription: '{amount} was added.',
+    transactionUpdated: 'Transaction Updated',
+    transactionUpdatedDescription: '{amount} was updated.',
     invalidAmount: 'Invalid Amount',
     invalidAmountDescription: 'Please enter a valid number',
     accountAdded: 'Account Created',
@@ -169,11 +175,14 @@ export const translations = {
     accounts: 'Cuentas',
     history: 'Historial',
 
-    // Expense Form
+    // Transaction Form
     addIncome: 'Agregar ingreso',
     addIncomeDescription: 'Registra un nuevo ingreso',
     addExpense: 'Agregar gasto',
     addExpenseDescription: 'Registra un nuevo gasto',
+    editTransaction: 'Editar transacción',
+    editTransactionDescription: 'Modificar detalles de la transacción',
+    updateTransaction: 'Actualizar transacción',
     amount: 'Monto',
     description: 'Descripción',
     account: 'Cuenta',
@@ -184,6 +193,7 @@ export const translations = {
     recentExpenses: 'Gastos recientes',
     recentExpensesDescription: 'Tus gastos más recientes',
     noExpenses: 'Aún no hay gastos',
+    transactionType: 'Tipo de transacción',
 
     // Transfer Form
     transferFunds: 'Transferir fondos',
@@ -230,6 +240,8 @@ export const translations = {
     // Toasts
     expenseAdded: 'Gasto registrado',
     expenseAddedDescription: '{amount} fue agregado.',
+    transactionUpdated: 'Transacción actualizada',
+    transactionUpdatedDescription: '{amount} fue actualizado.',
     invalidAmount: 'Monto inválido',
     invalidAmountDescription: 'Por favor ingresa un número válido',
     accountAdded: 'Cuenta creada',

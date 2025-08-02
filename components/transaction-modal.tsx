@@ -1,7 +1,7 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
-import { PlusCircle } from 'lucide-react'
+import { FormEvent, useState, useEffect } from 'react'
+import { PlusCircle, Edit } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -24,23 +24,24 @@ import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { DatePicker } from './date-picker'
+import { Transaction, TransactionType } from '@/types'
 
-export function ExpenseModal({
+export function TransactionModal({
   isOpen,
   onClose,
-  onAddExpense,
+  onAddTransaction,
+  onUpdateTransaction,
   accounts,
-  remainingToday
+  remainingToday,
+  transaction
 }: {
   isOpen: boolean
   onClose: () => void
-  onAddExpense: (expense: {
-    amount: number
-    description: string
-    account: string
-  }) => void
+  onAddTransaction: (transaction: Omit<Transaction, 'id'>) => void
+  onUpdateTransaction: (transaction: Transaction) => void
   accounts: { id: string; name: string }[]
   remainingToday: number
+  transaction?: Transaction | null
 }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
@@ -49,6 +50,26 @@ export function ExpenseModal({
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(new Date())
   const [account, setAccount] = useState('daily')
+  const [type, setType] = useState<TransactionType>('expense')
+
+  // Reset form when modal opens/closes or transaction changes
+  useEffect(() => {
+    if (transaction) {
+      // Editing existing transaction
+      setAmount(Math.abs(transaction.amount))
+      setDescription(transaction.description)
+      setDate(new Date(transaction.date))
+      setAccount(transaction.account)
+      setType(transaction.type)
+    } else {
+      // Adding new transaction
+      setAmount(0)
+      setDescription('')
+      setDate(new Date())
+      setAccount('daily')
+      setType('expense')
+    }
+  }, [transaction, isOpen])
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -62,24 +83,41 @@ export function ExpenseModal({
       return
     }
 
-    onAddExpense({
-      amount,
-      description,
-      account
-    })
+    if (transaction) {
+      // Update existing transaction
+      onUpdateTransaction({
+        ...transaction,
+        type,
+        amount: transaction.amount < 0 ? -amount : amount, // Preserve sign
+        description,
+        account,
+        date
+      })
 
-    // Reset form
-    setAmount(0)
-    setDescription('')
-    setAccount('daily')
+      toast({
+        title: t('transactionUpdated'),
+        description: t('transactionUpdatedDescription', { amount: formatCurrency(amount) })
+      })
+    } else {
+      // Add new transaction
+      onAddTransaction({
+        type,
+        amount,
+        description,
+        account,
+        date
+      })
+
+      toast({
+        title: t('expenseAdded'),
+        description: t('expenseAddedDescription', { amount: formatCurrency(amount) })
+      })
+    }
+
     onClose()
-
-    // Show toast
-    toast({
-      title: t('expenseAdded'),
-      description: t('expenseAddedDescription', { amount: formatCurrency(amount) })
-    })
   }
+
+  const isEditing = !!transaction
 
   return (
     <Dialog
@@ -88,8 +126,12 @@ export function ExpenseModal({
     >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t('addExpense')}</DialogTitle>
-          <DialogDescription>{t('addExpenseDescription')}</DialogDescription>
+          <DialogTitle>
+            {isEditing ? t('editTransaction') : t('addExpense')}
+          </DialogTitle>
+          <DialogDescription>
+            {isEditing ? t('editTransactionDescription') : t('addExpenseDescription')}
+          </DialogDescription>
         </DialogHeader>
         <form
           onSubmit={handleSubmit}
@@ -106,7 +148,7 @@ export function ExpenseModal({
               onChange={(e) => setAmount(e.target.valueAsNumber || 0)}
               required
             />
-            {amount > remainingToday && (
+            {!isEditing && amount > remainingToday && (
               <p className="text-sm text-yellow-500 dark:text-yellow-400">
                 {t('expenseExceedsWarning')}
               </p>
@@ -143,16 +185,16 @@ export function ExpenseModal({
                 ))}
               </SelectContent>
             </Select>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="endDate">{t('endDate')}</Label>
-              <DatePicker
-                date={date}
-                setDate={setDate}
-                className="w-full"
-                allowPrevious
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="date">{t('date')}</Label>
+            <DatePicker
+              date={date}
+              setDate={setDate}
+              className="w-full"
+              allowPrevious
+            />
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
@@ -164,8 +206,17 @@ export function ExpenseModal({
               {t('cancel')}
             </Button>
             <Button type="submit">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              {t('addExpense')}
+              {isEditing ? (
+                <>
+                  <Edit className="mr-2 h-4 w-4" />
+                  {t('updateTransaction')}
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  {t('addExpense')}
+                </>
+              )}
             </Button>
           </div>
         </form>
