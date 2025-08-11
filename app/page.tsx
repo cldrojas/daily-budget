@@ -66,6 +66,12 @@ export default function DailyBudgetApp() {
           <div className="flex items-center space-x-2">
             <LanguageCurrencySelector />
             <Button
+              variant="default"
+              size="default"
+              onClick={() => console.log(JSON.stringify(budget, null, 2))}
+              title={'Debug log'}
+            >TEST?</Button>
+            <Button
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}

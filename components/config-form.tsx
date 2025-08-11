@@ -24,9 +24,9 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
 }) {
   const { t } = useLanguage()
   const { toast } = useToast()
-  const { toggleAutoSave } = useBudget()
   const [isOpen, setIsOpen] = useState(true)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [autoSave, setAutoSave] = useState(budget.autoSave)
   const [startAmount, setStartAmount] = useState(budget.startAmount.toString())
   const [endDate, setEndDate] = useState(budget.endDate)
 
@@ -56,7 +56,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
     onUpdateConfig({
       startAmount: newStartAmount,
       endDate,
-      autoSave: budget.autoSave
+      autoSave
     })
 
 
@@ -102,7 +102,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="autosave">{t("toggleAutoSaving")}</Label>
-                <Checkbox className="ml-2" checked={budget.autoSave} onCheckedChange={toggleAutoSave} />
+                <Checkbox className="ml-2" checked={autoSave} onCheckedChange={() => setAutoSave(!autoSave)} />
               </div>
               <div>
                 <Button variant="destructive" onClick={(e) => {

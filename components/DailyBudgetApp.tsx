@@ -123,7 +123,7 @@ export default function DailyBudgetApp() {
                 <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
                 <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
                 <TabsTrigger value="transfer">{t('transfer')}</TabsTrigger>
-                <TabsTrigger value="history">{t('history')}</TabsTrigger>
+                <TabsTrigger value="history">{t('asddsd')}</TabsTrigger>
               </TabsList>
               <TabsContent
                 value="expenses"
