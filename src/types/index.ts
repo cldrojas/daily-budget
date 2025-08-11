@@ -7,7 +7,7 @@ export type Transaction = {
   date: Date
 }
 
-export type TransactionType = 'expense' | 'transfer' | 'income'
+export type TransactionType = 'expense' | 'income' | 'transfer'
 
 export type Budget = {
   startAmount: number
@@ -22,4 +22,12 @@ export type Account = {
   type: string
   balance: number
   icon: string
+} 
+
+export type Transfer = {
+  id: string
+  fromAccount: string
+  toAccount: string
+  amount: number
+  date: Date
 }

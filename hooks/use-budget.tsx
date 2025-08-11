@@ -19,7 +19,8 @@ export function useBudget() {
   const [budget, setBudget] = useState<Budget>({
     startAmount: 0,
     endDate: undefined,
-    startDate: undefined
+    startDate: undefined,
+    autoSave: true
   })
   const [accounts, setAccounts] = useState<Account[]>([
     { id: 'daily', name: 'Daily Budget', type: 'daily', balance: 0, icon: 'wallet' },
@@ -176,7 +177,8 @@ export function useBudget() {
     const newBudget: Budget = {
       startAmount,
       startDate: today,
-      endDate
+      endDate,
+      autoSave: true
     }
 
     // Update daily account with starting amount
@@ -522,6 +524,11 @@ export function useBudget() {
     localStorage.removeItem(LOCAL_STORAGE_KEY)
   }
 
+  // Toggle auto-save setting
+  const toggleAutoSave = () => {
+    setBudget((prev) => ({ ...prev, autoSave: !prev.autoSave }))
+  }
+
   // Update budget configuration
   const updateConfig = ({
     startAmount,
@@ -598,6 +605,7 @@ export function useBudget() {
     deleteAccount,
     transferFunds,
     updateConfig,
-    getRemainingDays
+    getRemainingDays,
+    toggleAutoSave
   }
 }

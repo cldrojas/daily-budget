@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useState } from "react"
+import React, { useState } from "react"
 import { Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,23 +10,27 @@ import { DatePicker } from "@/components/date-picker"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
-import { Budget } from "@/types"
-import ConfirmDialog from "./confirm-dialog"
+import type { Budget } from "@/types"
+import ConfirmDialog from "@/components/confirm-dialog"
+import { Checkbox } from "./ui/checkbox"
+import { useBudget } from "@/hooks/use-budget"
 
 export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
-  budget: Budget, onClearData: () => void, onUpdateConfig: ({ startAmount, endDate }: {
+  budget: Budget, onClearData: () => void, onUpdateConfig: ({ startAmount, endDate, autoSave }: {
     startAmount: number;
     endDate: Date;
-  }) => void
+    autoSave: boolean
+  }) => void,
 }) {
   const { t } = useLanguage()
   const { toast } = useToast()
-  const [isOpen, setIsOpen] = useState(false)
+  const { toggleAutoSave } = useBudget()
+  const [isOpen, setIsOpen] = useState(true)
   const [showConfirm, setShowConfirm] = useState(false)
   const [startAmount, setStartAmount] = useState(budget.startAmount.toString())
   const [endDate, setEndDate] = useState(budget.endDate)
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!startAmount || !endDate) {
@@ -52,7 +56,9 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
     onUpdateConfig({
       startAmount: newStartAmount,
       endDate,
+      autoSave: budget.autoSave
     })
+
 
     setIsOpen(false)
 
@@ -94,6 +100,10 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                 <Label htmlFor="endDate">{t("endDate")}</Label>
                 <DatePicker date={endDate} setDate={setEndDate} className="w-full" />
               </div>
+              <div className="space-y-2">
+                <Label htmlFor="autosave">{t("toggleAutoSaving")}</Label>
+                <Checkbox className="ml-2" checked={budget.autoSave} onCheckedChange={toggleAutoSave} />
+              </div>
               <div>
                 <Button variant="destructive" onClick={(e) => {
                   e.preventDefault()
@@ -111,7 +121,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
               open={showConfirm}
               onOpenChange={setShowConfirm}
               onConfirm={onClearData}
-              title={t('youSure')}
+              title={t('youSure')} // Confirm action (clear all data?, save changes?)
               description={t("undoable")}
               confirmText={t("confirm")}
               cancelText={t("cancel")}
