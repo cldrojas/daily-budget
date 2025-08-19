@@ -28,7 +28,7 @@ import { LanguageCurrencySelector } from '@/components/language-currency-selecto
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AddButton } from '@/components/ui/AddButton'
-import { Transaction } from '@/types'
+import { Int, toInt, Transaction } from '@/types'
 
 export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
@@ -195,10 +195,10 @@ export default function DailyBudgetApp() {
 function SetupForm({
   onSetup
 }: {
-  onSetup: (data: { startAmount: number; endDate: Date }) => void
+  onSetup: (data: { startAmount: Int; endDate: Date }) => void
 }) {
   const { t } = useLanguage()
-  const [startAmount, setStartAmount] = useState(0)
+  const [startAmount, setStartAmount] = useState(0 as Int)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -227,7 +227,7 @@ function SetupForm({
               placeholder="1000.00"
               value={startAmount}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setStartAmount(e.target.valueAsNumber)
+                setStartAmount(toInt(e.target.valueAsNumber))
               }
               required
             />
