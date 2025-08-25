@@ -1,0 +1,70 @@
+{
+    "budget": {
+        "startAmount": 10000,
+        "startDate": "2025-08-15T23:30:58.045Z",
+        "endDate": "2025-08-25T04:00:00.000Z",
+        "autoSave": true
+    },
+    "accounts": [
+        {
+            "id": "daily",
+            "name": "Daily Budget",
+            "type": "daily",
+            "balance": 6200,
+            "icon": "wallet"
+        },
+        {
+            "id": "savings",
+            "name": "Savings",
+            "type": "savings",
+            "balance": 3800,
+            "icon": "piggybank"
+        },
+        {
+            "id": "test-account",
+            "name": "Test account",
+            "type": "savings",
+            "balance": 0,
+            "icon": "piggybank"
+        }
+    ],
+    "transactions": [
+        {
+            "id": "b179a41a-9a6f-4f0c-aecd-beb27e3ea1c6",
+            "type": "transfer",
+            "date": "2025-08-25T18:57:19.676Z",
+            "amount": 1800,
+            "description": "Daily budget savings",
+            "account": "savings"
+        },
+        {
+            "id": "8b2ba2ac-cdcb-4f33-930f-f91aac89b6f7",
+            "type": "transfer",
+            "date": "2025-08-20T18:41:16.161Z",
+            "amount": 1000,
+            "description": "Daily budget savings",
+            "account": "savings"
+        },
+        {
+            "id": "8acd8a09-bf78-40a2-9407-a2c526e6af8c",
+            "type": "transfer",
+            "date": "2025-08-17T17:28:22.522Z",
+            "amount": 1000,
+            "description": "Daily budget savings",
+            "account": "savings"
+        },
+        {
+            "id": "a2ff986c-702d-4548-b5d5-87f8fdedea35",
+            "type": "income",
+            "date": "2025-08-15T23:30:58.045Z",
+            "amount": 10000,
+            "description": "Initial deposit",
+            "account": "daily"
+        }
+    ],
+    "dailyAllowance": 8000,
+    "remainingToday": 8000,
+    "progress": 100,
+    "lastCheckedDay": "2025-08-25T04:00:00.000Z",
+    "isSetup": true
+}

@@ -30,6 +30,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
+import { Account } from '@/types'
 
 // Define available icons
 const availableIcons = [
@@ -49,7 +50,7 @@ const availableIcons = [
   { id: 'utensils', icon: Utensils, name: 'Utensils' }
 ]
 
-export function AccountEditModal({ account, isOpen, onClose, onSave }) {
+export function AccountEditModal({ account, isOpen, onClose, onSave }: {account: Account | null, isOpen: boolean, onClose: () => void, onSave: (account: Account) => void }) {
   const { t } = useLanguage()
   const { toast } = useToast()
   const [accountName, setAccountName] = useState(account?.name || '')
@@ -78,6 +79,7 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
 
     onSave({
       ...account,
+      id: account?.id,
       name: accountName,
       icon: selectedIcon,
       balance: accountBalance || 0
