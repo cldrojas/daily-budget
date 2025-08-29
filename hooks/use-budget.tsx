@@ -30,6 +30,7 @@ export function useBudget() {
   const [remainingToday, setRemainingToday] = useState(0)
   const [progress, setProgress] = useState(100)
   const [lastCheckedDay, setLastCheckedDay] = useState<Date | null>(null)
+  const [selectedAccountId, setSelectedAccountId] = useState<string>('daily')
 
   // Load data from localStorage on initial render
   useEffect(() => {
@@ -55,6 +56,7 @@ export function useBudget() {
       setRemainingToday(parsedData.remainingToday || 0)
       setProgress(parsedData.progress || 100)
       setLastCheckedDay(parsedData.lastCheckedDay || null)
+  setSelectedAccountId(parsedData.selectedAccountId || 'daily')
       setIsSetup(parsedData.isSetup || false)
     }
   }, [])
@@ -73,6 +75,8 @@ export function useBudget() {
           progress,
           lastCheckedDay,
           isSetup
+          ,
+          selectedAccountId
         })
       )
     }
@@ -85,6 +89,8 @@ export function useBudget() {
     progress,
     lastCheckedDay,
     isSetup
+  ,
+  selectedAccountId
   ])
 
   // Check for day change and update budget
@@ -587,6 +593,8 @@ export function useBudget() {
     dailyAllowance,
     remainingToday,
     progress,
+  selectedAccountId,
+  setSelectedAccountId,
     isSetup,
     setupBudget,
     addTransaction,

@@ -16,9 +16,10 @@ export type Budget = {
 }
 
 export type Account = {
-  id: string | undefined
+  id?: string
   name: string
-  type: string
+  parentId?: string | null
   balance: number
-  icon: string
+  icon?: string | null
+  type?: string | null
 }

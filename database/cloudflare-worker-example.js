@@ -37,7 +37,14 @@ async function importData(body) {
     const tx = DB.batch()
 
     for (const a of accounts) {
-      await tx.prepare('INSERT OR REPLACE INTO accounts (id,name,type,balance,icon) VALUES (?,?,?,?,?)').bind(a.id,a.name,a.type,a.balance ?? 0,a.icon ?? null).run()
+      await tx.prepare('INSERT OR REPLACE INTO accounts (id,name,type,balance,icon,parent_id) VALUES (?,?,?,?,?,?)').bind(
+        a.id,
+        a.name ?? a.nombre ?? '',
+        a.type ?? null,
+        a.balance ?? a.amount ?? 0,
+        a.icon ?? null,
+        a.parentId ?? a.parent ?? null
+      ).run()
     }
 
     for (const t of transactions) {
@@ -45,7 +52,7 @@ async function importData(body) {
     }
 
     if (budget) {
-      await tx.prepare('INSERT OR REPLACE INTO budgets (id,start_amount,start_date,end_date) VALUES (?,?,?,?)').bind('budget-1',budget.startAmount ?? 0,budget.startDate ? new Date(budget.startDate).toISOString() : null,budget.endDate ? new Date(budget.endDate).toISOString() : null).run()
+  await tx.prepare('INSERT OR REPLACE INTO budgets (id,start_amount,start_date,end_date) VALUES (?,?,?,?)').bind('budget-1',budget.startAmount ?? 0,budget.startDate ? new Date(budget.startDate).toISOString() : null,budget.endDate ? new Date(budget.endDate).toISOString() : null).run()
     }
 
     await tx.commit()

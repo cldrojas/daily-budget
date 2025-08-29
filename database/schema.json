@@ -18,11 +18,12 @@
       "properties": {
         "id": { "type": "string" },
         "name": { "type": "string" },
-        "type": { "type": "string" },
         "balance": { "type": "number" },
-        "icon": { "type": "string" }
+        "parentId": { "anyOf": [{ "type": "string" }, { "type": "null"}], "description": "Referencia opcional a otra account.id (parentId)" },
+        "icon": { "type": ["string","null"] },
+        "type": { "type": ["string","null"] }
       },
-      "required": ["id", "name", "type", "balance"]
+      "required": ["id", "name", "balance"]
     },
 
     "transaction": {
@@ -30,7 +31,7 @@
       "properties": {
         "id": { "type": "string" },
         "type": { "type": "string", "enum": ["expense", "transfer", "income"] },
-        "date": { "type": "string", "format": "date-time", "description": "ISO date string" },
+        "date": { "type": ["string","object"], "description": "Fecha de la transacción. Se recomienda usar tipo Date al manipular en memoria; almacenado como ISO-string en persistencia." },
         "amount": { "type": "number" },
         "description": { "type": "string" },
         "account": { "type": "string", "description": "References account.id" }
@@ -41,14 +42,14 @@
 
   "root": {
     "type": "object",
-    "properties": {
+      "properties": {
       "budget": { "$ref": "#/entities/budget" },
       "accounts": { "type": "array", "items": { "$ref": "#/entities/account" } },
       "transactions": { "type": "array", "items": { "$ref": "#/entities/transaction" } },
       "dailyAllowance": { "type": "number" },
       "remainingToday": { "type": "number" },
       "progress": { "type": "number" },
-      "lastCheckedDay": { "type": ["string", "null"], "format": "date-time" },
+      "lastCheckedDay": { "type": ["string", "object", "null"], "description": "Fecha del último chequeo; en memoria usar Date, en persistencia ISO-string." },
       "isSetup": { "type": "boolean" }
     },
     "required": ["accounts", "transactions", "isSetup"]

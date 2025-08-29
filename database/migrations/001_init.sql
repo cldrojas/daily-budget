@@ -13,7 +13,9 @@ CREATE TABLE IF NOT EXISTS accounts (
   name TEXT NOT NULL,
   type TEXT NOT NULL,
   balance REAL NOT NULL DEFAULT 0,
-  icon TEXT
+  icon TEXT,
+  parent_id TEXT,
+  FOREIGN KEY(parent_id) REFERENCES accounts(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS transactions (

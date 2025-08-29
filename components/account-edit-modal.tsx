@@ -56,19 +56,21 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }: {account:
   const [accountName, setAccountName] = useState(account?.name || '')
   const [accountBalance, setAccountBalance] = useState(account?.balance || 0)
   const [selectedIcon, setSelectedIcon] = useState(account?.icon || 'wallet')
+  const [parentId, setParentId] = useState(account?.parentId || '')
 
   useEffect(() => {
     if (account) {
       setAccountName(account.name)
       setAccountBalance(account.balance)
-      setSelectedIcon(account.icon)
+      setSelectedIcon(account.icon || 'wallet')
+      setParentId(account.parentId || '')
     }
   }, [account])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!accountName.trim()) {
+  if (!accountName.trim()) {
       toast({
         title: t('invalidAccountName'),
         description: t('invalidAccountNameDescription'),
@@ -82,7 +84,8 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }: {account:
       id: account?.id,
       name: accountName,
       icon: selectedIcon,
-      balance: accountBalance || 0
+      balance: Number(accountBalance) || 0,
+      parentId: parentId || null
     })
 
     toast({
@@ -115,12 +118,22 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }: {account:
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="accountName">{t('Balance')}</Label>
+              <Label htmlFor="accountBalance">{t('Balance')}</Label>
               <Input
                 id="accountBalance"
                 value={accountBalance}
-                onChange={(e) => setAccountBalance(e.target.value)}
+                onChange={(e) => setAccountBalance(Number(e.target.value))}
                 placeholder={t('accountBalancePlaceholder')}
+                type="number"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="parentId">{t('parentAccount')}</Label>
+              <Input
+                id="parentId"
+                value={parentId}
+                onChange={(e) => setParentId(e.target.value)}
+                placeholder={t('parentAccountPlaceholder')}
               />
             </div>
             <div className="grid gap-2">

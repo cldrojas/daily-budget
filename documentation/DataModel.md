@@ -1,3 +1,140 @@
+# Documentación del modelo de datos
+
+Esta documentación describe las entidades encontradas en el esquema de datos (fuente: `database/schema.json`). Incluye descripción de campos, relaciones y un diagrama en formato Mermaid con indicación de PK y FK.
+
+## Contrato (resumen)
+- Origen: `database/schema.json` (modelo inferido para almacenamiento en localStorage bajo la clave `daily-budget-data`).
+- Entidades principales: `budget`, `account`, `transaction`.
+- Salida: este archivo `documentation/DataModel.md` contiene campos, descripciones, relaciones y diagrama mermaid.
+
+---
+
+## Entidades y campos
+
+### Budget (singleton)
+- Propósito: almacena los parámetros del presupuesto global.
+- Campos:
+  - `startAmount` (number, requerido): monto inicial del presupuesto.
+  - `startDate` (`Date` | null): fecha de inicio (usar tipo `Date` en memoria; persistir como ISO-string si se guarda en JSON).
+  - `endDate` (`Date` | null): fecha de fin (usar tipo `Date` en memoria; persistir como ISO-string si se guarda en JSON).
+
+Notas: `budget` se representa como un objeto único dentro del `root` del JSON; no tiene una clave primaria individual porque está pensado como configuración global.
+
+### Account
+- Propósito: representa una cuenta o fuente de fondos.
+- Campos:
+  - `id` (string, PK): identificador único de la cuenta.
+  - `name` (string): nombre legible de la cuenta.
+  - `balance` (number): monto/balance de la cuenta.
+  - `parentId` (string | null, FK -> `account.id`): referencia opcional a otra cuenta que actúa como padre; permite estructurar cuentas en jerarquías.
+  - `icon` (string, opcional): icono asociado.
+  - `type` (string, opcional): tipo de cuenta (ej. `savings`, `investment`, `expense`).
+
+Requeridos por esquema: `id`, `name`, `balance`.
+
+PK: `account.id`
+
+
+### Transaction
+- Propósito: registro de movimientos (gastos, transferencias, ingresos).
+- Campos:
+  - `id` (string, PK): identificador único de la transacción.
+  - `type` (string, enum: `"expense" | "transfer" | "income"`): tipo de la transacción.
+  - `date` (`Date`): fecha cuando ocurrió la transacción. Usar `Date` en memoria; persistir como ISO-string en JSON.
+  - `amount` (number): monto de la transacción. (positivo para ingresos, negativo/positivo según convención de la app)
+  - `description` (string): descripción o nota de la transacción.
+  - `account` (string, FK -> `account.id`): referencia a la cuenta relacionada (por ejemplo, la cuenta desde la cual se carga un gasto o a la que se abona un ingreso).
+
+Requeridos por esquema: `id`, `type`, `date`, `amount`, `account`.
+
+PK: `transaction.id`
+FK: `transaction.account` → `account.id`
+
+---
+
+## Relaciones
+
+- Una `Account` puede tener cero o muchas `Transaction` asociadas.
+  - Cardinalidad: Account 1 --- * Transaction
+  - Implementación en el JSON: las transacciones almacenan el `account` como string que referencia `account.id`.
+
+- Una `Account` puede ser hija de otra `Account` mediante `parentId` (recursiva/jerárquica).
+  - Cardinalidad: Account 0..1 --- 0..* Account (parentId -> children)
+
+- `Budget` es un objeto de configuración global que no referencia ni es referenciado por PK/FK en este esquema.
+
+---
+
+## Estructura raíz (root)
+El `root` del JSON contiene la composición principal de la aplicación:
+
+- `budget`: objeto `budget`.
+- `accounts`: arreglo de objetos `account`.
+- `transactions`: arreglo de objetos `transaction`.
+- `dailyAllowance`: number (cálculo interno de la app).
+- `remainingToday`: number (resumen/calculado).
+- `progress`: number (porcentaje/completitud del periodo).
+- `lastCheckedDay`: string|null (fecha ISO del último chequeo diario).
+- `isSetup`: boolean (indica si la configuración inicial se completó).
+
+Requeridos en el root: `accounts`, `transactions`, `isSetup`.
+
+---
+
+## Diagrama (Mermaid)
+
+El siguiente diagrama muestra entidades, tipos de campo y relaciones PK/FK.
+
+```mermaid
+erDiagram
+
+  ACCOUNT {
+    string id PK "Identificador único"
+    string name
+    number balance
+    string parentId FK? "Referencia opcional a account.id"
+    string icon
+    string type
+  }
+
+  TRANSACTION {
+    string id PK "Identificador único"
+    string type "expense|transfer|income"
+    Date date
+    number amount
+    string description
+    string account FK "Referencia a account.id"
+  }
+
+  BUDGET {
+    number startAmount
+    Date? startDate
+    Date? endDate
+  }
+
+    %% Relaciones
+    ACCOUNT ||--o{ TRANSACTION : "tiene"
+
+    %% Notas:
+  %% - TRANSACTION.account es FK hacia ACCOUNT.id
+  %% - ACCOUNT.parentId es FK opcional hacia ACCOUNT.id (jerarquía)
+  %% - BUDGET es un objeto singleton dentro del root (no PK/FK)
+```
+
+---
+
+## Observaciones y recomendaciones
+
+- El esquema actual es simple y almacena referencias por ID (string). Si en el futuro se migra a una base de datos relacional o a Prisma, se recomienda:
+  - Normalizar tipos de fecha a `DateTime`/ISO y validar al escribir/leer.
+  - Establecer constraints de FK para `transaction.account` hacia `account.id`.
+  - Considerar índices sobre `transaction.date` y `transaction.account` para consultas rápidas.
+
+- Si se genera una versión `schema.prisma`, mapear `account.id` y `transaction.id` a `String @id` y `transaction.account` a una relación utilizando `@relation` con `references: [id]`.
+
+---
+
+Archivo generado automáticamente a partir de `database/schema.json`.
 # Modelo de Datos — Saldo Cero
 
 ## Descripción General
