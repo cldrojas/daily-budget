@@ -64,7 +64,7 @@ export function TransactionList({
         ) : (
           <div className="space-y-2">
             {expenses
-              .toSorted((a, b) => time(b.date) - time(a.date)) // default sort by date descending
+              .toSorted((a, b) => time(b.date) - time(a.date)) // default sort by date descending, TODO: add sorting filter
               .map((transaction) => {
                 const account = accounts.find((account) => account.id === transaction.account)
                 return (
