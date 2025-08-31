@@ -27,7 +27,11 @@ This file gives focused, actionable guidance for AI coding agents working on the
    - Install: `pnpm install` (or `npm install`). Repository uses pnpm but npm also works.
    - Dev server: `pnpm dev` (runs Next.js frontend)
    - Typecheck: `pnpm tsc --noEmit` (run from repo root)
-   - Lint/test: not present currently. Avoid large refactors without running `pnpm tsc`.
+    - Tests:
+       - Unit/integration: `pnpm test` (Vitest, runs `tests/unit/**`)
+       - UI: `pnpm test:ui` (Playwright — starts `pnpm dev` automatically)
+       - Coverage: `pnpm test:coverage`
+    - Lint: `pnpm lint`. Avoid large refactors without running `pnpm tsc` and `pnpm test`.
 
 5. Integration points / external deps
    - UI libs: Tailwind CSS, Radix UI primitives, Lucide icon set
@@ -54,5 +58,7 @@ This file gives focused, actionable guidance for AI coding agents working on the
    - `components/transaction-modal.tsx`
    - `types/index.ts`
    - `README.md` (project overview)
+   - `vitest.config.ts` and `playwright.config.ts` for test runner config
+   - `.github/workflows/tests.yml` for CI test steps
 
 If you want, I can iterate: merge this into an existing `.github/copilot-instructions.md` if one exists, or adjust tone/length. Any specific areas you want expanded (tests, deployment, backend wiring)?
