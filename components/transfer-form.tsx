@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, FormEvent, ChangeEvent } from "react"
 import { ArrowRightLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,16 +11,16 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
 
-export function TransferForm({ accounts, onTransfer }) {
+export function TransferForm({ accounts, onTransfer }: { accounts: { id: string; name: string; balance: number }[]; onTransfer: (payload: { amount: number; fromAccount: string; toAccount: string; description?: string }) => void }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
-  const [amount, setAmount] = useState("")
+  const [amount, setAmount] = useState<string>("")
   const [fromAccount, setFromAccount] = useState("")
   const [toAccount, setToAccount] = useState("")
   const [description, setDescription] = useState("")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
 
     if (!fromAccount || !toAccount) {
@@ -130,7 +130,7 @@ export function TransferForm({ accounts, onTransfer }) {
               step="0.01"
               placeholder="0.00"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e: ChangeEvent<HTMLInputElement>) => setAmount(e.target.value)}
               required
             />
           </div>

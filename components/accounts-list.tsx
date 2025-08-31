@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, FormEvent } from 'react'
+import { Account } from '@/types'
 import {
   PlusCircle,
   Wallet,
@@ -79,20 +80,25 @@ export function AccountsList({
   onAddAccount,
   onUpdateAccount,
   onDeleteAccount
+}: {
+  accounts: Account[]
+  onAddAccount: (payload: { name: string; type: string; icon: string; balance: number }) => void
+  onUpdateAccount: (account: Account) => void
+  onDeleteAccount: (accountId: string) => boolean
 }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
   const [isAddingAccount, setIsAddingAccount] = useState(false)
-  const [newAccountName, setNewAccountName] = useState('')
-  const [newAccountType, setNewAccountType] = useState('savings')
-  const [newAccountIcon, setNewAccountIcon] = useState('piggybank')
-  const [editingAccount, setEditingAccount] = useState(null)
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [accountToDelete, setAccountToDelete] = useState(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [newAccountName, setNewAccountName] = useState<string>('')
+  const [newAccountType, setNewAccountType] = useState<string>('savings')
+  const [newAccountIcon, setNewAccountIcon] = useState<string>('piggybank')
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
+  const [accountToDelete, setAccountToDelete] = useState<Account | null>(null)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false)
 
-  const handleAddAccount = (e) => {
+  const handleAddAccount = (e: FormEvent) => {
     e.preventDefault()
 
     if (!newAccountName.trim()) {
@@ -124,12 +130,12 @@ export function AccountsList({
     })
   }
 
-  const handleEditClick = (account) => {
+  const handleEditClick = (account: Account) => {
     setEditingAccount(account)
     setIsEditModalOpen(true)
   }
 
-  const handleDeleteClick = (account) => {
+  const handleDeleteClick = (account: Account) => {
     setAccountToDelete(account)
     setIsDeleteDialogOpen(true)
   }
@@ -148,16 +154,16 @@ export function AccountsList({
     setAccountToDelete(null)
   }
 
-  const handleSaveEdit = (updatedAccount) => {
+  const handleSaveEdit = (updatedAccount: Account) => {
     onUpdateAccount(updatedAccount)
   }
 
-  const getAccountIcon = (account) => {
-    const IconComponent = iconMap[account.icon] || Wallet
+  const getAccountIcon = (account: Account) => {
+    const IconComponent = iconMap[account.icon as keyof typeof iconMap] || Wallet
     return <IconComponent className="h-5 w-5" />
   }
 
-  const canDeleteAccount = (accountId) => {
+  const canDeleteAccount = (accountId: string) => {
     return !DEFAULT_ACCOUNT_IDS.includes(accountId)
   }
 
@@ -293,11 +299,11 @@ export function AccountsList({
           <AlertDialogHeader>
             <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteAccountConfirmation', { name: accountToDelete?.name })}
-              {accountToDelete?.balance > 0 && (
+              {t('deleteAccountConfirmation', { name: accountToDelete ? accountToDelete.name : '' })}
+              {accountToDelete && accountToDelete.balance > 0 && (
                 <p className="mt-2 font-medium">
                   {t('deleteAccountBalance', {
-                    balance: formatCurrency(accountToDelete?.balance),
+                    balance: formatCurrency(accountToDelete.balance),
                     savings: t('savings')
                   })}
                 </p>

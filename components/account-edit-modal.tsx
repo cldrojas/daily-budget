@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, FormEvent, ChangeEvent } from 'react'
 import {
   Wallet,
   PiggyBank,
@@ -29,6 +29,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
+import { Account } from '@/types'
 import { useLanguage } from '@/contexts/language-context'
 
 // Define available icons
@@ -49,12 +50,12 @@ const availableIcons = [
   { id: 'utensils', icon: Utensils, name: 'Utensils' }
 ]
 
-export function AccountEditModal({ account, isOpen, onClose, onSave }) {
+export function AccountEditModal({ account, isOpen, onClose, onSave }: { account?: Account | null; isOpen: boolean; onClose: () => void; onSave: (account: Account) => void }) {
   const { t } = useLanguage()
   const { toast } = useToast()
-  const [accountName, setAccountName] = useState(account?.name || '')
-  const [accountBalance, setAccountBalance] = useState(account?.balance || 0)
-  const [selectedIcon, setSelectedIcon] = useState(account?.icon || 'wallet')
+  const [accountName, setAccountName] = useState<string>(account?.name || '')
+  const [accountBalance, setAccountBalance] = useState<number>(account?.balance || 0)
+  const [selectedIcon, setSelectedIcon] = useState<string>(account?.icon || 'wallet')
 
   useEffect(() => {
     if (account) {
@@ -64,7 +65,7 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
     }
   }, [account])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!accountName.trim()) {
@@ -76,12 +77,12 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
       return
     }
 
-    onSave({
-      ...account,
-      name: accountName,
-      icon: selectedIcon,
-      balance: accountBalance || 0
-    })
+      onSave({
+        ...(account as Account),
+        name: accountName,
+        icon: selectedIcon,
+        balance: accountBalance || 0
+      })
 
     toast({
       title: t('accountUpdated'),
@@ -116,8 +117,8 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
               <Label htmlFor="accountName">{t('Balance')}</Label>
               <Input
                 id="accountBalance"
-                value={accountBalance}
-                onChange={(e) => setAccountBalance(e.target.value)}
+                value={String(accountBalance)}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setAccountBalance(Number(e.target.value) || 0)}
                 placeholder={t('accountBalancePlaceholder')}
               />
             </div>
