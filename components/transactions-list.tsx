@@ -28,6 +28,7 @@ export function TransactionList({
 }) {
   const { t, language } = useLanguage()
   const { formatCurrency } = useCurrency()
+  const { accounts } = useBudget()
 
   // Set locale based on language
   const locale = language === 'es' ? es : undefined
@@ -65,7 +66,6 @@ export function TransactionList({
             {expenses
               .toSorted((a, b) => time(b.date) - time(a.date)) // default sort by date descending
               .map((transaction) => {
-                const { accounts } = useBudget()
                 const account = accounts.find((account) => account.id === transaction.account)
                 return (
                   <div
