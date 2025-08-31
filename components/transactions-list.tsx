@@ -63,9 +63,8 @@ export function TransactionList({
         ) : (
           <div className="space-y-2">
             {expenses
-              .toSorted((a, b) => time(b.date) - time(a.date))
+              .toSorted((a, b) => time(b.date) - time(a.date)) // default sort by date descending
               .map((transaction) => {
-                // TODO: get the account name from the account ID
                 const { accounts } = useBudget()
                 const account = accounts.find((account) => account.id === transaction.account)
                 return (
@@ -83,7 +82,7 @@ export function TransactionList({
                             {format(new Date(transaction.date), 'd MMM', { locale })}
                           </span>
                           <span className="text-xs text-muted-foreground capitalize">
-                            • {t(account ? account.name : 'unknownAccount')}
+                            • {account ? account.name : t('unknownAccount')}
                           </span>
                         </div>
                       </div>
