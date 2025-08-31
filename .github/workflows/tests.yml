@@ -2,9 +2,9 @@ name: Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   typecheck-and-tests:
@@ -26,4 +26,3 @@ jobs:
         run: pnpm test -- --run
       - name: Run Playwright UI tests
         run: pnpm test:ui --reporter=list
-*** End Patch
