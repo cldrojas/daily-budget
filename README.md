@@ -105,6 +105,25 @@ pnpm add -D cypress
 pnpm cypress open
 ```
 
+### 6. Tests (unit + UI)
+
+This repository uses Vitest for unit/integration tests and Playwright for UI tests.
+
+- Run unit tests:
+
+```sh
+pnpm test          # runs vitest (unit tests under tests/unit/**)
+pnpm test:coverage # run with coverage
+```
+
+- Run Playwright UI tests (starts `pnpm dev` automatically):
+
+```sh
+pnpm test:ui
+```
+
+CI: There's a GitHub Actions workflow at `.github/workflows/tests.yml` that runs `pnpm tsc --noEmit`, unit tests, and Playwright UI tests on push/PR to main.
+
 ---
 
 ## Notes
