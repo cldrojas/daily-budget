@@ -30,6 +30,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
+import { Account } from '@/types'
 
 // Define available icons
 const availableIcons = [
@@ -49,25 +50,27 @@ const availableIcons = [
   { id: 'utensils', icon: Utensils, name: 'Utensils' }
 ]
 
-export function AccountEditModal({ account, isOpen, onClose, onSave }) {
+export function AccountEditModal({ account, isOpen, onClose, onSave }: {account: Account | null, isOpen: boolean, onClose: () => void, onSave: (account: Account) => void }) {
   const { t } = useLanguage()
   const { toast } = useToast()
   const [accountName, setAccountName] = useState(account?.name || '')
   const [accountBalance, setAccountBalance] = useState(account?.balance || 0)
   const [selectedIcon, setSelectedIcon] = useState(account?.icon || 'wallet')
+  const [parentId, setParentId] = useState(account?.parentId || '')
 
   useEffect(() => {
     if (account) {
       setAccountName(account.name)
       setAccountBalance(account.balance)
-      setSelectedIcon(account.icon)
+      setSelectedIcon(account.icon || 'wallet')
+      setParentId(account.parentId || '')
     }
   }, [account])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!accountName.trim()) {
+  if (!accountName.trim()) {
       toast({
         title: t('invalidAccountName'),
         description: t('invalidAccountNameDescription'),
@@ -78,9 +81,11 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
 
     onSave({
       ...account,
+      id: account?.id,
       name: accountName,
       icon: selectedIcon,
-      balance: accountBalance || 0
+      balance: Number(accountBalance) || 0,
+      parentId: parentId || null
     })
 
     toast({
@@ -113,12 +118,22 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="accountName">{t('Balance')}</Label>
+              <Label htmlFor="accountBalance">{t('Balance')}</Label>
               <Input
                 id="accountBalance"
                 value={accountBalance}
-                onChange={(e) => setAccountBalance(e.target.value)}
+                onChange={(e) => setAccountBalance(Number(e.target.value))}
                 placeholder={t('accountBalancePlaceholder')}
+                type="number"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="parentId">{t('parentAccount')}</Label>
+              <Input
+                id="parentId"
+                value={parentId}
+                onChange={(e) => setParentId(e.target.value)}
+                placeholder={t('parentAccountPlaceholder')}
               />
             </div>
             <div className="grid gap-2">
