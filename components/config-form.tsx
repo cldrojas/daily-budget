@@ -78,6 +78,28 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+              <div className="flex justify-between mb-4">
+                <Button 
+                  type="button" 
+                  variant="secondary"
+                  onClick={() => {
+                    const data = localStorage.getItem('daily-budget-data')
+                    if (data) {
+                      const blob = new Blob([data], { type: 'application/json' })
+                      const url = URL.createObjectURL(blob)
+                      const a = document.createElement('a')
+                      a.href = url
+                      a.download = 'daily-budget-export.json'
+                      document.body.appendChild(a)
+                      a.click()
+                      document.body.removeChild(a)
+                      URL.revokeObjectURL(url)
+                    }
+                  }}
+                >
+                  {t("exportData")}
+                </Button>
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="startAmount">{t("startingAmount")}</Label>
                 <Input
