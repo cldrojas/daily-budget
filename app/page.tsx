@@ -45,6 +45,8 @@ export default function DailyBudgetApp() {
     remainingToday,
     progress,
     setupBudget,
+    selectedAccountId,
+    setSelectedAccountId,
     addTransaction,
     updateTransaction,
     addAccount,
@@ -92,6 +94,8 @@ export default function DailyBudgetApp() {
               progress={progress}
               accounts={accounts}
               remainingDays={getRemainingDays()}
+              selectedAccountId={selectedAccountId}
+              setSelectedAccountId={setSelectedAccountId}
             />
 
             <div className="mt-6">
@@ -254,22 +258,24 @@ function DailyBudgetStatus({
   remainingToday,
   progress,
   accounts,
-  remainingDays
+  remainingDays,
+  selectedAccountId,
+  setSelectedAccountId
 }: {
   dailyAllowance: number
   remainingToday: number
   progress: number
-  accounts: { id: string; balance: number }[]
+  accounts: { id: string; balance: number; name?: string }[]
   remainingDays: number
+  selectedAccountId: string
+  setSelectedAccountId: (id: string) => void
 }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
 
-  // Find the daily budget account
-  const dailyAccount: { id: string; balance: number } | undefined = accounts.find(
-    (acc: { id: string; balance: number }) => acc.id === 'daily'
-  )
-  const totalBudget = dailyAccount ? dailyAccount.balance : 0
+  // Find the selected account
+  const selectedAccount = accounts.find((acc) => acc.id === selectedAccountId)
+  const totalBudget = selectedAccount ? selectedAccount.balance : 0
 
   return (
     <Card>
@@ -310,6 +316,20 @@ function DailyBudgetStatus({
             </p>
           </div>
           <div className="space-y-2 text-right">
+            <div className="flex items-center justify-end space-x-3">
+              <label className="text-sm font-medium text-muted-foreground">{t('selectAccount')}</label>
+              <select
+                value={selectedAccountId}
+                onChange={(e) => setSelectedAccountId(e.target.value)}
+                className="bg-transparent text-right"
+              >
+                {accounts.map((acc) => (
+                  <option key={acc.id} value={acc.id}>
+                    {acc.name || acc.id}
+                  </option>
+                ))}
+              </select>
+            </div>
             <p className="text-sm font-medium text-muted-foreground">
               {t('totalBudget')}
             </p>

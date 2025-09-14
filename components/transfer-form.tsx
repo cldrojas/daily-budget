@@ -11,7 +11,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
 
-export function TransferForm({ accounts, onTransfer }) {
+export function TransferForm({ accounts, onTransfer }: { accounts: any[]; onTransfer: (t: any) => void }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
@@ -20,7 +20,7 @@ export function TransferForm({ accounts, onTransfer }) {
   const [toAccount, setToAccount] = useState("")
   const [description, setDescription] = useState("")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!fromAccount || !toAccount) {
@@ -51,12 +51,12 @@ export function TransferForm({ accounts, onTransfer }) {
     }
 
     const transferAmount = Number.parseFloat(amount)
-    const sourceAccount = accounts.find((acc) => acc.id === fromAccount)
+  const sourceAccount = accounts.find((acc) => acc.id === fromAccount)
 
-    if (sourceAccount && sourceAccount.balance < transferAmount) {
+  if (sourceAccount && sourceAccount.balance < transferAmount) {
       toast({
         title: t("insufficientFunds"),
-        description: t("insufficientFundsDescription", { account: sourceAccount.name }),
+    description: t("insufficientFundsDescription", { account: sourceAccount.name }),
         variant: "destructive",
       })
       return
@@ -114,7 +114,7 @@ export function TransferForm({ accounts, onTransfer }) {
               </SelectTrigger>
               <SelectContent>
                 {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
+                    <SelectItem key={account.id} value={account.id}>
                     {account.name}
                   </SelectItem>
                 ))}

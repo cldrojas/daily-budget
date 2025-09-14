@@ -42,6 +42,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AccountEditModal } from './account-edit-modal'
+import { Account } from '@/types'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -79,6 +80,11 @@ export function AccountsList({
   onAddAccount,
   onUpdateAccount,
   onDeleteAccount
+}: {
+  accounts: Account[]
+  onAddAccount: (a: Partial<Account>) => void
+  onUpdateAccount: (a: Account) => void
+  onDeleteAccount: (id?: string) => boolean
 }) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
@@ -87,12 +93,12 @@ export function AccountsList({
   const [newAccountName, setNewAccountName] = useState('')
   const [newAccountType, setNewAccountType] = useState('savings')
   const [newAccountIcon, setNewAccountIcon] = useState('piggybank')
-  const [editingAccount, setEditingAccount] = useState(null)
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [accountToDelete, setAccountToDelete] = useState(null)
+  const [accountToDelete, setAccountToDelete] = useState<Account | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  const handleAddAccount = (e) => {
+  const handleAddAccount = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!newAccountName.trim()) {
@@ -106,9 +112,10 @@ export function AccountsList({
 
     onAddAccount({
       name: newAccountName,
-      type: newAccountType,
+      balance: 0,
       icon: newAccountIcon,
-      balance: 0
+      parentId: null,
+      type: newAccountType
     })
 
     // Reset form
@@ -124,12 +131,12 @@ export function AccountsList({
     })
   }
 
-  const handleEditClick = (account) => {
+  const handleEditClick = (account: Account) => {
     setEditingAccount(account)
     setIsEditModalOpen(true)
   }
 
-  const handleDeleteClick = (account) => {
+  const handleDeleteClick = (account: Account) => {
     setAccountToDelete(account)
     setIsDeleteDialogOpen(true)
   }
@@ -148,23 +155,24 @@ export function AccountsList({
     setAccountToDelete(null)
   }
 
-  const handleSaveEdit = (updatedAccount) => {
+  const handleSaveEdit = (updatedAccount: Account) => {
     onUpdateAccount(updatedAccount)
   }
 
-  const getAccountIcon = (account) => {
-    const IconComponent = iconMap[account.icon] || Wallet
+  const getAccountIcon = (account: Account) => {
+  const key = (account.icon as string) || 'wallet'
+  const IconComponent = iconMap[key as keyof typeof iconMap] || Wallet
     return <IconComponent className="h-5 w-5" />
   }
 
-  const canDeleteAccount = (accountId) => {
-    return !DEFAULT_ACCOUNT_IDS.includes(accountId)
+  const canDeleteAccount = (accountId?: string) => {
+    return !!accountId && !DEFAULT_ACCOUNT_IDS.includes(accountId)
   }
 
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {accounts.map((account) => (
+    {accounts.map((account) => (
           <Card key={account.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
@@ -197,7 +205,7 @@ export function AccountsList({
             <CardContent>
               <div className="text-2xl font-bold">{formatCurrency(account.balance)}</div>
               <p className="text-xs text-muted-foreground">
-                {t(account.type)} {t('account')}
+                {account.parentId ? t('subAccount') : t('account')}
               </p>
             </CardContent>
           </Card>
@@ -289,12 +297,12 @@ export function AccountsList({
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
       >
-        <AlertDialogContent>
+              <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteAccountConfirmation', { name: accountToDelete?.name })}
-              {accountToDelete?.balance > 0 && (
+              {t('deleteAccountConfirmation', { name: accountToDelete?.name ?? '' })}
+              {accountToDelete?.balance && accountToDelete.balance > 0 && (
                 <p className="mt-2 font-medium">
                   {t('deleteAccountBalance', {
                     balance: formatCurrency(accountToDelete?.balance),
