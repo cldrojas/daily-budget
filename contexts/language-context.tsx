@@ -39,6 +39,7 @@ export const translations = {
     modifyBudgetConfig: 'Adjust your budget details',
     updateSettings: 'Save Changes',
     clearData: 'Clear All Data',
+    exportData: 'Export Data',
     cancel: 'Cancel',
 
     // Tabs
@@ -167,6 +168,7 @@ export const translations = {
     modifyBudgetConfig: 'Ajusta los detalles de tu presupuesto',
     updateSettings: 'Guardar cambios',
     clearData: 'Borrar todos los datos',
+    exportData: 'Exportar datos',
     cancel: 'Cancelar',
 
     // Tabs

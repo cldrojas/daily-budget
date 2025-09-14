@@ -203,7 +203,7 @@ function SetupForm({
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!startAmount || !endDate) return
+    if (!startAmount || startAmount <= 0 || !endDate) return
 
     onSetup({
       startAmount: startAmount,
@@ -224,7 +224,8 @@ function SetupForm({
             <Input
               id="startAmount"
               type="number"
-              placeholder="1000.00"
+              placeholder="2750000"
+              autoFocus
               value={startAmount}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setStartAmount(toInt(e.target.valueAsNumber))
