@@ -28,7 +28,7 @@ import { LanguageCurrencySelector } from '@/components/language-currency-selecto
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AddButton } from '@/components/ui/AddButton'
-import { Transaction } from '@/types'
+import { Int, toInt, Transaction } from '@/types'
 
 export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
@@ -65,6 +65,12 @@ export default function DailyBudgetApp() {
           <h1 className="text-xl font-bold">{t('appName')}</h1>
           <div className="flex items-center space-x-2">
             <LanguageCurrencySelector />
+            <Button
+              variant="default"
+              size="default"
+              onClick={() => console.log(JSON.stringify(budget, null, 2))}
+              title={'Debug log'}
+            >TEST?</Button>
             <Button
               variant="ghost"
               size="icon"
@@ -189,10 +195,10 @@ export default function DailyBudgetApp() {
 function SetupForm({
   onSetup
 }: {
-  onSetup: (data: { startAmount: number; endDate: Date }) => void
+  onSetup: (data: { startAmount: Int; endDate: Date }) => void
 }) {
   const { t } = useLanguage()
-  const [startAmount, setStartAmount] = useState(undefined as number | undefined)
+  const [startAmount, setStartAmount] = useState(0 as Int)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -222,7 +228,7 @@ function SetupForm({
               autoFocus
               value={startAmount}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setStartAmount(e.target.valueAsNumber)
+                setStartAmount(toInt(e.target.valueAsNumber))
               }
               required
             />

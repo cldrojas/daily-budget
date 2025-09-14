@@ -30,6 +30,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
+import { Int, toInt } from '@/types'
 
 // Define available icons
 const availableIcons = [
@@ -49,11 +50,16 @@ const availableIcons = [
   { id: 'utensils', icon: Utensils, name: 'Utensils' }
 ]
 
-export function AccountEditModal({ account, isOpen, onClose, onSave }) {
+export function AccountEditModal({ account, isOpen, onClose, onSave }: {
+  account: { id: string; name: string; balance: Int; icon: string } | null,
+  isOpen: boolean,
+  onClose: () => void,
+  onSave: (updatedAccount: { id?: string; name: string; balance: Int; icon: string }) => void
+}) {
   const { t } = useLanguage()
   const { toast } = useToast()
   const [accountName, setAccountName] = useState(account?.name || '')
-  const [accountBalance, setAccountBalance] = useState(account?.balance || 0)
+  const [accountBalance, setAccountBalance] = useState(toInt(account?.balance || 0))
   const [selectedIcon, setSelectedIcon] = useState(account?.icon || 'wallet')
 
   useEffect(() => {
@@ -64,7 +70,7 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
     }
   }, [account])
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault()
 
     if (!accountName.trim()) {
@@ -80,7 +86,7 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
       ...account,
       name: accountName,
       icon: selectedIcon,
-      balance: accountBalance || 0
+      balance: toInt(accountBalance || 0)
     })
 
     toast({
@@ -117,23 +123,23 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }) {
               <Input
                 id="accountBalance"
                 value={accountBalance}
-                onChange={(e) => setAccountBalance(e.target.value)}
+                onChange={(e) => setAccountBalance(toInt(Number(e.target.value) || 0))}
                 placeholder={t('accountBalancePlaceholder')}
               />
             </div>
             <div className="grid gap-2">
               <Label>{t('accountIcon')}</Label>
               <div className="grid grid-cols-7 gap-2">
-                {availableIcons.map((iconObj) => {
-                  const IconComponent = iconObj.icon
+                {availableIcons.map(({ id, icon, name }) => {
+                  const IconComponent = icon
                   return (
                     <Button
-                      key={iconObj.id}
+                      key={id}
                       type="button"
-                      variant={selectedIcon === iconObj.id ? 'default' : 'outline'}
+                      variant={selectedIcon === id ? 'default' : 'outline'}
                       className="h-10 w-10 p-0"
-                      onClick={() => setSelectedIcon(iconObj.id)}
-                      title={iconObj.name}
+                      onClick={() => setSelectedIcon(id)}
+                      title={name}
                     >
                       <IconComponent className="h-5 w-5" />
                     </Button>
