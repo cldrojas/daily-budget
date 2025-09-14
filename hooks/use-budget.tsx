@@ -102,18 +102,14 @@ export function useBudget() {
       // If there was a previous day, move remaining amount to savings
       if (lastCheckedDay && remainingToday > 0) {
         // Add remaining amount to savings and discount from daily
-        console.log(`DEBUG:remainingToday:`, remainingToday)
-        console.log(`updating accounts`)
         const updatedAccounts = accounts.map((account) => {
           console.log(`DEBUG:[accounts.map] account:`, account)
           if (account.id === 'savings') {
             const savingAcc = { ...account, balance: toInt(Math.floor(account.balance) + Math.floor(remainingToday)) }
-            console.log(`DEBUG:newAccount:`, savingAcc)
             return savingAcc
           }
           if (account.id === 'daily') {
             const dailyAcc = { ...account, balance: toInt(Math.floor(account.balance) - Math.floor(remainingToday)) }
-            console.log(`DEBUG:dailyAcc:`, dailyAcc)
             return dailyAcc
           }
           return account
@@ -129,8 +125,6 @@ export function useBudget() {
           account: 'savings'
         }
 
-        console.log(`DEBUG:updatedAccounts:`, updatedAccounts)
-
         setAccounts(updatedAccounts)
         setTransactions([savingsTransaction, ...transactions])
       }
@@ -139,7 +133,8 @@ export function useBudget() {
       calculateDailyAllowance()
 
       // Update last checked day
-      setLastCheckedDay(today)
+      today !== lastCheckedDay &&
+        setLastCheckedDay(today)
     }
   }, [isSetup, lastCheckedDay])
 
