@@ -132,3 +132,14 @@ CI: There's a GitHub Actions workflow at `.github/workflows/tests.yml` that runs
 - For production, consider deploying on Vercel, Cloudflare, or similar platforms.
 
 ---
+
+## Custom Rules
+
+This project uses custom rules for Kilo Code AI to enforce coding standards and security. See the following rule files:
+
+- [Naming Conventions](.kilocode/rules/naming-conventions.md)
+- [Restricted Files](.kilocode/rules/restricted-files.md)
+- [Documentation Requirements](.kilocode/rules/documentation.md)
+- [Testing Patterns](.kilocode/rules/testing.md)
+
+Global rules apply across projects: `~/.kilocode/rules/general-standards.md`.
