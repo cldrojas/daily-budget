@@ -1,60 +1,8 @@
-'use client'
-
-import { useState, useEffect } from 'react'
-import { Moon, Sun, Plus } from 'lucide-react'
-
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
-import { SetupForm } from '@/components/setup-form'
-import { DailyBudgetStatus } from '@/components/daily-budget-status'
-import { TransactionList } from '@/components/transactions-list'
-import { TransactionModal } from '@/components/modals/transaction-modal'
-import { AccountsList } from '@/components/accounts-list'
-import { TransactionHistory } from '@/components/transaction-history'
-import { useBudget } from '@/hooks/use-budget'
-import { ConfigForm } from '@/components/config-form'
-import { TransferForm } from '@/components/transfer-form'
-import { LanguageCurrencySelector } from '@/components/language-currency-selector'
-import { useLanguage } from '@/contexts/language-context'
-import { toInt } from '@/types'
-import type { Transaction } from '@/types'
-
-/**
- * Main application component for daily budget management.
- * Handles theme switching, budget setup, transactions, accounts, and transfers.
- * @returns The main app component with tabs for different functionalities.
- */
 export default function DailyBudgetApp() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const { theme, setTheme } = useTheme()
   const { t } = useLanguage()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
-
-  // Theme management
-  useEffect(() => {
-    // Only run on client side
-    if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-      if (savedTheme) {
-        setTheme(savedTheme)
-        document.documentElement.classList.toggle('dark', savedTheme === 'dark')
-      } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        setTheme(prefersDark ? 'dark' : 'light')
-        document.documentElement.classList.toggle('dark', prefersDark)
-      }
-    }
-  }, [])
-
-  const toggleTheme = () => {
-    if (typeof window !== 'undefined') {
-      const newTheme = theme === 'dark' ? 'light' : 'dark'
-      setTheme(newTheme)
-      localStorage.setItem('theme', newTheme)
-      document.documentElement.classList.toggle('dark', newTheme === 'dark')
-    }
-  }
 
   const {
     budget,
@@ -85,9 +33,15 @@ export default function DailyBudgetApp() {
           <div className="flex items-center space-x-2">
             <LanguageCurrencySelector />
             <Button
+              variant="default"
+              size="default"
+              onClick={() => console.log(JSON.stringify(budget, null, 2))}
+              title={'Debug log'}
+            >TEST?</Button>
+            <Button
               variant="ghost"
               size="icon"
-              onClick={toggleTheme}
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               title={theme === 'dark' ? t('lightMode') : t('darkMode')}
             >
               {theme === 'dark' ? (
@@ -102,7 +56,7 @@ export default function DailyBudgetApp() {
 
       <main className="container px-4 py-6 md:py-10 space-y-8">
         {!isSetup ? (
-          <SetupForm onSetup={({ startAmount, endDate }) => setupBudget({ startAmount: toInt(startAmount), endDate })} />
+          <SetupForm onSetup={setupBudget} />
         ) : (
           <>
             <DailyBudgetStatus
@@ -123,6 +77,7 @@ export default function DailyBudgetApp() {
 
             <Tabs defaultValue="accounts">
               <TabsList className="grid w-full grid-cols-4">
+                {/* TODO: add a way to reorder tabs (drag&drop) */}
                 <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
                 <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
                 <TabsTrigger value="transfer">{t('transfer')}</TabsTrigger>
@@ -182,6 +137,8 @@ export default function DailyBudgetApp() {
               <Plus className="h-6 w-6" />
             </Button>
 
+            <AddButton />
+
             {/* Expense Modal */}
             <TransactionModal
               isOpen={isTransactionModalOpen}
@@ -200,4 +157,4 @@ export default function DailyBudgetApp() {
       </main>
     </div>
   )
-} 
+}

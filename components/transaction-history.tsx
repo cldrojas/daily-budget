@@ -1,7 +1,7 @@
 "use client"
 
 import { format } from "date-fns"
-import { es } from "date-fns/locale"
+import { es } from "date-fns/locale/es"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useLanguage } from "@/contexts/language-context"

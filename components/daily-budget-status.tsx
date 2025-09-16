@@ -1,7 +1,9 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { CircularProgress } from '@/components/circular-progress'
+import { useLanguage } from '@/contexts/language-context'
+import { useCurrency } from '@/contexts/currency-context'
 import type { Account } from '@/types'
 
 interface DailyBudgetStatusProps {
@@ -12,6 +14,23 @@ interface DailyBudgetStatusProps {
   remainingDays: number
 }
 
+/**
+ * Component to display the daily budget status.
+ * @param dailyAllowance - The daily allowance amount.
+ * @param remainingToday - The remaining amount for today.
+ * @param progress - The progress percentage.
+ * @param accounts - Array of accounts.
+ * @param remainingDays - Number of remaining days.
+ * @returns JSX element for the daily budget status.
+ * @example
+ * <DailyBudgetStatus
+ *   dailyAllowance={100}
+ *   remainingToday={50}
+ *   progress={50}
+ *   accounts={[]}
+ *   remainingDays={10}
+ * />
+ */
 export function DailyBudgetStatus({
   dailyAllowance,
   remainingToday,
@@ -19,40 +38,56 @@ export function DailyBudgetStatus({
   accounts,
   remainingDays,
 }: DailyBudgetStatusProps) {
-  const totalBalance = accounts.reduce((sum, account) => sum + account.balance, 0)
+  const { t } = useLanguage()
+  const { formatCurrency } = useCurrency()
+
+  // Find the daily budget account
+  const dailyAccount = accounts.find(acc => acc.id === 'daily')
+  const totalBudget = dailyAccount ? dailyAccount.balance : 0
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Daily Budget Status</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Daily Allowance</p>
-            <p className="text-2xl font-bold">${dailyAllowance.toLocaleString()}</p>
-          </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Remaining Today</p>
-            <p className="text-2xl font-bold">${remainingToday.toLocaleString()}</p>
-          </div>
-        </div>
-
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
         <div>
-          <p className="text-sm font-medium text-muted-foreground mb-2">
-            Progress ({Math.round(progress)}%)
-          </p>
-          <Progress value={progress} className="h-2" />
+          <CardTitle>{t('dailyBudget')}</CardTitle>
+          <CardDescription>{t('budgetForToday')}</CardDescription>
         </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Total Balance</p>
-            <p className="text-xl font-semibold">${totalBalance.toLocaleString()}</p>
+        <div className="text-right">
+          <p className="text-sm font-medium text-muted-foreground">
+            {t('dailyAllowance')}
+          </p>
+          <p className="text-xl font-bold">{formatCurrency(dailyAllowance)}</p>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col items-center space-y-6">
+        <CircularProgress
+          value={progress}
+          size={200}
+          strokeWidth={15}
+          className="my-4"
+        >
+          <div className="text-center">
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('remainingToday')}
+            </p>
+            <p className="text-3xl font-bold">{formatCurrency(remainingToday)}</p>
           </div>
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Days Remaining</p>
-            <p className="text-xl font-semibold">{remainingDays}</p>
+        </CircularProgress>
+
+        <div className="grid grid-cols-2 gap-4 w-full">
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('remainingDays')}
+            </p>
+            <p className="text-2xl font-bold">
+              {remainingDays} {t('days')}
+            </p>
+          </div>
+          <div className="space-y-2 text-right">
+            <p className="text-sm font-medium text-muted-foreground">
+              {t('totalBudget')}
+            </p>
+            <p className="text-2xl font-bold">{formatCurrency(totalBudget)}</p>
           </div>
         </div>
       </CardContent>

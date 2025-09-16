@@ -57,7 +57,7 @@ export function useBudget() {
       }
 
       setBudget(parsedData.budget || budget)
-      setAccounts(parsedData.accounts || accounts)
+      setAccounts(parsedData.accounts && parsedData.accounts.length > 0 ? parsedData.accounts : accounts)
       setTransactions(parsedData.transactions || transactions)
       setDailyAllowance(parsedData.dailyAllowance || 0)
       setRemainingToday(parsedData.remainingToday || 0)
@@ -241,6 +241,10 @@ export function useBudget() {
     account: string
     date?: Date
   }) => {
+
+    if (!isFinite(amount) || amount <= 0) {
+      return;
+    }
 
     if (type === 'expense') {
 

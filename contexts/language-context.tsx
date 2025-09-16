@@ -279,18 +279,27 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 // Create the provider
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  // Detect browser language on client side
-  const [language, setLanguage] = useState<Language>('es') // Default to Spanish initially
+  // Get initial language from localStorage or browser language
+  const getInitialLanguage = (): Language => {
+    if (typeof window === 'undefined') return 'es' // SSR default
 
-  // Effect to detect browser language on client side
-  useEffect(() => {
-    // Get browser language
+    // Check localStorage first
+    const stored = localStorage.getItem('language')
+    if (stored === 'en' || stored === 'es') return stored as Language
+
+    // Fallback to browser language
     const browserLang = navigator.language.split('-')[0].toLowerCase()
-    // Check if browser language is supported
-    if (browserLang === 'en' || browserLang === 'es') {
-      setLanguage(browserLang as Language)
-    }
-  }, [])
+    if (browserLang === 'en' || browserLang === 'es') return browserLang as Language
+
+    return 'es' // Final fallback
+  }
+
+  const [language, setLanguage] = useState<Language>(getInitialLanguage)
+
+  // Effect to save language changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('language', language)
+  }, [language])
 
   // Function to get translation
   const t = (key: string, params?: Record<string, string | number>) => {

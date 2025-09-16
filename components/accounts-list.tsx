@@ -298,36 +298,38 @@ export function AccountsList({
       )}
 
       {/* Delete Account Confirmation Dialog */}
-      <AlertDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('deleteAccountConfirmation', { name: accountToDelete!.name })}
-              {accountToDelete!.balance > 0 && (
-                <p className="mt-2 font-medium">
-                  {t('deleteAccountBalance', {
-                    balance: formatCurrency(accountToDelete!.balance),
-                    savings: t('savings')
-                  })}
-                </p>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmDelete}
-              className="bg-destructive text-destructive-foreground"
-            >
-              {t('delete')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {isDeleteDialogOpen && accountToDelete && (
+        <AlertDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
+              <AlertDialogDescription>
+                {t('deleteAccountConfirmation', { name: accountToDelete.name })}
+                {accountToDelete.balance > 0 && (
+                  <p className="mt-2 font-medium">
+                    {t('deleteAccountBalance', {
+                      balance: formatCurrency(accountToDelete.balance),
+                      savings: t('savings')
+                    })}
+                  </p>
+                )}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                className="bg-destructive text-destructive-foreground"
+              >
+                {t('delete')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </div>
   )
 }
