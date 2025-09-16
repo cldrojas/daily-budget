@@ -83,12 +83,21 @@ export function TransactionModal({
       return
     }
 
+    if (!Number.isInteger(amount)) {
+      toast({
+        title: t('invalidAmount'),
+        description: 'Amount must be a whole number',
+        variant: 'destructive'
+      })
+      return
+    }
+
     if (transaction) {
       // Update existing transaction
       onUpdateTransaction({
         ...transaction,
         type,
-        amount: toInt(transaction.amount < 0 ? -amount : amount), // Preserve sign
+        amount: toInt(transaction.amount < 0 ? -amount : amount)!, // Preserve sign
         description,
         account,
         date
@@ -102,7 +111,7 @@ export function TransactionModal({
       // Add new transaction
       onAddTransaction({
         type,
-        amount: toInt(amount),
+        amount: toInt(amount)!,
         description,
         account,
         date

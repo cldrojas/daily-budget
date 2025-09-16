@@ -116,7 +116,7 @@ export function AccountsList({
       name: newAccountName,
       type: newAccountType,
       icon: newAccountIcon,
-      balance: toInt(0)
+      balance: toInt(0)!
     })
 
     // Reset form
