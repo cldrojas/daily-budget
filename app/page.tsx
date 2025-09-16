@@ -17,7 +17,7 @@ import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DatePicker } from '@/components/date-picker'
 import { TransactionList } from '@/components/transactions-list'
-import { TransactionModal } from '@/components/transaction-modal'
+import { TransactionModal } from '@/components/modals/transaction-modal'
 import { AccountsList } from '@/components/accounts-list'
 import { TransactionHistory } from '@/components/transaction-history'
 import { useBudget } from '@/hooks/use-budget'
@@ -33,7 +33,6 @@ import { Int, toInt, Transaction } from '@/types'
 export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
   const { t } = useLanguage()
-  const { formatCurrency } = useCurrency()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 

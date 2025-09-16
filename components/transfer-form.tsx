@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
+import { Account, Int, toInt } from "@/types"
 import { ArrowRightLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -11,7 +12,12 @@ import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
 
-export function TransferForm({ accounts, onTransfer }) {
+interface TransferFormProps {
+  accounts: Account[]
+  onTransfer: (transfer: { amount: Int; fromAccount: string; toAccount: string; description?: string }) => void
+}
+
+export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
@@ -20,7 +26,7 @@ export function TransferForm({ accounts, onTransfer }) {
   const [toAccount, setToAccount] = useState("")
   const [description, setDescription] = useState("")
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!fromAccount || !toAccount) {
@@ -50,8 +56,8 @@ export function TransferForm({ accounts, onTransfer }) {
       return
     }
 
-    const transferAmount = Number.parseFloat(amount)
-    const sourceAccount = accounts.find((acc) => acc.id === fromAccount)
+    const transferAmount = toInt(Number.parseFloat(amount))
+    const sourceAccount = accounts.find((acc: Account) => acc.id === fromAccount)
 
     if (sourceAccount && sourceAccount.balance < transferAmount) {
       toast({

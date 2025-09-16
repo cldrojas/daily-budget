@@ -171,6 +171,13 @@ function toast({ ...props }: Toast) {
   }
 }
 
+/**
+ * Hook for managing toast notifications.
+ * @returns Object with toast state and functions to show toasts.
+ * @example
+ * const { toast } = useToast();
+ * toast({ title: "Success", description: "Operation completed" });
+ */
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
 

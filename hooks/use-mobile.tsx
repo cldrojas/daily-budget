@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from "react"
 
+/**
+ * Hook to detect if the device is mobile based on window width.
+ * @returns Boolean indicating if the screen width is less than 768px.
+ * @example
+ * const isMobile = useMobile();
+ * if (isMobile) { // render mobile layout }
+ */
 export function useMobile() {
   const [isMobile, setIsMobile] = useState(false)
 

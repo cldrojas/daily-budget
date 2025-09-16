@@ -14,7 +14,6 @@ import { useCurrency } from '@/contexts/currency-context'
 import { Transaction } from '@/types'
 import { Button } from './ui/button'
 import { Trash2 } from 'lucide-react'
-import { TransactionModal } from './transaction-modal'
 import { useBudget } from '@/hooks/use-budget'
 
 export function TransactionList({

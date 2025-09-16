@@ -5,15 +5,18 @@ import { differenceInDays, startOfDay, isSameDay, isToday } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
 import { Account, Budget, Int, toInt, Transaction, TransactionType } from '@/types'
 
-
-
-
 // This would be replaced with actual KV database calls
 const LOCAL_STORAGE_KEY = 'daily-budget-data'
 
 // Default account IDs that cannot be deleted
 const DEFAULT_ACCOUNT_IDS = ['daily', 'savings', 'investment']
 
+/**
+ * Hook to manage budget state.
+ * @returns Object with budget state and functions to manage budget, accounts, and transactions.
+ * @example
+ * const { budget, accounts, transactions, setupBudget, addTransaction } = useBudget();
+ */
 export function useBudget() {
   const [isSetup, setIsSetup] = useState(false)
   const [budget, setBudget] = useState<Budget>({

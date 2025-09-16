@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
-import { Transaction, TransactionType } from "@/types"
+import { Transaction } from "@/types"
 
 export function TransactionForm({ onAddExpense, remainingToday }:
   {
@@ -24,7 +24,6 @@ export function TransactionForm({ onAddExpense, remainingToday }:
   const [amount, setAmount] = useState("")
   const [description, setDescription] = useState("")
   const [account, setAccount] = useState("daily")
-  const [transactionType, setTransactionType] = useState<TransactionType>('expense')
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -93,21 +92,6 @@ export function TransactionForm({ onAddExpense, remainingToday }:
 
           <div className="space-y-2">
             <Label htmlFor="account">{t("account")}</Label>
-            <Select value={account} onValueChange={setAccount}>
-              <SelectTrigger>
-                <SelectValue placeholder={t("selectAccount")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="daily">{t("daily")}</SelectItem>
-                <SelectItem value="savings">{t("savings")}</SelectItem>
-                <SelectItem value="investment">{t("investment")}</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            {/* <Label htmlFor="account">{t("transactionType")}</Label> */}
-            <Label htmlFor="account">{t("transactionType")}</Label>
             <Select value={account} onValueChange={setAccount}>
               <SelectTrigger>
                 <SelectValue placeholder={t("selectAccount")} />

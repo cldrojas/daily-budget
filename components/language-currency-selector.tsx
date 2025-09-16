@@ -6,7 +6,7 @@ import { useLanguage, type Language, translations } from "@/contexts/language-co
 import { useCurrency, type Currency, currencies } from "@/contexts/currency-context"
 
 export function LanguageCurrencySelector() {
-  const { language, setLanguage, t } = useLanguage()
+  const { language, setLanguage } = useLanguage()
   const { currency, setCurrency } = useCurrency()
 
   return (
