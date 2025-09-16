@@ -11,7 +11,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { toInt, type Budget, type Int } from "@/types"
-import ConfirmDialog from "@/components/confirm-dialog"
+import ConfirmDialog from "@/components/modals/confirm-dialog"
 import { Checkbox } from "./ui/checkbox"
 import { useBudget } from "@/hooks/use-budget"
 

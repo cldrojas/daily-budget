@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { SetupForm } from '@/components/setup-form'
 import { DailyBudgetStatus } from '@/components/daily-budget-status'
 import { TransactionList } from '@/components/transactions-list'
-import { TransactionModal } from '@/components/transaction-modal'
+import { TransactionModal } from '@/components/modals/transaction-modal'
 import { AccountsList } from '@/components/accounts-list'
 import { TransactionHistory } from '@/components/transaction-history'
 import { useBudget } from '@/hooks/use-budget'
@@ -17,14 +17,17 @@ import { ConfigForm } from '@/components/config-form'
 import { TransferForm } from '@/components/transfer-form'
 import { LanguageCurrencySelector } from '@/components/language-currency-selector'
 import { useLanguage } from '@/contexts/language-context'
-import { useCurrency } from '@/contexts/currency-context'
-import { AddButton } from '@/components/ui/AddButton'
+import { toInt } from '@/types'
 import type { Transaction } from '@/types'
 
+/**
+ * Main application component for daily budget management.
+ * Handles theme switching, budget setup, transactions, accounts, and transfers.
+ * @returns The main app component with tabs for different functionalities.
+ */
 export default function DailyBudgetApp() {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark')
   const { t } = useLanguage()
-  // const { formatCurrency } = useCurrency()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
@@ -99,7 +102,7 @@ export default function DailyBudgetApp() {
 
       <main className="container px-4 py-6 md:py-10 space-y-8">
         {!isSetup ? (
-          <SetupForm onSetup={setupBudget} />
+          <SetupForm onSetup={({ startAmount, endDate }) => setupBudget({ startAmount: toInt(startAmount), endDate })} />
         ) : (
           <>
             <DailyBudgetStatus
@@ -123,7 +126,7 @@ export default function DailyBudgetApp() {
                 <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
                 <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
                 <TabsTrigger value="transfer">{t('transfer')}</TabsTrigger>
-                <TabsTrigger value="history">{t('asddsd')}</TabsTrigger>
+                <TabsTrigger value="history">{t('history')}</TabsTrigger>
               </TabsList>
               <TabsContent
                 value="expenses"
@@ -178,8 +181,6 @@ export default function DailyBudgetApp() {
             >
               <Plus className="h-6 w-6" />
             </Button>
-
-            <AddButton />
 
             {/* Expense Modal */}
             <TransactionModal

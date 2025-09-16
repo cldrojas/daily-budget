@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
+import { Account, Int, toInt } from '@/types'
 import {
   PlusCircle,
   Wallet,
@@ -41,7 +42,7 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
-import { AccountEditModal } from './account-edit-modal'
+import { AccountEditModal } from './modals/account-edit-modal'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -74,12 +75,19 @@ const iconMap = {
   utensils: Utensils
 }
 
+interface AccountsListProps {
+  accounts: Account[]
+  onAddAccount: (account: Omit<Account, 'id'>) => void
+  onUpdateAccount: (account: Account) => void
+  onDeleteAccount: (accountId: string) => boolean
+}
+
 export function AccountsList({
   accounts,
   onAddAccount,
   onUpdateAccount,
   onDeleteAccount
-}) {
+}: AccountsListProps) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
@@ -87,12 +95,12 @@ export function AccountsList({
   const [newAccountName, setNewAccountName] = useState('')
   const [newAccountType, setNewAccountType] = useState('savings')
   const [newAccountIcon, setNewAccountIcon] = useState('piggybank')
-  const [editingAccount, setEditingAccount] = useState(null)
+  const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [accountToDelete, setAccountToDelete] = useState(null)
+  const [accountToDelete, setAccountToDelete] = useState<Account | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
-  const handleAddAccount = (e) => {
+  const handleAddAccount = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!newAccountName.trim()) {
@@ -108,7 +116,7 @@ export function AccountsList({
       name: newAccountName,
       type: newAccountType,
       icon: newAccountIcon,
-      balance: 0
+      balance: toInt(0)
     })
 
     // Reset form
@@ -124,12 +132,12 @@ export function AccountsList({
     })
   }
 
-  const handleEditClick = (account) => {
+  const handleEditClick = (account: Account) => {
     setEditingAccount(account)
     setIsEditModalOpen(true)
   }
 
-  const handleDeleteClick = (account) => {
+  const handleDeleteClick = (account: Account) => {
     setAccountToDelete(account)
     setIsDeleteDialogOpen(true)
   }
@@ -148,16 +156,21 @@ export function AccountsList({
     setAccountToDelete(null)
   }
 
-  const handleSaveEdit = (updatedAccount) => {
-    onUpdateAccount(updatedAccount)
+  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: Int; icon: string }) => {
+    if (editingAccount) {
+      onUpdateAccount({
+        ...editingAccount,
+        ...updatedAccount
+      })
+    }
   }
 
-  const getAccountIcon = (account) => {
-    const IconComponent = iconMap[account.icon] || Wallet
+  const getAccountIcon = (account: Account) => {
+    const IconComponent = iconMap[account.icon as keyof typeof iconMap] || Wallet
     return <IconComponent className="h-5 w-5" />
   }
 
-  const canDeleteAccount = (accountId) => {
+  const canDeleteAccount = (accountId: string) => {
     return !DEFAULT_ACCOUNT_IDS.includes(accountId)
   }
 
@@ -293,11 +306,11 @@ export function AccountsList({
           <AlertDialogHeader>
             <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('deleteAccountConfirmation', { name: accountToDelete?.name })}
-              {accountToDelete?.balance > 0 && (
+              {t('deleteAccountConfirmation', { name: accountToDelete!.name })}
+              {accountToDelete!.balance > 0 && (
                 <p className="mt-2 font-medium">
                   {t('deleteAccountBalance', {
-                    balance: formatCurrency(accountToDelete?.balance),
+                    balance: formatCurrency(accountToDelete!.balance),
                     savings: t('savings')
                   })}
                 </p>
