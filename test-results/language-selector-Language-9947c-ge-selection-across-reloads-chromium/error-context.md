@@ -1,0 +1,52 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - heading "Saldo Cero" [level=1] [ref=e5]
+        - generic [ref=e6]:
+          - generic [ref=e7]:
+            - button "EN" [active] [ref=e8] [cursor=pointer]:
+              - img
+              - generic [ref=e9] [cursor=pointer]: EN
+            - button "CLP" [ref=e10] [cursor=pointer]:
+              - img
+              - generic [ref=e11] [cursor=pointer]: CLP
+          - button "TEST?" [ref=e12] [cursor=pointer]
+          - button "Light Mode" [ref=e13] [cursor=pointer]:
+            - img
+    - main [ref=e14]:
+      - generic [ref=e15]:
+        - generic [ref=e16]:
+          - generic [ref=e17]: Set Up Your Budget
+          - generic [ref=e18]: Enter your starting amount and end date to calculate your daily budget.
+        - generic [ref=e19]:
+          - generic [ref=e20]:
+            - generic [ref=e21]:
+              - generic [ref=e22]: Starting Amount
+              - spinbutton "Starting Amount" [ref=e23]: "0"
+            - generic [ref=e24]:
+              - generic [ref=e25]: End Date
+              - button "Pick a date" [ref=e26] [cursor=pointer]:
+                - img
+                - generic [ref=e27] [cursor=pointer]: Pick a date
+          - button "Start Now" [ref=e29] [cursor=pointer]
+  - region "Notifications (F8)":
+    - list
+  - generic:
+    - generic [ref=e32] [cursor=pointer]:
+      - img [ref=e33] [cursor=pointer]
+      - generic [ref=e35] [cursor=pointer]: 1 error
+      - button "Hide Errors" [ref=e36] [cursor=pointer]:
+        - img [ref=e37] [cursor=pointer]
+    - status [ref=e40]:
+      - generic [ref=e41]:
+        - img [ref=e43]
+        - generic [ref=e45]:
+          - text: Static route
+          - button "Hide static indicator" [ref=e46] [cursor=pointer]:
+            - img [ref=e47] [cursor=pointer]
+  - alert [ref=e50]
+```

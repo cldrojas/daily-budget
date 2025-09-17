@@ -29,6 +29,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           attribute="class"
           defaultTheme="dark"
           enableSystem
+          disableTransitionOnChange
+          storageKey="theme"
         >
           <LanguageProvider>
             <CurrencyProvider>

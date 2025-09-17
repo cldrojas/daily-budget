@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Sun, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -29,12 +29,23 @@ import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AddButton } from '@/components/ui/AddButton'
 import { Int, toInt, Transaction } from '@/types'
+import { SetupForm } from '@/components/setup-form'
+import { DailyBudgetStatus } from '@/components/daily-budget-status'
 
+/**
+ * Main component for the Daily Budget application.
+ * @returns JSX element for the entire app.
+ */
 export default function DailyBudgetApp() {
   const { theme, setTheme } = useTheme()
   const { t } = useLanguage()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const {
     budget,
@@ -74,12 +85,19 @@ export default function DailyBudgetApp() {
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              title={theme === 'dark' ? t('lightMode') : t('darkMode')}
+              title={mounted ? (theme === 'dark' ? t('lightMode') : t('darkMode')) : 'Toggle theme'}
             >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
+              {mounted ? (
+                (() => {
+                  const isSun = theme === 'dark';
+                  return isSun ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  );
+                })()
               ) : (
-                <Moon className="h-5 w-5" />
+                <Sun className="h-5 w-5" />
               )}
             </Button>
           </div>
@@ -191,137 +209,4 @@ export default function DailyBudgetApp() {
   )
 }
 
-function SetupForm({
-  onSetup
-}: {
-  onSetup: (data: { startAmount: Int; endDate: Date }) => void
-}) {
-  const { t } = useLanguage()
-  const [startAmount, setStartAmount] = useState(0 as Int)
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined)
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    if (!startAmount || startAmount <= 0 || !endDate) return
-
-    onSetup({
-      startAmount: startAmount,
-      endDate
-    })
-  }
-
-  return (
-    <Card className="max-w-md mx-auto">
-      <CardHeader>
-        <CardTitle>{t('setupTitle')}</CardTitle>
-        <CardDescription>{t('setupDescription')}</CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="startAmount">{t('startingAmount')}</Label>
-            <Input
-              id="startAmount"
-              type="number"
-              placeholder="2750000"
-              autoFocus
-              value={startAmount}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setStartAmount(toInt(e.target.valueAsNumber))
-              }
-              required
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="endDate">{t('endDate')}</Label>
-            <DatePicker
-              date={endDate}
-              setDate={setEndDate}
-              className="w-full"
-            />
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button
-            type="submit"
-            className="w-full"
-          >
-            {t('startTracking')}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
-  )
-}
-
-function DailyBudgetStatus({
-  dailyAllowance,
-  remainingToday,
-  progress,
-  accounts,
-  remainingDays
-}: {
-  dailyAllowance: number
-  remainingToday: number
-  progress: number
-  accounts: { id: string; balance: number }[]
-  remainingDays: number
-}) {
-  const { t } = useLanguage()
-  const { formatCurrency } = useCurrency()
-
-  // Find the daily budget account
-  const dailyAccount: { id: string; balance: number } | undefined = accounts.find(
-    (acc: { id: string; balance: number }) => acc.id === 'daily'
-  )
-  const totalBudget = dailyAccount ? dailyAccount.balance : 0
-
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <div>
-          <CardTitle>{t('dailyBudget')}</CardTitle>
-          <CardDescription>{t('budgetForToday')}</CardDescription>
-        </div>
-        <div className="text-right">
-          <p className="text-sm font-medium text-muted-foreground">
-            {t('dailyAllowance')}
-          </p>
-          <p className="text-xl font-bold">{formatCurrency(dailyAllowance)}</p>
-        </div>
-      </CardHeader>
-      <CardContent className="flex flex-col items-center space-y-6">
-        <CircularProgress
-          value={progress}
-          size={200}
-          strokeWidth={15}
-          className="my-4"
-        >
-          <div className="text-center">
-            <p className="text-sm font-medium text-muted-foreground">
-              {t('remainingToday')}
-            </p>
-            <p className="text-3xl font-bold">{formatCurrency(remainingToday)}</p>
-          </div>
-        </CircularProgress>
-
-        <div className="grid grid-cols-2 gap-4 w-full">
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-muted-foreground">
-              {t('remainingDays')}
-            </p>
-            <p className="text-2xl font-bold">
-              {remainingDays} {t('days')}
-            </p>
-          </div>
-          <div className="space-y-2 text-right">
-            <p className="text-sm font-medium text-muted-foreground">
-              {t('totalBudget')}
-            </p>
-            <p className="text-2xl font-bold">{formatCurrency(totalBudget)}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}

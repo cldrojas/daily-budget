@@ -7,19 +7,27 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { DatePicker } from "@/components/date-picker";
+import { Int, toInt } from "@/types";
 
+/**
+ * Component for setting up the initial budget.
+ * @param onSetup - Callback function to handle setup with start amount and end date.
+ * @returns JSX element for the setup form.
+ * @example
+ * <SetupForm onSetup={(data) => console.log(data)} />
+ */
 export function SetupForm({
   onSetup
 }: {
-  onSetup: (data: { startAmount: number; endDate: Date }) => void
+  onSetup: (data: { startAmount: Int; endDate: Date }) => void
 }) {
   const { t } = useLanguage()
-  const [startAmount, setStartAmount] = useState(0)
+  const [startAmount, setStartAmount] = useState<Int | null>(0 as Int)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!startAmount || !endDate) return
+    if (!startAmount || startAmount <= 0 || !endDate) return
 
     onSetup({
       startAmount: startAmount,
@@ -40,10 +48,11 @@ export function SetupForm({
             <Input
               id="startAmount"
               type="number"
-              placeholder="1000.00"
-              value={startAmount}
+              placeholder="2750000"
+              autoFocus
+              value={startAmount ?? undefined}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setStartAmount(e.target.valueAsNumber)
+                setStartAmount(toInt(e.target.valueAsNumber))
               }
               required
             />

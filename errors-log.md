@@ -65,6 +65,19 @@
   4. Ensured server and client start with the same language/theme state.
 - **Things to test**: Check that app loads without hydration warnings; verify theme and language switching works correctly.
 
+### Theme Toggle Hydration Mismatch Fixed
+- **Main error cause**: Theme toggle button rendered different title ("Modo Claro" vs "Modo Oscuro") and icon (sun vs moon) on server vs client due to theme and language state differences.
+- **How and where fixed**: Added mounted state to prevent dynamic rendering until after hydration in `app/page.tsx`.
+  - Added useState for mounted and useEffect to set it true after mount.
+  - Conditionally rendered dynamic title and icon only when mounted.
+  - Added diagnostic logs to validate theme, title, and icon on render.
+- **Step by step short description**:
+  1. Identified theme state mismatch between server (defaultTheme="dark") and client (localStorage).
+  2. Added mounted state to delay dynamic content rendering.
+  3. Used mounted flag to show static content during SSR, dynamic after hydration.
+  4. Included console logs for debugging theme values.
+- **Things to test**: Load app and check console for consistent theme logs; verify no hydration errors; test theme switching functionality.
+
 ### Empty accounts array not falling back to defaults in localStorage loading
 - **Main error cause**: When loading data from localStorage, if accounts array was empty or undefined, it wasn't falling back to default accounts, causing app to have no accounts.
 - **How and where fixed**: Added fallback check in `hooks/use-budget.tsx` at line 60 in the localStorage loading useEffect.
@@ -103,3 +116,17 @@
 - **Indentation**: Code uses 2 spaces, rule requires 4 spaces. Not fixed due to scope.
 - **Secrets**: No hardcoded secrets found.
 - **Responsiveness**: Tailwind classes with sm:, md:, lg: breakpoints are used appropriately.
+
+### Hydration Mismatch Error Fixed
+- **Main error cause**: Hydration mismatch due to inconsistent theme state between server and client rendering in the theme toggle button.
+- **How and where fixed**: Implemented mounted state pattern in app/page.tsx to render dynamic theme content only after component mounts.
+- **Step by step short description**: Added useState for mounted flag, useEffect to set mounted to true after mount, conditionally render dynamic title and icon only when mounted.
+- **Things to test to prevent this happening again**: Check browser console for consistent theme logs, verify no hydration warnings, test theme switching, confirm app loads without errors in both modes.
+
+### Uncontrolled Input to Controlled Input Error Fixed
+- **Main error cause**: A component is changing an uncontrolled input to be controlled caused by conditional value prop in setup-form.tsx.
+- **How and where fixed**: Changed value={startAmount || undefined} to value={startAmount} on line 53 in components/setup-form.tsx.
+- **Step by step short description**:
+  1. Identified conditional value prop causing uncontrolled to controlled input change.
+  2. Changed value prop to always be defined.
+- **Things to test to prevent this from happening again**: Test input behavior with different startAmount values; verify no React warnings; check form submission works correctly.
