@@ -24,7 +24,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { DatePicker } from '../date-picker'
-import { Transaction, TransactionType, toInt } from '@/types'
+import { Int, Transaction, TransactionType, toInt } from '@/types'
 
 export function TransactionModal({
   isOpen,
@@ -97,7 +97,7 @@ export function TransactionModal({
       onUpdateTransaction({
         ...transaction,
         type,
-        amount: toInt(transaction.amount < 0 ? -amount : amount)!, // Preserve sign
+        amount: toInt(transaction.amount < 0 ? -amount : amount) as Int, // Preserve sign
         description,
         account,
         date
@@ -111,7 +111,7 @@ export function TransactionModal({
       // Add new transaction
       onAddTransaction({
         type,
-        amount: toInt(amount)!,
+        amount: toInt(amount) as Int,
         description,
         account,
         date
