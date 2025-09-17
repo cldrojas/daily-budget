@@ -22,7 +22,7 @@ export function SetupForm({
   onSetup: (data: { startAmount: Int; endDate: Date }) => void
 }) {
   const { t } = useLanguage()
-  const [startAmount, setStartAmount] = useState(0 as Int)
+  const [startAmount, setStartAmount] = useState<Int | null>(0 as Int)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -50,7 +50,7 @@ export function SetupForm({
               type="number"
               placeholder="2750000"
               autoFocus
-              value={startAmount}
+              value={startAmount ?? undefined}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setStartAmount(toInt(e.target.valueAsNumber))
               }

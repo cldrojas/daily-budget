@@ -89,9 +89,7 @@ export default function DailyBudgetApp() {
             >
               {mounted ? (
                 (() => {
-                  const title = theme === 'dark' ? t('lightMode') : t('darkMode');
                   const isSun = theme === 'dark';
-                  console.log('Theme Toggle Render:', { theme, title, icon: isSun ? 'Sun' : 'Moon' });
                   return isSun ? (
                     <Sun className="h-5 w-5" />
                   ) : (

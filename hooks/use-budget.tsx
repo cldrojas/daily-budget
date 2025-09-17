@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { differenceInDays, startOfDay, isSameDay, isToday } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
 import { Account, Budget, Int, toInt, Transaction, TransactionType } from '@/types'
@@ -26,8 +26,8 @@ export function useBudget() {
     autoSave: true
   })
   const [accounts, setAccounts] = useState<Account[]>([
-    { id: 'daily', name: 'Daily Budget', type: 'daily', balance: toInt(0), icon: 'wallet' },
-    { id: 'savings', name: 'Savings', type: 'savings', balance: toInt(0), icon: 'piggybank' }
+    { id: 'daily', name: 'Daily Budget', type: 'daily', balance: 0 as Int, icon: 'wallet' },
+    { id: 'savings', name: 'Savings', type: 'savings', balance: 0 as Int, icon: 'piggybank' }
   ])
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [dailyAllowance, setDailyAllowance] = useState(0)
@@ -95,54 +95,8 @@ export function useBudget() {
     isSetup
   ])
 
-  // Check for day change and update budget
-  useEffect(() => {
-    if (!isSetup) return
-
-    // If this is the first check or a new day has started
-    if (!lastCheckedDay || !isSameDay(today, lastCheckedDay)) {
-      console.log(`DEBUG:here should enter:`)
-      // If there was a previous day, move remaining amount to savings
-      if (lastCheckedDay && remainingToday > 0) {
-        // Add remaining amount to savings and discount from daily
-        const updatedAccounts = accounts.map((account) => {
-          console.log(`DEBUG:[accounts.map] account:`, account)
-          if (account.id === 'savings') {
-            const savingAcc = { ...account, balance: toInt(Math.floor(account.balance) + Math.floor(remainingToday)) }
-            return savingAcc
-          }
-          if (account.id === 'daily') {
-            const dailyAcc = { ...account, balance: toInt(Math.floor(account.balance) - Math.floor(remainingToday)) }
-            return dailyAcc
-          }
-          return account
-        })
-
-        // Record the transaction
-        const savingsTransaction: Transaction = {
-          id: uuidv4(),
-          type: 'transfer',
-          date: today,
-          amount: toInt(remainingToday),
-          description: 'Daily budget savings',
-          account: 'savings'
-        }
-
-        setAccounts(updatedAccounts)
-        setTransactions([savingsTransaction, ...transactions])
-      }
-
-      // Recalculate daily allowance
-      calculateDailyAllowance()
-
-      // Update last checked day
-      today !== lastCheckedDay &&
-        setLastCheckedDay(today)
-    }
-  }, [isSetup, lastCheckedDay])
-
   // Calculate daily allowance based on remaining amount and days
-  const calculateDailyAllowance = () => {
+  const calculateDailyAllowance = useCallback(() => {
     if (!budget.endDate) return
 
     const daysRemaining = differenceInDays(budget.endDate, today) + 1
@@ -156,7 +110,7 @@ export function useBudget() {
 
     // Get total balance from main account
     const mainAccount = accounts.find((a) => a.id === 'daily')
-    const totalBalance = mainAccount ? mainAccount.balance : toInt(0)
+    const totalBalance = mainAccount ? mainAccount.balance : 0 as Int
 
     const newDailyAllowance = totalBalance / daysRemaining
     setDailyAllowance(newDailyAllowance)
@@ -169,7 +123,52 @@ export function useBudget() {
     const _progress = (remainingToday - usedToday) / newDailyAllowance * 100
     console.log(`DEBUG:_progress:`, _progress)
     setProgress(_progress)
-  }
+  }, [budget, accounts, today])
+
+  // Check for day change and update budget
+  useEffect(() => {
+    if (!isSetup) return
+
+    // If this is the first check or a new day has started
+    if (!lastCheckedDay || !isSameDay(today, lastCheckedDay)) {
+      console.log(`DEBUG:here should enter:`)
+      // If there was a previous day, move remaining amount to savings
+      if (lastCheckedDay && remainingToday > 0) {
+        // Add remaining amount to savings and discount from daily
+        const updatedAccounts = accounts.map((account) => {
+          console.log(`DEBUG:[accounts.map] account:`, account)
+          if (account.id === 'savings') {
+            const savingAcc = { ...account, balance: toInt(Math.floor(account.balance) + Math.floor(remainingToday)) ?? 0 as Int }
+            return savingAcc
+          }
+          if (account.id === 'daily') {
+            const dailyAcc = { ...account, balance: toInt(Math.floor(account.balance) - Math.floor(remainingToday)) ?? 0 as Int }
+            return dailyAcc
+          }
+          return account
+        })
+
+        // Record the transaction
+        const savingsTransaction: Transaction = {
+          id: uuidv4(),
+          type: 'transfer',
+          date: today,
+          amount: toInt(remainingToday) ?? 0 as Int,
+          description: 'Daily budget savings',
+          account: 'savings'
+        }
+
+        setAccounts(updatedAccounts)
+        setTransactions([savingsTransaction, ...transactions])
+      }
+
+      // Recalculate daily allowance
+      calculateDailyAllowance()
+
+      // Update last checked day
+      if (today !== lastCheckedDay) setLastCheckedDay(today)
+    }
+  }, [isSetup, lastCheckedDay, accounts, calculateDailyAllowance, remainingToday, today, transactions])
 
   // Get remaining days until end date
   const getRemainingDays = () => {
@@ -253,7 +252,7 @@ export function useBudget() {
         id: uuidv4(),
         type,
         date,
-        amount: toInt(-amount), // Negative for expenses
+        amount: toInt(-amount) ?? 0 as Int, // Negative for expenses
         description,
         account
       }
@@ -272,7 +271,7 @@ export function useBudget() {
           // Update daily account balance
           updatedAccounts = accounts.map((acc) => {
             if (acc.id === 'daily') {
-              return { ...acc, balance: toInt(acc.balance - amount) }
+              return { ...acc, balance: toInt(acc.balance - amount) ?? 0 as Int }
             }
             return acc
           })
@@ -280,7 +279,7 @@ export function useBudget() {
           // Update accounts
           updatedAccounts = accounts.map((acc) => {
             if (acc.id === 'daily') {
-              return { ...acc, balance: toInt(acc.balance - amount) }
+              return { ...acc, balance: toInt(acc.balance - amount) ?? 0 as Int }
             }
             return acc
           })
@@ -288,7 +287,7 @@ export function useBudget() {
           setTransactions([transaction, ...transactions])
           // Recalculate daily allowance with remaining balance
           const dailyAccount = updatedAccounts.find((acc) => acc.id === 'daily')
-          const daysRemaining = differenceInDays(budget.endDate || '', today) + 1
+          const daysRemaining = differenceInDays(budget.endDate!, today) + 1
 
           if (daysRemaining > 0 && dailyAccount) {
             const newDailyAllowance = dailyAccount.balance / daysRemaining
@@ -301,7 +300,7 @@ export function useBudget() {
         // For non-daily accounts, simply update the balance
         updatedAccounts = accounts.map((acc) => {
           if (acc.id === account) {
-            return { ...acc, balance: toInt(acc.balance - amount) }
+            return { ...acc, balance: toInt(acc.balance - amount) ?? 0 as Int }
           }
           return acc
         })
@@ -324,7 +323,7 @@ export function useBudget() {
 
       updatedAccounts = accounts.map((acc) => {
         if (acc.id === account) {
-          return { ...acc, balance: toInt(acc.balance + Math.abs(amount)) }
+          return { ...acc, balance: toInt(acc.balance + Math.abs(amount)) ?? 0 as Int }
         }
         return acc
       })
@@ -354,7 +353,7 @@ export function useBudget() {
     // First, reverse the original transaction's effect
     updatedAccounts = updatedAccounts.map(acc => {
       if (acc.id === originalTransaction.account) {
-        return { ...acc, balance: toInt(acc.balance - originalTransaction.amount) }
+        return { ...acc, balance: toInt(acc.balance - originalTransaction.amount) ?? 0 as Int }
       }
       return acc
     })
@@ -362,7 +361,7 @@ export function useBudget() {
     // Then apply the updated transaction's effect
     updatedAccounts = updatedAccounts.map(acc => {
       if (acc.id === updatedTransaction.account) {
-        return { ...acc, balance: toInt(acc.balance + updatedTransaction.amount) }
+        return { ...acc, balance: toInt(acc.balance + updatedTransaction.amount) ?? 0 as Int }
       }
       return acc
     })
@@ -460,7 +459,7 @@ export function useBudget() {
         id: uuidv4(),
         type: 'transfer',
         date: today,
-        amount: toInt(-accountToDelete.balance),
+        amount: toInt(-accountToDelete.balance) ?? 0 as Int,
         description: `Account deleted: ${accountToDelete.name}`,
         account: accountId
       }
@@ -470,7 +469,7 @@ export function useBudget() {
         .filter((acc) => acc.id !== accountId)
         .map((acc) => {
           if (acc.id === 'savings') {
-            return { ...acc, balance: toInt(acc.balance + accountToDelete.balance) }
+            return { ...acc, balance: toInt(acc.balance + accountToDelete.balance) ?? 0 as Int }
           }
           return acc
         })
@@ -502,7 +501,7 @@ export function useBudget() {
       id: uuidv4(),
       type: 'expense',
       date: today,
-      amount: toInt(-amount),
+      amount: toInt(-amount) ?? 0 as Int,
       description:
         description || 'Transfer to ' + accounts.find((a) => a.id === toAccount)?.name,
       account: fromAccount
@@ -523,10 +522,10 @@ export function useBudget() {
     // Update account balances
     const updatedAccounts = accounts.map((account) => {
       if (account.id === fromAccount) {
-        return { ...account, balance: toInt(account.balance - amount) }
+        return { ...account, balance: toInt(account.balance - amount) ?? 0 as Int }
       }
       if (account.id === toAccount) {
-        return { ...account, balance: toInt(account.balance + amount) }
+        return { ...account, balance: toInt(account.balance + amount) ?? 0 as Int }
       }
       return account
     })
@@ -559,7 +558,7 @@ export function useBudget() {
     const currentBalance = dailyAccount ? dailyAccount.balance : 0
 
     // Calculate difference to add or subtract
-    const balanceDifference = toInt(startAmount - budget.startAmount)
+    const balanceDifference = toInt(startAmount - budget.startAmount) ?? 0 as Int
 
     // Update budget
     const updatedBudget = {
@@ -571,7 +570,7 @@ export function useBudget() {
     // Update daily account balance
     const updatedAccounts = accounts.map((account) => {
       if (account.id === 'daily') {
-        return { ...account, balance: toInt(currentBalance + balanceDifference) }
+        return { ...account, balance: toInt(currentBalance + balanceDifference) ?? 0 as Int }
       }
       return account
     })
@@ -582,7 +581,7 @@ export function useBudget() {
         id: uuidv4(),
         type: 'transfer',
         date: today,
-        amount: balanceDifference,
+        amount: balanceDifference ?? 0 as Int,
         description: 'Budget adjustment',
         account: 'daily'
       }
@@ -596,7 +595,7 @@ export function useBudget() {
     const daysRemaining = differenceInDays(endDate, today) + 1
 
     if (daysRemaining > 0) {
-      const newDailyAllowance = (currentBalance + balanceDifference) / daysRemaining
+      const newDailyAllowance = (currentBalance + (balanceDifference ?? 0)) / daysRemaining
       setDailyAllowance(newDailyAllowance)
       setRemainingToday(newDailyAllowance)
       setProgress(100)
