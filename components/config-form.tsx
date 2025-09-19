@@ -25,7 +25,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
   const { t } = useLanguage()
   const { toast } = useToast()
   const { setLastCheckedDay } = useBudget()
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [autoSave, setAutoSave] = useState(budget.autoSave)
   const [startAmount, setStartAmount] = useState(budget.startAmount.toString())
