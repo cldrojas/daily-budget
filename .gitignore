@@ -31,3 +31,6 @@ next-env.d.ts
 
 # kilocode
 .kilocode/
+
+# generated code for test context
+/test-results
