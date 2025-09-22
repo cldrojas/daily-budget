@@ -12,33 +12,35 @@ export type Int = number & { __int__: true }
  * toInt("42.5") // returns 42 as Int (floored)
  * toInt("abc") // returns null
  */
-export function toInt(input: string | number): Int {
+export function toInt(input: string | number): Int | null {
   // Handle invalid types early
-  if (
-    input == null ||
-    (typeof input !== 'string' && typeof input !== 'number')
-  ) {
-    return 0 as Int
+  if (input == null) {
+    return null
   }
 
   let num: number
 
   if (typeof input === 'string') {
-    // Trim whitespace and validate format (allow optional decimals)
+    // Trim whitespace and validate format (allow optional decimals, but not scientific notation)
     const trimmed = input.trim()
-    if (!/^\s*\-?\d+(\.\d+)?\s*$/.test(trimmed)) {
-      return 0 as Int
+    if (!trimmed || !/^\s*-?\d+(\.\d+)?\s*$/.test(trimmed)) {
+      return null
     }
     // parseInt floors decimals automatically
     num = parseInt(trimmed, 10)
+
+    // Check if parseInt failed (returns NaN for invalid strings)
+    if (isNaN(num) || !Number.isInteger(num)) {
+      return null
+    }
   } else {
     // For numbers, floor to nearest integer
     num = Math.floor(input)
-  }
 
-  // Ensure the result is finite (handles NaN, Infinity, etc.)
-  if (!isFinite(num)) {
-    return 0 as Int
+    // Check if the result is a valid integer
+    if (isNaN(num) || !Number.isInteger(num)) {
+      return null
+    }
   }
 
   return num as Int

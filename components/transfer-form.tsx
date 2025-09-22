@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
+import { EmptyState } from "@/components/error-boundary"
 
 interface TransferFormProps {
   accounts: Account[]
@@ -57,6 +58,16 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
     }
 
     const transferAmount = toInt(Number.parseFloat(amount))
+
+    if (!transferAmount) {
+      toast({
+        title: t("invalidAmount"),
+        description: t("invalidAmountDescription"),
+        variant: "destructive",
+      })
+      return
+    }
+
     const sourceAccount = accounts.find((acc: Account) => acc.id === fromAccount)
 
     if (sourceAccount && sourceAccount.balance < transferAmount) {
@@ -88,6 +99,42 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
     })
   }
 
+  // Handle uninitialized state
+  if (!accounts || accounts.length === 0) {
+    return (
+      <EmptyState
+        title={t("noAccounts") || "No accounts available"}
+        description={t("noAccountsDescription") || "Please add accounts before making transfers."}
+        action={
+          <Button onClick={() => {
+            // TODO: Add account creation flow
+            console.log('Add account clicked')
+          }}>
+            {t("addAccount") || "Add Account"}
+          </Button>
+        }
+      />
+    )
+  }
+
+  // Handle insufficient accounts for transfers
+  if (accounts.length < 2) {
+    return (
+      <EmptyState
+        title={t("insufficientAccounts") || "Need more accounts"}
+        description={t("insufficientAccountsDescription") || "You need at least 2 accounts to make transfers."}
+        action={
+          <Button onClick={() => {
+            // TODO: Add account creation flow
+            console.log('Add account clicked')
+          }}>
+            {t("addAccount") || "Add Account"}
+          </Button>
+        }
+      />
+    )
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -99,12 +146,12 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
           <div className="space-y-2">
             <Label htmlFor="fromAccount">{t("fromAccount")}</Label>
             <Select value={fromAccount} onValueChange={setFromAccount}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="transfer-from-account">
                 <SelectValue placeholder={t("selectSourceAccount")} />
               </SelectTrigger>
               <SelectContent>
                 {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
+                  <SelectItem key={account.id} value={account.id} data-testid={`account-option-${account.id}`}>
                     {account.name} ({formatCurrency(account.balance)})
                   </SelectItem>
                 ))}
@@ -115,12 +162,12 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
           <div className="space-y-2">
             <Label htmlFor="toAccount">{t("toAccount")}</Label>
             <Select value={toAccount} onValueChange={setToAccount}>
-              <SelectTrigger>
+              <SelectTrigger data-testid="transfer-to-account">
                 <SelectValue placeholder={t("selectDestinationAccount")} />
               </SelectTrigger>
               <SelectContent>
                 {accounts.map((account) => (
-                  <SelectItem key={account.id} value={account.id}>
+                  <SelectItem key={account.id} value={account.id} data-testid={`account-option-${account.id}`}>
                     {account.name}
                   </SelectItem>
                 ))}
@@ -137,6 +184,7 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
               placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
+              data-testid="transfer-amount"
               required
             />
           </div>
@@ -148,11 +196,12 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
               placeholder={t("whatTransferFor")}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              data-testid="transfer-description"
             />
           </div>
         </CardContent>
         <CardFooter>
-          <Button type="submit" className="w-full">
+          <Button type="submit" className="w-full" data-testid="transfer-submit">
             <ArrowRightLeft className="mr-2 h-4 w-4" />
             {t("transferFunds")}
           </Button>
