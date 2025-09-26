@@ -23,7 +23,6 @@ Saldo Cero is a minimalist finance app designed to eliminate the anxiety of mone
 /hooks          # Custom React hooks
 /lib            # Utility functions
 /public         # Static assets (icons, images)
-/src            # (Optional) Additional source code
 /styles         # Global styles
 /types          # TypeScript type definitions
 ```
