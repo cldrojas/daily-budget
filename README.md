@@ -12,12 +12,23 @@ Saldo Cero is a minimalist finance app designed to eliminate the anxiety of mone
 /app            # Next.js app directory (pages, layouts, global styles)
 |-- globals.css
 |-- layout.tsx
-|-- page.tsx
+|-- page.tsx    # Main DailyBudgetApp component
 
 /components     # UI and feature components
-|-- DailyBudgetApp.tsx
-|-- ... (other components)
-/components/ui  # UI primitives (buttons, dialogs, etc.)
+|-- accounts-list.tsx
+|-- circular-progress.tsx
+|-- config-form.tsx
+|-- daily-budget-status.tsx
+|-- date-picker.tsx
+|-- error-boundary.tsx
+|-- language-currency-selector.tsx
+|-- setup-form.tsx
+|-- theme-provider.tsx
+|-- transaction-history.tsx
+|-- transactions-list.tsx
+|-- transfer-form.tsx
+/components/modals  # Modal components
+/components/ui      # UI primitives (buttons, dialogs, etc.)
 
 /contexts       # React context providers (currency, language)
 /hooks          # Custom React hooks
@@ -25,6 +36,7 @@ Saldo Cero is a minimalist finance app designed to eliminate the anxiety of mone
 /public         # Static assets (icons, images)
 /styles         # Global styles
 /types          # TypeScript type definitions
+/tests          # Test files (unit and e2e)
 ```
 
 ---
@@ -50,6 +62,21 @@ Saldo Cero is a minimalist finance app designed to eliminate the anxiety of mone
 - **Backend:** Designed to be serverless-first (Cloudflare Workers), but can be adapted to any REST/GraphQL backend.
 - **Database:** Cloudflare D1 (SQLite-compatible, serverless), with the option to swap for PostgreSQL or other DBs.
 - **Security:** No user data is sold or shared; privacy is a core value.
+
+---
+
+## Recent Improvements
+
+The codebase has been recently cleaned up and improved with the following enhancements:
+
+- **Code Quality**: Removed unused variables, imports, and duplicate code sections
+- **Documentation**: Added comprehensive JSDoc comments to all exported functions, hooks, and components
+- **Type Safety**: Fixed TypeScript 'any' warnings by adding proper type annotations and interfaces
+- **Bug Fixes**: Resolved hydration mismatches, input validation issues, and theme toggle problems
+- **Error Handling**: Added proper validation for transaction amounts and account data loading
+- **Performance**: Improved component structure and removed unnecessary re-renders
+
+All functionality has been maintained while significantly improving code quality and reliability.
 
 ---
 
@@ -95,16 +122,7 @@ docker run --name saldo-cero-db -e POSTGRES_PASSWORD=yourpassword -p 5432:5432 -
 
 Update your environment variables as needed.
 
-### 5. (Planned) Run Cypress Tests
-
-```sh
-# Install Cypress if not present
-pnpm add -D cypress
-# Open Cypress test runner
-pnpm cypress open
-```
-
-### 6. Tests (unit + UI)
+### 5. Run Tests
 
 This repository uses Vitest for unit/integration tests and Playwright for UI tests.
 
@@ -119,6 +137,7 @@ pnpm test:coverage # run with coverage
 
 ```sh
 pnpm test:ui
+pnpm test:ui:headed # run with browser UI
 ```
 
 CI: There's a GitHub Actions workflow at `.github/workflows/tests.yml` that runs `pnpm tsc --noEmit`, unit tests, and Playwright UI tests on push/PR to main.
