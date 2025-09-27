@@ -4,31 +4,18 @@ import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Sun, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { DatePicker } from '@/components/date-picker'
 import { TransactionList } from '@/components/transactions-list'
 import { TransactionModal } from '@/components/modals/transaction-modal'
 import { AccountsList } from '@/components/accounts-list'
 import { TransactionHistory } from '@/components/transaction-history'
 import { useBudget } from '@/hooks/use-budget'
-import { CircularProgress } from '@/components/circular-progress'
 import { ConfigForm } from '@/components/config-form'
 import { TransferForm } from '@/components/transfer-form'
 import { LanguageCurrencySelector } from '@/components/language-currency-selector'
 import { useLanguage } from '@/contexts/language-context'
-import { useCurrency } from '@/contexts/currency-context'
 import { AddButton } from '@/components/ui/AddButton'
-import { Int, toInt, Transaction } from '@/types'
+import { Transaction } from '@/types'
 import { SetupForm } from '@/components/setup-form'
 import { DailyBudgetStatus } from '@/components/daily-budget-status'
 import { ErrorBoundary, EmptyState } from '@/components/error-boundary'
@@ -38,15 +25,10 @@ import { ErrorBoundary, EmptyState } from '@/components/error-boundary'
  * @returns JSX element for the entire app.
  */
 export default function DailyBudgetApp() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const { t } = useLanguage()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   const {
     budget,
@@ -69,6 +51,10 @@ export default function DailyBudgetApp() {
     removeTransaction
   } = useBudget()
 
+  // Ensure theme is set on initial load
+  const currentTheme = theme || resolvedTheme || 'dark'
+  const isDarkMode = currentTheme === 'dark'
+
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
@@ -80,21 +66,16 @@ export default function DailyBudgetApp() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                title={mounted ? (theme === 'dark' ? t('lightMode') : t('darkMode')) : 'Toggle theme'}
+                onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
+                title={isDarkMode ? t('lightMode') : t('darkMode')}
               >
-                {mounted ? (
-                  (() => {
-                    const isSun = theme === 'dark';
-                    return isSun ? (
-                      <Sun className="h-5 w-5" />
-                    ) : (
-                      <Moon className="h-5 w-5" />
-                    );
-                  })()
-                ) : (
-                  <Sun className="h-5 w-5" />
-                )}
+                {
+                  isDarkMode ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )
+                }
               </Button>
             </div>
           </div>

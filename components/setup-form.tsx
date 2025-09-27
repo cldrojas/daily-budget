@@ -50,7 +50,7 @@ export function SetupForm({
               type="number"
               placeholder="2750000"
               autoFocus
-              value={startAmount ?? undefined}
+              value={startAmount ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 setStartAmount(toInt(e.target.valueAsNumber) || null)
               }
