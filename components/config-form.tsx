@@ -28,7 +28,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
   const [isOpen, setIsOpen] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
   const [autoSave, setAutoSave] = useState(budget.autoSave)
-  const [startAmount, setStartAmount] = useState(budget.startAmount.toString())
+  const [startAmount, setStartAmount] = useState(budget.startAmount)
   const [endDate, setEndDate] = useState(budget.endDate)
 
   const getYesterday = () => {
@@ -49,9 +49,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
       return
     }
 
-    const newStartAmount = Number.parseFloat(startAmount)
-
-    if (isNaN(newStartAmount) || newStartAmount <= 0) {
+    if (isNaN(startAmount) || startAmount <= 0) {
       toast({
         title: t("invalidAmount"),
         description: t("invalidAmountDescription"),
@@ -61,7 +59,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
     }
 
     onUpdateConfig({
-      startAmount: toInt(newStartAmount),
+      startAmount: toInt(startAmount) ?? 0 as Int,
       endDate,
       autoSave
     })
@@ -92,8 +90,8 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="flex justify-between mb-4">
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   variant="secondary"
                   onClick={() => {
                     const data = localStorage.getItem('daily-budget-data')
@@ -121,7 +119,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                   step="1"
                   placeholder="1000"
                   value={startAmount}
-                  onChange={(e) => setStartAmount(e.target.value)}
+                  onChange={(e) => setStartAmount(toInt(e.target.value) || 0 as Int)}
                   required
                 />
               </div>
