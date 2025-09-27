@@ -14,7 +14,6 @@ import { ConfigForm } from '@/components/config-form'
 import { TransferForm } from '@/components/transfer-form'
 import { LanguageCurrencySelector } from '@/components/language-currency-selector'
 import { useLanguage } from '@/contexts/language-context'
-import { AddButton } from '@/components/ui/AddButton'
 import { Transaction } from '@/types'
 import { SetupForm } from '@/components/setup-form'
 import { DailyBudgetStatus } from '@/components/daily-budget-status'
@@ -52,8 +51,7 @@ export default function DailyBudgetApp() {
   } = useBudget()
 
   // Ensure theme is set on initial load
-  const currentTheme = theme || resolvedTheme || 'dark'
-  const isDarkMode = currentTheme === 'dark'
+  const isDarkMode = (theme || resolvedTheme) === 'dark'
 
   return (
     <ErrorBoundary>
@@ -194,8 +192,6 @@ export default function DailyBudgetApp() {
                   >
                     <Plus className="h-6 w-6" />
                   </Button>
-
-                  <AddButton />
 
                   {/* Expense Modal */}
                   <ErrorBoundary>

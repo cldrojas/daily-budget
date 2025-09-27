@@ -86,7 +86,7 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }: {
       ...account,
       name: accountName,
       icon: selectedIcon,
-      balance: toInt(accountBalance || 0)
+      balance: accountBalance || 0 as Int
     })
 
     toast({
@@ -122,7 +122,7 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }: {
               <Label htmlFor="accountName">{t('Balance')}</Label>
               <Input
                 id="accountBalance"
-                value={accountBalance}
+                value={accountBalance || ''}
                 onChange={(e) => setAccountBalance(toInt(Number(e.target.value) || 0))}
                 placeholder={t('accountBalancePlaceholder')}
               />

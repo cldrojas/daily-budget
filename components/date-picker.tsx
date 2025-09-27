@@ -44,12 +44,11 @@ export function DatePicker({
           mode="single"
           selected={date}
           onSelect={(date) => {
-            date && setDate(date)
+            if (date) setDate(date)
             // Close the popover after date selection
             const popover = document.querySelector("[data-radix-popper-content-wrapper]");
             if (popover) {
               popover.setAttribute("style", "opacity: 0; pointer-events: none;");
-
             }
           }}
           initialFocus
