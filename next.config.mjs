@@ -8,20 +8,8 @@ try {
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
-    dirs: ['./app', './components'],
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
-  images: {
-    unoptimized: true,
-  },
-  experimental: {
-    webpackBuildWorker: true,
-    parallelServerBuildTraces: true,
-    parallelServerCompiles: true,
-  },
+    dirs: ['./app', './components']
+  }
 }
 
 mergeConfig(nextConfig, userConfig)
@@ -37,8 +25,7 @@ function mergeConfig(nextConfig, userConfig) {
       !Array.isArray(nextConfig[key])
     ) {
       nextConfig[key] = {
-        ...nextConfig[key],
-        ...userConfig[key],
+        ...nextConfig[key]
       }
     } else {
       nextConfig[key] = userConfig[key]

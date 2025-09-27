@@ -108,7 +108,6 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
         action={
           <Button onClick={() => {
             // TODO: Add account creation flow
-            console.log('Add account clicked')
           }}>
             {t("addAccount") || "Add Account"}
           </Button>
@@ -126,7 +125,6 @@ export function TransferForm({ accounts, onTransfer }: TransferFormProps) {
         action={
           <Button onClick={() => {
             // TODO: Add account creation flow
-            console.log('Add account clicked')
           }}>
             {t("addAccount") || "Add Account"}
           </Button>

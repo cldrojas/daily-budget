@@ -121,7 +121,6 @@ export function useBudget() {
       .reduce((sum, t) => sum + Math.abs(t.amount), 0)
 
     const _progress = (remainingToday - usedToday) / newDailyAllowance * 100
-    console.log(`DEBUG:_progress:`, _progress)
     setProgress(_progress)
   }, [budget, accounts, today])
 
@@ -131,12 +130,10 @@ export function useBudget() {
 
     // If this is the first check or a new day has started
     if (!lastCheckedDay || !isSameDay(today, lastCheckedDay)) {
-      console.log(`DEBUG:here should enter:`)
       // If there was a previous day, move remaining amount to savings
       if (lastCheckedDay && remainingToday > 0) {
         // Add remaining amount to savings and discount from daily
         const updatedAccounts = accounts.map((account) => {
-          console.log(`DEBUG:[accounts.map] account:`, account)
           if (account.id === 'savings') {
             const savingAcc = { ...account, balance: toInt(Math.floor(account.balance) + Math.floor(remainingToday)) ?? 0 as Int }
             return savingAcc
