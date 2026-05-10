@@ -1,163 +1,155 @@
-# Saldo Cero
+# 💸 Saldo Cero
 
-## Purpose
+**Libera tu mente del estrés financiero.**
 
-Saldo Cero is a minimalist finance app designed to eliminate the anxiety of money management. It provides users with a clear, daily spending allowance, removing the need for complex charts or accounting knowledge. The app’s goal is to offer financial peace of mind by showing exactly how much you can spend today—no guilt, no calculations.
+Saldo Cero es una app minimalista de finanzas personales diseñada para ayudarte a tomar decisiones con claridad. No necesitas conectar cuentas bancarias ni entender contabilidad: solo anota lo esencial y nosotros hacemos el resto.
 
 ---
 
-## Folder Structure
+## ✨ ¿Qué es Saldo Cero?
+
+Una herramienta simple y directa para:
+
+- 📌 **Saber cuánto dinero tienes realmente**
+- 📅 **Organizar tus pagos y cobros**
+- 🚨 **Evitar olvidos y gastos fantasmas**
+- 📈 **Tomar decisiones financieras sin ansiedad**
+
+Sin curvas de aprendizaje. Sin publicidad. Sin humo.
+
+---
+
+## 🧠 Filosofía
+
+- **Menos fricción, más claridad**
+- **Privacidad por defecto** (tus datos son tuyos)
+- **Cero estrés, cero deudas, cero enredos**
+
+Pensada para personas que:
+- Se estresan al ver su cuenta
+- Quieren ahorrar pero no logran hacerlo
+- Sienten que su plata "se va sola"
+- Necesitan control, pero sin Excel ni apps bancarias confusas
+
+---
+
+## 🧑‍💻 ¿Quién está detrás?
+
+Proyecto personal de **Daniel**, ingeniero informático con hambre de claridad financiera y diseño funcional.
+
+*Inspirado por el caos, construido con cariño.*
+
+---
+
+## 📁 Estructura del Proyecto
 
 ```
-/app            # Next.js app directory (pages, layouts, global styles)
-|-- globals.css
+/app            # Next.js app directory (App Router)
 |-- layout.tsx
-|-- page.tsx    # Main DailyBudgetApp component
+|-- page.tsx    # Componente principal
 
-/components     # UI and feature components
-|-- accounts-list.tsx
-|-- circular-progress.tsx
-|-- config-form.tsx
-|-- daily-budget-status.tsx
-|-- date-picker.tsx
-|-- error-boundary.tsx
-|-- language-currency-selector.tsx
-|-- setup-form.tsx
-|-- theme-provider.tsx
-|-- transaction-history.tsx
-|-- transactions-list.tsx
-|-- transfer-form.tsx
-/components/modals  # Modal components
-/components/ui      # UI primitives (buttons, dialogs, etc.)
+/components     # Componentes UI y funcionalidades
+|-- modals/     # Componentes de modales
+|-- ui/         # Primitivas UI (botones, diálogos, etc.)
 
-/contexts       # React context providers (currency, language)
-/hooks          # Custom React hooks
-/lib            # Utility functions
-/public         # Static assets (icons, images)
-/styles         # Global styles
-/types          # TypeScript type definitions
-/tests          # Test files (unit and e2e)
+/contexts       # React Context providers (idioma, moneda)
+/hooks          # Custom React hooks (presupuesto, transacciones)
+/lib            # Funciones utilitarias
+/public         # Assets estáticos (íconos)
+/styles         # Estilos globales
+/types          # Definiciones TypeScript
+/tests          # Tests unitarios y de UI
 ```
 
 ---
 
-## Technologies
+## 🛠️ Stack Tecnológico
 
-- **Frontend:** Next.js (React), Tailwind CSS, Radix UI, TypeScript
-- **State Management:** React Context, Custom Hooks
-- **Styling:** Tailwind CSS, PostCSS
-- **Icons & UI:** Lucide, Radix UI Primitives
-- **Testing:** (Cypress planned, not yet present)
-- **Backend:** (Pluggable, see architecture)
-- **Database:** (Pluggable, see architecture)
-- **Infrastructure:** Cloudflare Workers, Cloudflare D1 (planned)
+### Frontend
+- **Framework:** Next.js 15 (App Router, React Server Components)
+- **UI:** React 19, TypeScript
+- **Estilos:** Tailwind CSS, PostCSS
+- **Componentes:** Radix UI Primitives, shadcn/ui
+- **Íconos:** Lucide React
 
----
+### Bibliotecas Adicionales
+- **Formularios:** React Hook Form + Zod
+- **Validación:** @hookform/resolvers
+- **UI Enhancements:** Sonner (toasts), cmdk (comandos), Embla Carousel
+- **Fechas:** date-fns, react-day-picker
+- **Gráficos:** Recharts
+- **Temas:** next-themes (dark/light mode)
 
-## Architecture
+### Gestión de Estado
+- React Context (Language, Currency)
+- Custom Hooks (useBudget para lógica de presupuesto)
 
-- **Frontend:** Built with Next.js using the App Router and React Server Components for optimal performance and scalability.
-- **Componentization:** Modular UI components and hooks for maintainability and reusability.
-- **State:** Managed via React Context and custom hooks for budget, language, and currency.
-- **Backend:** Designed to be serverless-first (Cloudflare Workers), but can be adapted to any REST/GraphQL backend.
-- **Database:** Cloudflare D1 (SQLite-compatible, serverless), with the option to swap for PostgreSQL or other DBs.
-- **Security:** No user data is sold or shared; privacy is a core value.
+### Testing
+- **Unitarios:** Vitest + React Testing Library
+- **UI/E2E:** Playwright
+- **Configuración:** GitHub Actions CI pipeline
 
----
-
-## Recent Improvements
-
-The codebase has been recently cleaned up and improved with the following enhancements:
-
-- **Code Quality**: Removed unused variables, imports, and duplicate code sections
-- **Documentation**: Added comprehensive JSDoc comments to all exported functions, hooks, and components
-- **Type Safety**: Fixed TypeScript 'any' warnings by adding proper type annotations and interfaces
-- **Bug Fixes**: Resolved hydration mismatches, input validation issues, and theme toggle problems
-- **Error Handling**: Added proper validation for transaction amounts and account data loading
-- **Performance**: Improved component structure and removed unnecessary re-renders
-
-All functionality has been maintained while significantly improving code quality and reliability.
+### Infraestructura (Planificado)
+- Cloudflare Workers + Cloudflare D1 (SQLite serverless)
+- Opción para PostgreSQL u otras bases de datos
 
 ---
 
-## Setup Instructions
+## 🏗️ Arquitectura
 
-### Prerequisites
+- **Frontend:** Next.js con App Router para optimal rendimiento y escalabilidad
+- **Componentes:** UI modular y hooks para mantenibilidad y reusabilidad
+- **Estado:** Gestionado via React Context y custom hooks para presupuesto, idioma y moneda
+- **Backend:** Diseñado para serverless (Cloudflare Workers), adaptable a cualquier API REST/GraphQL
+- **Base de datos:** Cloudflare D1 (SQLite-compatible, serverless) con opción de swapping
+- **Seguridad:** No se vende ni comparte datos del usuario; la privacidad es un valor central
 
-- Node.js (v18+ recommended)
-- pnpm (or npm/yarn)
-- Docker (for PostgreSQL, if backend is required)
-- (Planned) Cypress for E2E testing
+---
 
-### 1. Clone the Repository
+## 🚀 Inicio Rápido
 
+### Requisitos Previos
+- Node.js 18+
+- pnpm (o npm/yarn)
+
+### 1. Clonar el Repositorio
 ```sh
-git clone https://github.com/cldrojas/daily-budget.git
-cd daily-budget
+git clone https://github.com/cldrojas/saldo-cero.git
+cd saldo-cero
 ```
 
-### 2. Install Dependencies
-
+### 2. Instalar Dependencias
 ```sh
 pnpm install
-# or
-npm install
 ```
 
-### 3. Run the Frontend
-
+### 3. Ejecutar en Desarrollo
 ```sh
 pnpm dev
-# or
-npm run dev
 ```
 
-### 4. (Optional) Setup PostgreSQL with Docker
+La aplicación estará disponible en `http://localhost:3000`
 
-If you want to use PostgreSQL locally:
-
-```sh
-docker run --name saldo-cero-db -e POSTGRES_PASSWORD=yourpassword -p 5432:5432 -d postgres
-```
-
-Update your environment variables as needed.
-
-### 5. Run Tests
-
-This repository uses Vitest for unit/integration tests and Playwright for UI tests.
-
-- Run unit tests:
+### 4. Ejecutar Tests
 
 ```sh
-pnpm test          # runs vitest (unit tests under tests/unit/**)
-pnpm test:coverage # run with coverage
-```
+# Tests unitarios
+pnpm test
 
-- Run Playwright UI tests (starts `pnpm dev` automatically):
+# Tests con coverage
+pnpm test:coverage
 
-```sh
+# Tests de UI (abre servidor automáticamente)
 pnpm test:ui
-pnpm test:ui:headed # run with browser UI
+
+# Tests de UI con navegador visible
+pnpm test:ui:headed
 ```
 
-CI: There's a GitHub Actions workflow at `.github/workflows/tests.yml` that runs `pnpm tsc --noEmit`, unit tests, and Playwright UI tests on push/PR to main.
-
 ---
 
-## Notes
+## 📝 Notas
 
-- The current implementation is frontend-focused. Backend and database integration are designed to be pluggable and serverless-friendly.
-- For production, consider deploying on Vercel, Cloudflare, or similar platforms.
-
----
-
-## Custom Rules
-
-This project uses custom rules for Kilo Code AI to enforce coding standards and security. See the following rule files:
-
-- [Naming Conventions](.kilocode/rules/naming-conventions.md)
-- [Restricted Files](.kilocode/rules/restricted-files.md)
-- [Documentation Requirements](.kilocode/rules/documentation.md)
-- [Testing Patterns](.kilocode/rules/testing.md)
-
-Global rules apply across projects: `~/.kilocode/rules/general-standards.md`.
+- La implementación actual es frontend-focused con estado en localStorage
+- Backend y base de datos están diseñados para ser pluggable y serverless-friendly
+- Para producción, considerar desplegar en Vercel o Cloudflare
