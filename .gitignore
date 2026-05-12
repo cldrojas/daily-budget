@@ -34,3 +34,9 @@ next-env.d.ts
 
 # generated code for test context
 /test-results
+
+# atl (agent teams lite)
+.atl
+
+# openspec (spec-driven development artifacts)
+openspec/
