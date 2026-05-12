@@ -1,8 +1,14 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { SetupForm } from '@/components/setup-form'
 import { LanguageProvider } from '@/contexts/language-context'
-import { toInt } from '@/types'
+
+// Mock ResizeObserver for Radix UI components
+global.ResizeObserver = vi.fn().mockImplementation(() => ({
+  observe: vi.fn(),
+  unobserve: vi.fn(),
+  disconnect: vi.fn(),
+}))
 
 // Mock the DatePicker component
 vi.mock('@/components/date-picker', () => ({
@@ -31,7 +37,9 @@ const mockTranslations = {
   startingAmount: 'Starting Amount',
   endDate: 'End Date',
   startTracking: 'Start Now',
-  pickDate: 'Pick a date'
+  pickDate: 'Pick a date',
+  addEndDate: 'Add end date',
+  addEndDateDescription: 'Enable to set a deadline and calculate daily budget. Without it, the app tracks transactions only.',
 }
 
 const mockUseLanguage = vi.fn(() => ({
@@ -72,7 +80,7 @@ describe('SetupForm', () => {
       expect(screen.getByText('Set Up Your Budget')).toBeInTheDocument()
       expect(screen.getByText('Enter your starting amount and end date to calculate your daily budget.')).toBeInTheDocument()
       expect(screen.getByLabelText('Starting Amount')).toBeInTheDocument()
-      expect(screen.getByLabelText('End Date')).toBeInTheDocument()
+      expect(screen.getByLabelText('Add end date')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: 'Start Now' })).toBeInTheDocument()
     })
 
@@ -82,6 +90,39 @@ describe('SetupForm', () => {
       const amountInput = screen.getByLabelText('Starting Amount') as HTMLInputElement
       expect(amountInput.value).toBe('')
     })
+
+    it('should NOT show date picker by default (checkbox unchecked)', () => {
+      renderSetupForm()
+
+      // Date picker should not be visible initially
+      expect(screen.queryByTestId('date-picker')).not.toBeInTheDocument()
+    })
+  })
+
+  describe('Checkbox behavior', () => {
+    it('should show date picker when checkbox is checked', async () => {
+      renderSetupForm()
+
+      const checkbox = screen.getByLabelText('Add end date')
+      fireEvent.click(checkbox)
+
+      // Now date picker should be visible
+      expect(screen.getByTestId('date-picker')).toBeInTheDocument()
+    })
+
+    it('should hide date picker when checkbox is unchecked after being checked', async () => {
+      renderSetupForm()
+
+      const checkbox = screen.getByLabelText('Add end date')
+
+      // Check the checkbox
+      fireEvent.click(checkbox)
+      expect(screen.getByTestId('date-picker')).toBeInTheDocument()
+
+      // Uncheck the checkbox
+      fireEvent.click(checkbox)
+      expect(screen.queryByTestId('date-picker')).not.toBeInTheDocument()
+    })
   })
 
   describe('Amount input behavior', () => {
@@ -90,11 +131,11 @@ describe('SetupForm', () => {
 
       const amountInput = screen.getByLabelText('Starting Amount')
 
-      // Enter 0
+      // Enter 0 - it becomes null in the component, so input shows empty
       fireEvent.change(amountInput, { target: { valueAsNumber: 0 } })
 
-      // The input should show '0' (HTML number input behavior)
-      expect((amountInput as HTMLInputElement).value).toBe('0')
+      // The input shows empty because 0 becomes null (not a valid amount)
+      expect((amountInput as HTMLInputElement).value).toBe('')
     })
 
     it('should convert positive numbers to Int type', async () => {
@@ -161,8 +202,12 @@ describe('SetupForm', () => {
   })
 
   describe('Date picker behavior', () => {
-    it('should handle date selection', async () => {
+    it('should handle date selection when checkbox is checked', async () => {
       renderSetupForm()
+
+      // Check the checkbox first
+      const checkbox = screen.getByLabelText('Add end date')
+      fireEvent.click(checkbox)
 
       const dateInput = screen.getByTestId('date-input')
 
@@ -174,8 +219,12 @@ describe('SetupForm', () => {
       expect(screen.getByText(/12\/30\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
     })
 
-    it('should handle date clearing', async () => {
+    it('should handle date clearing when checkbox is checked', async () => {
       renderSetupForm()
+
+      // Check the checkbox first
+      const checkbox = screen.getByLabelText('Add end date')
+      fireEvent.click(checkbox)
 
       const dateInput = screen.getByTestId('date-input')
 
@@ -186,26 +235,38 @@ describe('SetupForm', () => {
 
       // Clear the date
       fireEvent.change(dateInput, { target: { value: '' } })
-
-      // Should show the date
-      expect(screen.getByText(/12\/30\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
     })
   })
 
-  describe('Form submission', () => {
-    it('should not submit when amount is 0 (null)', async () => {
+  describe('Form submission - tracking mode (no date)', () => {
+    it('should submit successfully with only amount (tracking mode)', async () => {
       renderSetupForm()
 
       const amountInput = screen.getByLabelText('Starting Amount')
-      const dateInput = screen.getByTestId('date-input')
       const submitButton = screen.getByRole('button', { name: 'Start Now' })
 
-      // Enter 0 (which becomes null)
-      fireEvent.change(amountInput, { target: { valueAsNumber: 0 } })
+      // Enter positive amount (no date checkbox)
+      fireEvent.change(amountInput, { target: { valueAsNumber: 1000 } })
 
-      // Select a date
-      const futureDate = '2024-12-31'
-      fireEvent.change(dateInput, { target: { value: futureDate } })
+      // Submit the form
+      fireEvent.click(submitButton)
+
+      // Should call onSetup in tracking mode (no endDate)
+      expect(mockOnSetup).toHaveBeenCalledWith({
+        startAmount: 1000,
+        endDate: undefined,
+        hasEndDate: false
+      })
+    })
+
+    it('should not submit when amount is 0', async () => {
+      renderSetupForm()
+
+      const amountInput = screen.getByLabelText('Starting Amount')
+      const submitButton = screen.getByRole('button', { name: 'Start Now' })
+
+      // Enter 0
+      fireEvent.change(amountInput, { target: { valueAsNumber: 0 } })
 
       // Try to submit
       fireEvent.click(submitButton)
@@ -218,33 +279,12 @@ describe('SetupForm', () => {
       renderSetupForm()
 
       const amountInput = screen.getByLabelText('Starting Amount')
-      const dateInput = screen.getByTestId('date-input')
       const submitButton = screen.getByRole('button', { name: 'Start Now' })
 
       // Enter negative amount
       fireEvent.change(amountInput, { target: { valueAsNumber: -100 } })
 
-      // Select a date
-      const futureDate = '2024-12-31'
-      fireEvent.change(dateInput, { target: { value: futureDate } })
-
       // Try to submit
-      fireEvent.click(submitButton)
-
-      // Should not call onSetup
-      expect(mockOnSetup).not.toHaveBeenCalled()
-    })
-
-    it('should not submit when no date is selected', async () => {
-      renderSetupForm()
-
-      const amountInput = screen.getByLabelText('Starting Amount')
-      const submitButton = screen.getByRole('button', { name: 'Start Now' })
-
-      // Enter positive amount
-      fireEvent.change(amountInput, { target: { valueAsNumber: 1000 } })
-
-      // Try to submit without date
       fireEvent.click(submitButton)
 
       // Should not call onSetup
@@ -254,12 +294,7 @@ describe('SetupForm', () => {
     it('should not submit when amount is empty', async () => {
       renderSetupForm()
 
-      const dateInput = screen.getByTestId('date-input')
       const submitButton = screen.getByRole('button', { name: 'Start Now' })
-
-      // Select a date
-      const futureDate = '2024-12-31'
-      fireEvent.change(dateInput, { target: { value: futureDate } })
 
       // Try to submit without amount
       fireEvent.click(submitButton)
@@ -267,43 +302,74 @@ describe('SetupForm', () => {
       // Should not call onSetup
       expect(mockOnSetup).not.toHaveBeenCalled()
     })
+  })
 
-    it('should submit successfully with valid positive amount and date', async () => {
+  describe('Form submission - budget mode (with date)', () => {
+    it('should submit successfully with amount and date', async () => {
       renderSetupForm()
 
       const amountInput = screen.getByLabelText('Starting Amount')
-      const dateInput = screen.getByTestId('date-input')
       const submitButton = screen.getByRole('button', { name: 'Start Now' })
 
       // Enter positive amount
       fireEvent.change(amountInput, { target: { valueAsNumber: 1000 } })
 
+      // Check the checkbox to enable date
+      const checkbox = screen.getByLabelText('Add end date')
+      fireEvent.click(checkbox)
+
       // Select a date
       const futureDate = '2024-12-31'
+      const dateInput = screen.getByTestId('date-input')
       fireEvent.change(dateInput, { target: { value: futureDate } })
 
       // Submit the form
       fireEvent.click(submitButton)
 
-      // Should call onSetup with correct data
+      // Should call onSetup in budget mode
       expect(mockOnSetup).toHaveBeenCalledWith({
-        startAmount: 1000, // Should be Int type
-        endDate: new Date(futureDate)
+        startAmount: 1000,
+        endDate: new Date(futureDate),
+        hasEndDate: true
       })
     })
 
-    it('should submit successfully with large positive amount', async () => {
+    it('should not submit when date checkbox is checked but no date selected', async () => {
       renderSetupForm()
 
       const amountInput = screen.getByLabelText('Starting Amount')
-      const dateInput = screen.getByTestId('date-input')
+      const submitButton = screen.getByRole('button', { name: 'Start Now' })
+
+      // Enter positive amount
+      fireEvent.change(amountInput, { target: { valueAsNumber: 1000 } })
+
+      // Check the checkbox to enable date
+      const checkbox = screen.getByLabelText('Add end date')
+      fireEvent.click(checkbox)
+
+      // Submit without selecting a date
+      fireEvent.click(submitButton)
+
+      // Should not call onSetup
+      expect(mockOnSetup).not.toHaveBeenCalled()
+    })
+
+    it('should submit successfully with large positive amount and date', async () => {
+      renderSetupForm()
+
+      const amountInput = screen.getByLabelText('Starting Amount')
       const submitButton = screen.getByRole('button', { name: 'Start Now' })
 
       // Enter large amount
       fireEvent.change(amountInput, { target: { valueAsNumber: 1000000 } })
 
+      // Check the checkbox to enable date
+      const checkbox = screen.getByLabelText('Add end date')
+      fireEvent.click(checkbox)
+
       // Select a date
       const futureDate = '2024-12-31'
+      const dateInput = screen.getByTestId('date-input')
       fireEvent.change(dateInput, { target: { value: futureDate } })
 
       // Submit the form
@@ -311,23 +377,22 @@ describe('SetupForm', () => {
 
       // Should call onSetup with correct data
       expect(mockOnSetup).toHaveBeenCalledWith({
-        startAmount: 1000000, // Should be Int type
-        endDate: new Date(futureDate)
+        startAmount: 1000000,
+        endDate: new Date(futureDate),
+        hasEndDate: true
       })
     })
   })
 
   describe('Form validation', () => {
-    it('should prevent form submission with amount <= 0', async () => {
+    it('should prevent form submission with amount <= 0 in tracking mode', async () => {
       renderSetupForm()
 
       const amountInput = screen.getByLabelText('Starting Amount')
-      const dateInput = screen.getByTestId('date-input')
       const submitButton = screen.getByRole('button', { name: 'Start Now' })
 
       // Test with 0
       fireEvent.change(amountInput, { target: { valueAsNumber: 0 } })
-      fireEvent.change(dateInput, { target: { value: '2024-12-31' } })
       fireEvent.click(submitButton)
       expect(mockOnSetup).not.toHaveBeenCalled()
 
@@ -338,28 +403,17 @@ describe('SetupForm', () => {
       expect(mockOnSetup).not.toHaveBeenCalled()
     })
 
-    it('should not submit when only date is provided', async () => {
+    it('should prevent form submission when only date is provided (no amount)', async () => {
       renderSetupForm()
+
+      const checkbox = screen.getByLabelText('Add end date')
+      fireEvent.click(checkbox)
 
       const dateInput = screen.getByTestId('date-input')
       const submitButton = screen.getByRole('button', { name: 'Start Now' })
 
-      // Set only date
+      // Set only date (no amount)
       fireEvent.change(dateInput, { target: { value: '2024-12-31' } })
-      fireEvent.click(submitButton)
-
-      // Should not call onSetup
-      expect(mockOnSetup).not.toHaveBeenCalled()
-    })
-
-    it('should not submit when only amount is provided', async () => {
-      renderSetupForm()
-
-      const amountInput = screen.getByLabelText('Starting Amount')
-      const submitButton = screen.getByRole('button', { name: 'Start Now' })
-
-      // Set only amount
-      fireEvent.change(amountInput, { target: { valueAsNumber: 1000 } })
       fireEvent.click(submitButton)
 
       // Should not call onSetup
@@ -374,16 +428,11 @@ describe('SetupForm', () => {
       const amountInput = screen.getByLabelText('Starting Amount')
 
       // Test various inputs
-      const testValues = [0, 100, 1000, 50000, -50, 0]
+      const testValues = [100, 1000, 50000, -50]
 
       for (const value of testValues) {
         fireEvent.change(amountInput, { target: { valueAsNumber: value } })
-
-        if (value === 0) {
-          expect((amountInput as HTMLInputElement).value).toBe('0')
-        } else {
-          expect((amountInput as HTMLInputElement).value).toBe(value.toString())
-        }
+        expect((amountInput as HTMLInputElement).value).toBe(value.toString())
       }
     })
 

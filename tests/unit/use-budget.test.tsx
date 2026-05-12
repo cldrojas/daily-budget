@@ -43,40 +43,79 @@ describe('useBudget hook', () => {
     expect(result.current.transactions).toHaveLength(0)
   })
 
-  it('handles invalid initial budget values - negative', () => {
-    const { result } = renderHook(() => useBudget())
+  describe('setupBudget', () => {
+    it('handles invalid initial budget values - negative', () => {
+      const { result } = renderHook(() => useBudget())
 
-    act(() => {
-      result.current.setupBudget({
-        startAmount: -100 as any,
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      act(() => {
+        result.current.setupBudget({
+          startAmount: -100 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          hasEndDate: true
+        })
       })
+
+      // Should still set up but with negative amount (though in practice validation should prevent this)
+      expect(result.current.isSetup).toBe(true)
+      expect(result.current.budget.startAmount).toBe(-100)
     })
 
-    // Should still set up but with negative amount (though in practice validation should prevent this)
-    expect(result.current.isSetup).toBe(true)
-    expect(result.current.budget.startAmount).toBe(-100)
-  })
+    it('handles invalid initial budget values - non-numeric', () => {
+      const { result } = renderHook(() => useBudget())
 
-  it('handles invalid initial budget values - non-numeric', () => {
-    const { result } = renderHook(() => useBudget())
-
-    act(() => {
-      result.current.setupBudget({
-        startAmount: 'invalid' as any,
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 'invalid' as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          hasEndDate: true
+        })
       })
+
+      // TypeScript would prevent this, but runtime should handle
+      expect(result.current.isSetup).toBe(true)
     })
 
-    // TypeScript would prevent this, but runtime should handle
-    expect(result.current.isSetup).toBe(true)
+    it('sets up budget in tracking mode (no end date)', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          hasEndDate: false
+        })
+      })
+
+      expect(result.current.isSetup).toBe(true)
+      expect(result.current.budget.hasEndDate).toBe(false)
+      expect(result.current.budget.endDate).toBeUndefined()
+      expect(result.current.dailyAllowance).toBe(0) // No daily allowance in tracking mode
+    })
+
+    it('sets up budget in budget mode (with end date)', () => {
+      const { result } = renderHook(() => useBudget())
+
+      const futureDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: futureDate,
+          hasEndDate: true
+        })
+      })
+
+      expect(result.current.isSetup).toBe(true)
+      expect(result.current.budget.hasEndDate).toBe(true)
+      expect(result.current.budget.endDate).toEqual(futureDate)
+      expect(result.current.dailyAllowance).toBeGreaterThan(0) // Has daily allowance in budget mode
+    })
   })
 
   it('handles empty accounts array', () => {
     // Mock localStorage with empty accounts
     localStorageMock.getItem.mockReturnValue(JSON.stringify({
       accounts: [],
-      budget: { startAmount: 1000, endDate: new Date().toISOString() },
+      budget: { startAmount: 1000, endDate: new Date().toISOString(), hasEndDate: true },
       transactions: [],
       isSetup: true
     }))
@@ -87,7 +126,7 @@ describe('useBudget hook', () => {
     expect(result.current.accounts).toHaveLength(2)
   })
 
-  it('handles large numbers', () => {
+  it('handles large numbers in budget mode', () => {
     const { result } = renderHook(() => useBudget())
 
     const largeAmount = 1000000000 // 1 billion
@@ -95,22 +134,40 @@ describe('useBudget hook', () => {
     act(() => {
       result.current.setupBudget({
         startAmount: largeAmount as any,
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        hasEndDate: true
       })
     })
 
     expect(result.current.budget.startAmount).toBe(largeAmount)
-    expect(result.current.dailyAllowance).toBe(largeAmount / 8) // 8 days including today
+    // 8 days including today
+    expect(result.current.dailyAllowance).toBe(largeAmount / 8)
+  })
+
+  it('handles large numbers in tracking mode', () => {
+    const { result } = renderHook(() => useBudget())
+
+    const largeAmount = 125000000
+
+    act(() => {
+      result.current.setupBudget({
+        startAmount: largeAmount as any,
+        hasEndDate: false
+      })
+    })
+
+    expect(result.current.budget.startAmount).toBe(largeAmount)
+    expect(result.current.dailyAllowance).toBe(0) // No daily allowance in tracking mode
   })
 
   it('handles error in addTransaction with invalid amount', () => {
     const { result } = renderHook(() => useBudget())
 
-    // Set up budget first
+    // Set up budget in tracking mode (no daily allowance)
     act(() => {
       result.current.setupBudget({
         startAmount: 1000 as any,
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        hasEndDate: false
       })
     })
 
@@ -124,17 +181,44 @@ describe('useBudget hook', () => {
       })
     })
 
-    // Should not crash, transactions should remain empty or handle gracefully
+    // Should not crash, transactions should remain with only initial deposit
     expect(result.current.transactions).toHaveLength(1) // Only the initial deposit
   })
 
-  it('handles addTransaction with amount exceeding balance', () => {
+  it('handles addTransaction in tracking mode (no daily allowance)', () => {
+    const { result } = renderHook(() => useBudget())
+
+    // Set up budget in tracking mode
+    act(() => {
+      result.current.setupBudget({
+        startAmount: 1000 as any,
+        hasEndDate: false
+      })
+    })
+
+    // Add expense - should just deduct from balance
+    act(() => {
+      result.current.addTransaction({
+        type: 'expense',
+        amount: 200,
+        description: 'Test expense',
+        account: 'daily'
+      })
+    })
+
+    expect(result.current.transactions).toHaveLength(2) // Initial + expense
+    const dailyAccount = result.current.accounts.find(a => a.id === 'daily')
+    expect(dailyAccount?.balance).toBe(800)
+  })
+
+  it('handles addTransaction in budget mode with amount exceeding balance', () => {
     const { result } = renderHook(() => useBudget())
 
     act(() => {
       result.current.setupBudget({
         startAmount: 100 as any,
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        hasEndDate: true
       })
     })
 
@@ -158,7 +242,8 @@ describe('useBudget hook', () => {
     act(() => {
       result.current.setupBudget({
         startAmount: 100 as any,
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        hasEndDate: true
       })
     })
 
@@ -183,7 +268,7 @@ describe('useBudget hook', () => {
     act(() => {
       result.current.setupBudget({
         startAmount: 1000 as any,
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        hasEndDate: false
       })
     })
 
@@ -219,5 +304,60 @@ describe('useBudget hook', () => {
 
     // Account should still exist
     expect(result.current.accounts.find(a => a.id === 'daily')).toBeDefined()
+  })
+
+  describe('updateConfig', () => {
+    it('updates config in tracking mode', () => {
+      const { result } = renderHook(() => useBudget())
+
+      // Initial setup in tracking mode
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          hasEndDate: false
+        })
+      })
+
+      // Update to budget mode with new end date
+      const futureDate = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+      act(() => {
+        result.current.updateConfig({
+          startAmount: 1500 as any,
+          endDate: futureDate,
+          hasEndDate: true
+        })
+      })
+
+      expect(result.current.budget.hasEndDate).toBe(true)
+      expect(result.current.budget.endDate).toEqual(futureDate)
+      expect(result.current.dailyAllowance).toBeGreaterThan(0)
+    })
+
+    it('converts from budget mode to tracking mode', () => {
+      const { result } = renderHook(() => useBudget())
+
+      // Initial setup in budget mode
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+          hasEndDate: true
+        })
+      })
+
+      expect(result.current.dailyAllowance).toBeGreaterThan(0)
+
+      // Convert to tracking mode
+      act(() => {
+        result.current.updateConfig({
+          startAmount: 1000 as any,
+          hasEndDate: false
+        })
+      })
+
+      expect(result.current.budget.hasEndDate).toBe(false)
+      expect(result.current.budget.endDate).toBeUndefined()
+      expect(result.current.dailyAllowance).toBe(0)
+    })
   })
 })
