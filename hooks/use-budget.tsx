@@ -23,7 +23,8 @@ export function useBudget() {
     startAmount: 0 as Int,
     endDate: undefined,
     startDate: undefined,
-    autoSave: true
+    autoSave: true,
+    hasEndDate: false
   })
   const [accounts, setAccounts] = useState<Account[]>([
     { id: 'daily', name: 'Daily Budget', type: 'daily', balance: 0 as Int, icon: 'wallet' },
@@ -97,7 +98,13 @@ export function useBudget() {
 
   // Calculate daily allowance based on remaining amount and days
   const calculateDailyAllowance = useCallback(() => {
-    if (!budget.endDate) return
+    // If no end date, we're in tracking mode - no daily allowance calculation
+    if (!budget.endDate || !budget.hasEndDate) {
+      setDailyAllowance(0)
+      setRemainingToday(0)
+      setProgress(100)
+      return
+    }
 
     const daysRemaining = differenceInDays(budget.endDate, today) + 1
 
@@ -177,18 +184,21 @@ export function useBudget() {
   // Set up initial budget
   const setupBudget = ({
     startAmount,
-    endDate
+    endDate,
+    hasEndDate
   }: {
     startAmount: Int
-    endDate: Date
+    endDate?: Date
+    hasEndDate: boolean
   }) => {
 
     // Create initial budget
     const newBudget: Budget = {
       startAmount,
       startDate: today,
-      endDate,
-      autoSave: true
+      endDate: hasEndDate ? endDate : undefined,
+      autoSave: true,
+      hasEndDate
     }
 
     // Update daily account with starting amount
@@ -215,12 +225,19 @@ export function useBudget() {
     setLastCheckedDay(startOfDay(today))
     setIsSetup(true)
 
-    // Calculate initial daily allowance
-    const daysRemaining = differenceInDays(endDate, today) + 1
-    const newDailyAllowance = startAmount / daysRemaining
-    setDailyAllowance(newDailyAllowance)
-    setRemainingToday(newDailyAllowance)
-    setProgress(100)
+    // Calculate initial daily allowance only if has end date
+    if (hasEndDate && endDate) {
+      const daysRemaining = differenceInDays(endDate, today) + 1
+      const newDailyAllowance = startAmount / daysRemaining
+      setDailyAllowance(newDailyAllowance)
+      setRemainingToday(newDailyAllowance)
+      setProgress(100)
+    } else {
+      // In tracking mode, no daily allowance - just set initial state
+      setDailyAllowance(0)
+      setRemainingToday(0)
+      setProgress(100)
+    }
   }
 
   // Add a new expense by default
@@ -258,6 +275,20 @@ export function useBudget() {
       let updatedAccounts = [...accounts]
 
       if (account === 'daily') {
+        // In tracking mode (no end date), just subtract from balance
+        if (!budget.hasEndDate || !budget.endDate) {
+          updatedAccounts = accounts.map((acc) => {
+            if (acc.id === 'daily') {
+              return { ...acc, balance: toInt(acc.balance - amount) ?? 0 as Int }
+            }
+            return acc
+          })
+          setTransactions([transaction, ...transactions])
+          setAccounts(updatedAccounts)
+          return
+        }
+
+        // In budget mode (has end date), apply daily allowance logic
         // If expense is less than or equal to remaining daily amount
         if (amount <= remainingToday) {
           // Simply reduce the remaining amount for today
@@ -298,6 +329,58 @@ export function useBudget() {
         updatedAccounts = accounts.map((acc) => {
           if (acc.id === account) {
             return { ...acc, balance: toInt(acc.balance - amount) ?? 0 as Int }
+          }
+          return acc
+        })
+
+        setTransactions([transaction, ...transactions])
+      }
+
+      setAccounts(updatedAccounts)
+    } else if (type === 'income') {
+      // Create transaction record
+      const transaction = {
+        id: uuidv4(),
+        type,
+        date,
+        amount: toInt(amount) ?? 0 as Int, // Positive for income
+        description,
+        account
+      }
+
+      // Update accounts based on income logic
+      let updatedAccounts = [...accounts]
+
+      if (account === 'daily') {
+        // In tracking mode (no end date), just add to balance
+        if (!budget.hasEndDate || !budget.endDate) {
+          updatedAccounts = accounts.map((acc) => {
+            if (acc.id === 'daily') {
+              return { ...acc, balance: toInt(acc.balance + amount) ?? 0 as Int }
+            }
+            return acc
+          })
+          setTransactions([transaction, ...transactions])
+          setAccounts(updatedAccounts)
+          return
+        }
+
+        // In budget mode (has end date), add to balance and remainingToday
+        updatedAccounts = accounts.map((acc) => {
+          if (acc.id === 'daily') {
+            return { ...acc, balance: toInt(acc.balance + amount) ?? 0 as Int }
+          }
+          return acc
+        })
+
+        // Add to remainingToday since income increases available funds
+        setRemainingToday(remainingToday + amount)
+        setTransactions([transaction, ...transactions])
+      } else {
+        // For non-daily accounts, simply update the balance
+        updatedAccounts = accounts.map((acc) => {
+          if (acc.id === account) {
+            return { ...acc, balance: toInt(acc.balance + amount) ?? 0 as Int }
           }
           return acc
         })
@@ -545,10 +628,12 @@ export function useBudget() {
   // Update budget configuration
   const updateConfig = ({
     startAmount,
-    endDate
+    endDate,
+    hasEndDate
   }: {
     startAmount: Int
-    endDate: Date
+    endDate?: Date
+    hasEndDate: boolean
   }) => {
     // Get current daily account balance
     const dailyAccount = accounts.find((a) => a.id === 'daily')
@@ -561,7 +646,8 @@ export function useBudget() {
     const updatedBudget = {
       ...budget,
       startAmount,
-      endDate
+      endDate: hasEndDate ? endDate : undefined,
+      hasEndDate
     }
 
     // Update daily account balance
@@ -588,13 +674,20 @@ export function useBudget() {
     setBudget(updatedBudget)
     setAccounts(updatedAccounts)
 
-    // Recalculate daily allowance
-    const daysRemaining = differenceInDays(endDate, today) + 1
+    // Recalculate daily allowance - only if has end date
+    if (hasEndDate && endDate) {
+      const daysRemaining = differenceInDays(endDate, today) + 1
 
-    if (daysRemaining > 0) {
-      const newDailyAllowance = (currentBalance + (balanceDifference ?? 0)) / daysRemaining
-      setDailyAllowance(newDailyAllowance)
-      setRemainingToday(newDailyAllowance)
+      if (daysRemaining > 0) {
+        const newDailyAllowance = (currentBalance + (balanceDifference ?? 0)) / daysRemaining
+        setDailyAllowance(newDailyAllowance)
+        setRemainingToday(newDailyAllowance)
+        setProgress(100)
+      }
+    } else {
+      // In tracking mode, no daily allowance
+      setDailyAllowance(0)
+      setRemainingToday(0)
       setProgress(100)
     }
   }
