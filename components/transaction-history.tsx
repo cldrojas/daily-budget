@@ -44,7 +44,7 @@ export function TransactionHistory({ transactions }: { transactions: Transaction
                     <TableCell>{format(new Date(transaction.date), "d MMM yyyy", { locale })}</TableCell>
                     <TableCell>{transaction.description || "—"}</TableCell>
                     <TableCell className="capitalize">{account ? account.name : t("unknownAccount")}</TableCell>
-                    <TableCell className={`text-right ${transaction.amount < 0 ? "text-red-500" : ""}`}>
+                    <TableCell className={`text-right ${transaction.amount < 0 ? "text-red-500" : "text-green-500"}`}>
                       {formatCurrency(Math.abs(transaction.amount))}
                     </TableCell>
                   </TableRow>

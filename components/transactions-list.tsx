@@ -32,12 +32,12 @@ export function TransactionList({
   // Set locale based on language
   const locale = language === 'es' ? es : undefined
 
-  // Filter only expense transactions (negative amounts)
-  const expenses = transactions.filter((transaction) => transaction.amount < 0)
+  // Filter transactions - show all (both income and expenses)
+  const filteredTransactions = transactions
 
   // Function to get a short name from description
-  const getShortName = (description: string) => {
-    if (!description) return t('unnamedExpense')
+  const getShortName = (description: string, amount: number) => {
+    if (!description) return amount >= 0 ? t('unnamedIncome') : t('unnamedExpense')
 
     // If description is short enough, return it
     if (description.length <= 20) return description
@@ -54,15 +54,15 @@ export function TransactionList({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{t('recentExpenses')}</CardTitle>
-        <CardDescription>{t('recentExpensesDescription')}</CardDescription>
+        <CardTitle>{t('recentActivity')}</CardTitle>
+        <CardDescription>{t('recentActivityDescription')}</CardDescription>
       </CardHeader>
       <CardContent>
-        {expenses.length === 0 ? (
-          <p className="text-center text-muted-foreground py-4">{t('noExpenses')}</p>
+        {filteredTransactions.length === 0 ? (
+          <p className="text-center text-muted-foreground py-4">{t('noTransactions')}</p>
         ) : (
           <div className="space-y-2">
-            {expenses
+            {filteredTransactions
               .toSorted((a, b) => time(b.date) - time(a.date)) // default sort by date descending, TODO: add sorting filter
               .map((transaction) => {
                 const account = accounts.find((account) => account.id === transaction.account)
@@ -74,7 +74,7 @@ export function TransactionList({
                     <main className="flex items-center justify-between w-full cursor-pointer" onClick={() => openTransactionModal(transaction.id)}>
                       <div className="flex flex-col ">
                         <span className="font-medium">
-                          {getShortName(transaction.description)}
+                          {getShortName(transaction.description, transaction.amount)}
                         </span>
                         <div className="flex items-center space-x-2">
                           <span className="text-xs text-muted-foreground">
@@ -85,7 +85,7 @@ export function TransactionList({
                           </span>
                         </div>
                       </div>
-                      <span className="font-semibold text-red-500">
+                      <span className={`font-semibold ${transaction.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                         {formatCurrency(Math.abs(transaction.amount))}
                       </span>
                     </main>
