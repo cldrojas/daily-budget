@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useState, useEffect } from 'react'
-import { PlusCircle, Edit } from 'lucide-react'
+import { PlusCircle, Edit, ArrowDownRight, ArrowUpLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -20,6 +20,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
@@ -50,7 +51,7 @@ export function TransactionModal({
   const [description, setDescription] = useState('')
   const [date, setDate] = useState(new Date())
   const [account, setAccount] = useState('daily')
-  const [type, setType] = useState<TransactionType>('expense')
+  const [transactionType, setTransactionType] = useState<TransactionType>('expense')
 
   // Reset form when modal opens/closes or transaction changes
   useEffect(() => {
@@ -60,14 +61,14 @@ export function TransactionModal({
       setDescription(transaction.description)
       setDate(new Date(transaction.date))
       setAccount(transaction.account)
-      setType(transaction.type)
+      setTransactionType(transaction.type)
     } else {
       // Adding new transaction
       setAmount(0)
       setDescription('')
       setDate(new Date())
       setAccount('daily')
-      setType('expense')
+      setTransactionType('expense')
     }
   }, [transaction, isOpen])
 
@@ -92,11 +93,14 @@ export function TransactionModal({
       return
     }
 
+    const isIncome = transactionType === 'income'
+    const finalAmount = isIncome ? amount : -amount
+
     if (transaction) {
       // Update existing transaction
       onUpdateTransaction({
         ...transaction,
-        type,
+        type: transactionType,
         amount: toInt(transaction.amount < 0 ? -amount : amount) as Int, // Preserve sign
         description,
         account,
@@ -110,17 +114,24 @@ export function TransactionModal({
     } else {
       // Add new transaction
       onAddTransaction({
-        type,
-        amount: toInt(amount) as Int,
+        type: transactionType,
+        amount: toInt(finalAmount) as Int,
         description,
         account,
         date
       })
 
-      toast({
-        title: t('expenseAdded'),
-        description: t('expenseAddedDescription', { amount: formatCurrency(amount) })
-      })
+      if (isIncome) {
+        toast({
+          title: t('incomeAdded'),
+          description: t('incomeAddedDescription', { amount: formatCurrency(amount) })
+        })
+      } else {
+        toast({
+          title: t('expenseAdded'),
+          description: t('expenseAddedDescription', { amount: formatCurrency(amount) })
+        })
+      }
     }
 
     onClose()
@@ -134,12 +145,49 @@ export function TransactionModal({
       onOpenChange={onClose}
     >
       <DialogContent className="sm:max-w-[425px]">
+        {!isEditing && (
+          <Tabs
+            value={transactionType}
+            onValueChange={(v) => setTransactionType(v as TransactionType)}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger
+                value="expense"
+                className="flex items-center gap-2 data-[state=active]:text-red-600 data-[state=active]:dark:text-red-500"
+              >
+                <ArrowDownRight className="h-4 w-4" />
+                {t('expenses')}
+              </TabsTrigger>
+              <TabsTrigger
+                value="income"
+                className="flex items-center gap-2 data-[state=active]:text-green-600 data-[state=active]:dark:text-green-500"
+              >
+                <ArrowUpLeft className="h-4 w-4" />
+                {t('income')}
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        )}
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? t('editTransaction') : t('addExpense')}
+          <DialogTitle className="flex items-center gap-2">
+            {transactionType === 'income' ? (
+              <>
+                <ArrowUpLeft className="h-5 w-5 text-green-600 dark:text-green-500" />
+                {isEditing ? t('editTransaction') : t('addIncome')}
+              </>
+            ) : (
+              <>
+                <ArrowDownRight className="h-5 w-5 text-red-600 dark:text-red-500" />
+                {isEditing ? t('editTransaction') : t('addExpense')}
+              </>
+            )}
           </DialogTitle>
           <DialogDescription>
-            {isEditing ? t('editTransactionDescription') : t('addExpenseDescription')}
+            {transactionType === 'income'
+              ? (isEditing ? t('editTransactionDescription') : t('addIncomeDescription'))
+              : (isEditing ? t('editTransactionDescription') : t('addExpenseDescription'))
+            }
           </DialogDescription>
         </DialogHeader>
         <form
@@ -157,7 +205,7 @@ export function TransactionModal({
               onChange={(e) => setAmount(e.target.valueAsNumber || 0)}
               required
             />
-            {!isEditing && amount > remainingToday && (
+            {!isEditing && transactionType === 'expense' && amount > remainingToday && (
               <p className="text-sm text-yellow-500 dark:text-yellow-400">
                 {t('expenseExceedsWarning')}
               </p>
@@ -168,7 +216,7 @@ export function TransactionModal({
             <Label htmlFor="description">{t('description')}</Label>
             <Textarea
               id="description"
-              placeholder={t('whatExpenseFor')}
+              placeholder={transactionType === 'income' ? t('whatIncomeFor') : t('whatExpenseFor')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -214,7 +262,11 @@ export function TransactionModal({
             >
               {t('cancel')}
             </Button>
-            <Button type="submit">
+            <Button
+              type="submit"
+              variant={transactionType === 'income' ? 'default' : 'destructive'}
+              className={transactionType === 'income' ? 'bg-green-600 hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700' : ''}
+            >
               {isEditing ? (
                 <>
                   <Edit className="mr-2 h-4 w-4" />
@@ -223,7 +275,7 @@ export function TransactionModal({
               ) : (
                 <>
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  {t('addExpense')}
+                  {transactionType === 'income' ? t('addIncome') : t('addExpense')}
                 </>
               )}
             </Button>

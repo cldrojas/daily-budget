@@ -307,6 +307,35 @@ export function useBudget() {
 
       setAccounts(updatedAccounts)
     }
+
+    if (type === 'income') {
+      // Create transaction record
+      const transaction = {
+        id: uuidv4(),
+        type,
+        date,
+        amount: toInt(amount) ?? 0 as Int, // Positive for income
+        description,
+        account
+      }
+
+      // Update account balance by adding the income amount
+      let updatedAccounts = accounts.map((acc) => {
+        if (acc.id === account) {
+          return { ...acc, balance: toInt(acc.balance + amount) ?? 0 as Int }
+        }
+        return acc
+      })
+
+      // If daily account in budget mode, also update remainingToday
+      if (account === 'daily' && budget.endDate) {
+        setRemainingToday(remainingToday + amount)
+        setProgress(((remainingToday + amount) / dailyAllowance) * 100)
+      }
+
+      setAccounts(updatedAccounts)
+      setTransactions([transaction, ...transactions])
+    }
   }
 
   // Remove an existing transaction

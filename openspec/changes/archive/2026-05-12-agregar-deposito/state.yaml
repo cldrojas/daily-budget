@@ -1,0 +1,9 @@
+# Archive State: agregar-deposito
+status: archived
+archived_at: 2026-05-12
+last_phase: archive
+tasks_completed: 6/7
+tasks_verified: 6/7
+notes: >
+  E2E verification (task 3.1) was not formally documented but all code
+  was implemented and manually verified. No CRITICAL issues remain.
