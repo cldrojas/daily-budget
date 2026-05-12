@@ -16,10 +16,11 @@ import { Checkbox } from "./ui/checkbox"
 import { useBudget } from "@/hooks/use-budget"
 
 export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
-  budget: Budget, onClearData: () => void, onUpdateConfig: ({ startAmount, endDate, autoSave }: {
+  budget: Budget, onClearData: () => void, onUpdateConfig: ({ startAmount, endDate, autoSave, hasEndDate }: {
     startAmount: Int;
-    endDate: Date;
-    autoSave?: boolean
+    endDate?: Date;
+    autoSave?: boolean;
+    hasEndDate: boolean;
   }) => void,
 }) {
   const { t } = useLanguage()
@@ -30,6 +31,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
   const [autoSave, setAutoSave] = useState(budget.autoSave)
   const [startAmount, setStartAmount] = useState(budget.startAmount)
   const [endDate, setEndDate] = useState(budget.endDate)
+  const [hasEndDate, setHasEndDate] = useState(budget.hasEndDate)
 
   const getYesterday = () => {
     const yesterday = new Date()
@@ -40,7 +42,16 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!startAmount || !endDate) {
+    if (!startAmount) {
+      toast({
+        title: t("missingInformation"),
+        description: t("missingInformationDescription"),
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (hasEndDate && !endDate) {
       toast({
         title: t("missingInformation"),
         description: t("missingInformationDescription"),
@@ -60,8 +71,9 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
 
     onUpdateConfig({
       startAmount: toInt(startAmount) ?? 0 as Int,
-      endDate,
-      autoSave
+      endDate: hasEndDate ? endDate : undefined,
+      autoSave,
+      hasEndDate
     })
 
 
@@ -110,6 +122,9 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                 >
                   {t("exportData")}
                 </Button>
+                <span className="text-sm text-muted-foreground px-2 py-1 bg-secondary rounded">
+                  {budget.hasEndDate ? t("modeBudget") : t("modeRegister")}
+                </span>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="startAmount">{t("startingAmount")}</Label>
@@ -124,9 +139,25 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="endDate">{t("endDate")}</Label>
-                <DatePicker date={endDate} setDate={setEndDate} className="w-full" />
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="hasEndDate"
+                    checked={hasEndDate}
+                    onCheckedChange={(checked) => {
+                      setHasEndDate(checked === true)
+                      if (!checked) setEndDate(undefined)
+                    }}
+                  />
+                  <Label htmlFor="hasEndDate" className="cursor-pointer">{t('addEndDate')}</Label>
+                </div>
+                <p className="text-sm text-muted-foreground pl-6">{t('addEndDateDescription')}</p>
               </div>
+              {hasEndDate && (
+                <div className="space-y-2">
+                  <Label htmlFor="endDate">{t("endDate")}</Label>
+                  <DatePicker date={endDate} setDate={setEndDate} className="w-full" />
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="autosave">{t("toggleAutoSaving")}</Label>
                 <Checkbox className="ml-2" checked={autoSave} onCheckedChange={() => setAutoSave(!autoSave)} />

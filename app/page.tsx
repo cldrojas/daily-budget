@@ -108,6 +108,7 @@ export default function DailyBudgetApp() {
                       progress={progress}
                       accounts={accounts}
                       remainingDays={getRemainingDays()}
+                      hasEndDate={budget.hasEndDate}
                     />
                   </ErrorBoundary>
 
