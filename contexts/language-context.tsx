@@ -10,6 +10,7 @@ export const translations = {
   en: {
     // General
     appName: 'Saldo Cero',
+    unknownAccount: 'Unknown account',
     darkMode: 'Dark Mode',
     lightMode: 'Light Mode',
     youSure: 'Are you sure?',
@@ -22,6 +23,10 @@ export const translations = {
     startingAmount: 'Starting Amount',
     endDate: 'End Date',
     startTracking: 'Start Now',
+    addEndDate: 'Add end date',
+    addEndDateDescription: 'Enable to set a deadline and calculate daily budget. Without it, the app tracks transactions only.',
+    modeBudget: 'Budget Mode',
+    modeRegister: 'Tracking Mode',
 
     // Dashboard
     dailyBudget: 'Daily Budget',
@@ -65,8 +70,12 @@ export const translations = {
     unnamedExpense: 'Unnamed Expense',
     recentExpenses: 'Recent Expenses',
     recentExpensesDescription: 'Your latest recorded expenses',
+    recentActivity: 'Recent Activity',
+    recentActivityDescription: 'Your latest transactions',
     noExpenses: 'No expenses yet',
     transactionType: 'Transaction Type',
+    unnamedIncome: 'Unnamed income',
+    whatIncomeFor: 'What is this income for?',
 
     // Transfer Form
     transferFunds: 'Transfer Funds',
@@ -111,6 +120,8 @@ export const translations = {
     noTransactions: 'No transactions yet',
 
     // Toasts
+    incomeAdded: 'Income added',
+    incomeAddedDescription: 'Successfully recorded',
     expenseAdded: 'Expense Added',
     expenseAddedDescription: '{amount} was added.',
     transactionUpdated: 'Transaction Updated',
@@ -139,6 +150,7 @@ export const translations = {
   }, es: {
     // General
     appName: 'Saldo Cero',
+    unknownAccount: 'Cuenta desconocida',
     darkMode: 'Modo Oscuro',
     lightMode: 'Modo Claro',
     youSure: '¿Estás seguro?',
@@ -151,6 +163,10 @@ export const translations = {
     startingAmount: 'Monto inicial',
     endDate: 'Fecha final',
     startTracking: 'Comenzar ahora',
+    addEndDate: 'Agregar fecha límite',
+    addEndDateDescription: 'Activa para establecer una fecha límite y calcular el presupuesto diario. Sin ella, la app solo registra transacciones.',
+    modeBudget: 'Modo presupuesto',
+    modeRegister: 'Modo registro',
 
     // Dashboard
     dailyBudget: 'Presupuesto Diario',
@@ -194,8 +210,12 @@ export const translations = {
     unnamedExpense: 'Gasto sin nombre',
     recentExpenses: 'Gastos recientes',
     recentExpensesDescription: 'Tus gastos más recientes',
+    recentActivity: 'Actividad Reciente',
+    recentActivityDescription: 'Tus últimas transacciones',
     noExpenses: 'Aún no hay gastos',
     transactionType: 'Tipo de transacción',
+    unnamedIncome: 'Ingreso sin nombre',
+    whatIncomeFor: '¿Para qué es este ingreso?',
 
     // Transfer Form
     transferFunds: 'Transferir fondos',
@@ -240,6 +260,8 @@ export const translations = {
     noTransactions: 'Aún no hay transacciones',
 
     // Toasts
+    incomeAdded: 'Ingreso agregado',
+    incomeAddedDescription: 'Registrado exitosamente',
     expenseAdded: 'Gasto registrado',
     expenseAddedDescription: '{amount} fue agregado.',
     transactionUpdated: 'Transacción actualizada',
