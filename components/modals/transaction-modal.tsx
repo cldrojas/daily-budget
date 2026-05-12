@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useState, useEffect } from 'react'
-import { PlusCircle, Edit } from 'lucide-react'
+import { PlusCircle, Edit, ArrowDownRight, ArrowUpLeft } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -20,6 +20,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
@@ -51,6 +52,7 @@ export function TransactionModal({
   const [date, setDate] = useState(new Date())
   const [account, setAccount] = useState('daily')
   const [type, setType] = useState<TransactionType>('expense')
+  const [activeTab, setActiveTab] = useState<'expense' | 'income'>('expense')
 
   // Reset form when modal opens/closes or transaction changes
   useEffect(() => {
@@ -61,6 +63,8 @@ export function TransactionModal({
       setDate(new Date(transaction.date))
       setAccount(transaction.account)
       setType(transaction.type)
+      // Handle transfer type - default to expense tab
+      setActiveTab(transaction.type === 'income' ? 'income' : 'expense')
     } else {
       // Adding new transaction
       setAmount(0)
@@ -68,8 +72,15 @@ export function TransactionModal({
       setDate(new Date())
       setAccount('daily')
       setType('expense')
+      setActiveTab('expense')
     }
   }, [transaction, isOpen])
+
+  const handleTabChange = (value: string) => {
+    const newType = value as 'expense' | 'income'
+    setActiveTab(newType)
+    setType(newType)
+  }
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -118,8 +129,8 @@ export function TransactionModal({
       })
 
       toast({
-        title: t('expenseAdded'),
-        description: t('expenseAddedDescription', { amount: formatCurrency(amount) })
+        title: type === 'income' ? t('incomeAdded') : t('expenseAdded'),
+        description: type === 'income' ? t('incomeAddedDescription', { amount: formatCurrency(amount) }) : t('expenseAddedDescription', { amount: formatCurrency(amount) })
       })
     }
 
@@ -135,13 +146,42 @@ export function TransactionModal({
     >
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {isEditing ? t('editTransaction') : t('addExpense')}
+          <DialogTitle className="flex items-center gap-2">
+            {type === 'income' ? (
+              <ArrowUpLeft className="h-5 w-5 text-green-500" />
+            ) : (
+              <ArrowDownRight className="h-5 w-5 text-red-500" />
+            )}
+            {isEditing ? t('editTransaction') : type === 'income' ? t('addIncome') : t('addExpense')}
           </DialogTitle>
           <DialogDescription>
-            {isEditing ? t('editTransactionDescription') : t('addExpenseDescription')}
+            {isEditing ? t('editTransactionDescription') : type === 'income' ? t('addIncomeDescription') : t('addExpenseDescription')}
           </DialogDescription>
         </DialogHeader>
+
+        {/* Type selector tabs */}
+        <Tabs
+          value={activeTab}
+          onValueChange={handleTabChange}
+          className="w-full"
+        >
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger
+              value="expense"
+              className="flex items-center gap-2 data-[state=active]:text-red-600"
+            >
+              <ArrowDownRight className="h-4 w-4" />
+              {t('expense')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="income"
+              className="flex items-center gap-2 data-[state=active]:text-green-600"
+            >
+              <ArrowUpLeft className="h-4 w-4" />
+              {t('income')}
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
         <form
           onSubmit={handleSubmit}
           className="space-y-4 pt-4"
@@ -168,7 +208,7 @@ export function TransactionModal({
             <Label htmlFor="description">{t('description')}</Label>
             <Textarea
               id="description"
-              placeholder={t('whatExpenseFor')}
+              placeholder={type === 'income' ? t('whatIncomeFor') : t('whatExpenseFor')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
@@ -222,8 +262,12 @@ export function TransactionModal({
                 </>
               ) : (
                 <>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  {t('addExpense')}
+                  {type === 'income' ? (
+                    <ArrowUpLeft className="mr-2 h-4 w-4" />
+                  ) : (
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                  )}
+                  {type === 'income' ? t('addIncome') : t('addExpense')}
                 </>
               )}
             </Button>
