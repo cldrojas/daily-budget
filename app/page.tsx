@@ -27,7 +27,10 @@ export default function DailyBudgetApp() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const { t } = useLanguage()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null)
+
+  const isDarkMode = true
 
   const {
     budget,
@@ -50,9 +53,6 @@ export default function DailyBudgetApp() {
     removeTransaction
   } = useBudget()
 
-  // Ensure theme is set on initial load
-  const isDarkMode = (theme || resolvedTheme) === 'dark'
-
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
@@ -61,20 +61,6 @@ export default function DailyBudgetApp() {
             <h1 className="text-xl font-bold">{t('appName')}</h1>
             <div className="flex items-center space-x-2">
               <LanguageCurrencySelector />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
-                title={isDarkMode ? t('lightMode') : t('darkMode')}
-              >
-                {
-                  isDarkMode ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )
-                }
-              </Button>
             </div>
           </div>
         </header>
@@ -89,12 +75,17 @@ export default function DailyBudgetApp() {
               {accounts.length === 0 ? (
                 <EmptyState
                   title={t('noAccounts') || 'No accounts available'}
-                  description={t('noAccountsDescription') || 'Please add an account to get started with transfers.'}
+                  description={
+                    t('noAccountsDescription') ||
+                    'Please add an account to get started with transfers.'
+                  }
                   action={
-                    <Button onClick={() => {
-                      // TODO: Add account creation flow
-                      console.log('Add account clicked')
-                    }}>
+                    <Button
+                      onClick={() => {
+                        // TODO: Add account creation flow
+                        console.log('Add account clicked')
+                      }}
+                    >
                       {t('addAccount') || 'Add Account'}
                     </Button>
                   }
@@ -125,10 +116,18 @@ export default function DailyBudgetApp() {
                     <Tabs defaultValue="accounts">
                       <TabsList className="grid w-full grid-cols-4">
                         {/* TODO: add a way to reorder tabs (drag&drop) */}
-                        <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
-                        <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
-                        <TabsTrigger value="transfer">{t('transfer')}</TabsTrigger>
-                        <TabsTrigger value="history">{t('history')}</TabsTrigger>
+                        <TabsTrigger value="accounts">
+                          {t('accounts')}
+                        </TabsTrigger>
+                        <TabsTrigger value="expenses">
+                          {t('expenses')}
+                        </TabsTrigger>
+                        <TabsTrigger value="transfer">
+                          {t('transfer')}
+                        </TabsTrigger>
+                        <TabsTrigger value="history">
+                          {t('history')}
+                        </TabsTrigger>
                       </TabsList>
                       <TabsContent
                         value="expenses"
@@ -139,7 +138,9 @@ export default function DailyBudgetApp() {
                             transactions={transactions}
                             onDelete={removeTransaction}
                             openTransactionModal={(transactionId: string) => {
-                              const transaction = transactions.find(t => t.id === transactionId)
+                              const transaction = transactions.find(
+                                (t) => t.id === transactionId
+                              )
                               setEditingTransaction(transaction || null)
                               setIsTransactionModalOpen(true)
                             }}
@@ -217,5 +218,3 @@ export default function DailyBudgetApp() {
     </ErrorBoundary>
   )
 }
-
-
