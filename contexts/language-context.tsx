@@ -13,7 +13,7 @@ export const translations = {
     darkMode: 'Dark Mode',
     lightMode: 'Light Mode',
     youSure: 'Are you sure?',
-    undoable: 'This action can’t be undone.',
+    undoable: "This action cannot be undone.",
     confirm: 'Yes, continue',
 
     // Setup
@@ -25,7 +25,7 @@ export const translations = {
 
     // Dashboard
     dailyBudget: 'Daily Budget',
-    budgetForToday: 'Today’s available budget',
+    budgetForToday: "Today available budget",
     dailyAllowance: 'Daily Allowance',
     remainingToday: 'Remaining Today',
     progress: 'Progress',
@@ -44,6 +44,7 @@ export const translations = {
 
     // Tabs
     expenses: 'Expenses',
+    income: 'Income',
     transfer: 'Transfer',
     accounts: 'Accounts',
     history: 'History',
@@ -60,8 +61,13 @@ export const translations = {
     description: 'Description',
     account: 'Account',
     selectAccount: 'Select an account',
-    expenseExceedsWarning: 'This expense exceeds today’s budget.',
-    whatExpenseFor: 'What’s this expense for?',
+    expenseExceedsWarning: "This expense exceeds your budget.",
+    whatExpenseFor: 'What is this expense for?',
+    whatIncomeFor: 'What is this income for?',
+    unnamedExpense: 'Unnamed Expense',
+    unnamedIncome: 'Unnamed Income',
+    recentActivity: 'Recent Activity',
+    recentActivityDescription: 'Your latest transactions',
     unnamedExpense: 'Unnamed Expense',
     recentExpenses: 'Recent Expenses',
     recentExpensesDescription: 'Your latest recorded expenses',
@@ -92,7 +98,7 @@ export const translations = {
     accountUpdated: 'Account Updated',
     accountUpdatedDescription: '{name} was updated successfully.',
     deleteAccount: 'Delete Account',
-    deleteAccountConfirmation: "Delete '{name}'? This can’t be undone.",
+    deleteAccountConfirmation: "Delete '{name}'? This cannot be undone.",
     deleteAccountBalance: '{balance} will be moved to your {savings} account.',
     delete: 'Delete',
     accountDeleted: 'Account Deleted',
@@ -111,6 +117,8 @@ export const translations = {
     noTransactions: 'No transactions yet',
 
     // Toasts
+    incomeAdded: 'Income Added',
+    incomeAddedDescription: '{amount} was added.',
     expenseAdded: 'Expense Added',
     expenseAddedDescription: '{amount} was added.',
     transactionUpdated: 'Transaction Updated',
@@ -124,7 +132,7 @@ export const translations = {
     missingAccounts: 'Accounts Missing',
     missingAccountsDescription: 'Please select both source and destination accounts',
     invalidTransfer: 'Invalid Transfer',
-    invalidTransferDescription: 'Can’t transfer to the same account',
+    invalidTransferDescription: "Cannot transfer to the same account",
     insufficientFunds: 'Not Enough Funds',
     insufficientFundsDescription: 'Balance too low in {account}',
     transferComplete: 'Transfer Complete',
@@ -173,6 +181,7 @@ export const translations = {
 
     // Tabs
     expenses: 'Gastos',
+    income: 'Ingresos',
     transfer: 'Transferencias',
     accounts: 'Cuentas',
     history: 'Historial',
@@ -191,6 +200,11 @@ export const translations = {
     selectAccount: 'Selecciona una cuenta',
     expenseExceedsWarning: 'Este gasto excede tu presupuesto diario.',
     whatExpenseFor: '¿Para qué es este gasto?',
+    whatIncomeFor: '¿Para qué es este ingreso?',
+    unnamedExpense: 'Gasto sin nombre',
+    unnamedIncome: 'Ingreso sin nombre',
+    recentActivity: 'Actividad Reciente',
+    recentActivityDescription: 'Tus últimas transacciones',
     unnamedExpense: 'Gasto sin nombre',
     recentExpenses: 'Gastos recientes',
     recentExpensesDescription: 'Tus gastos más recientes',
@@ -240,6 +254,8 @@ export const translations = {
     noTransactions: 'Aún no hay transacciones',
 
     // Toasts
+    incomeAdded: 'Ingreso agregado',
+    incomeAddedDescription: '{amount} fue agregado.',
     expenseAdded: 'Gasto registrado',
     expenseAddedDescription: '{amount} fue agregado.',
     transactionUpdated: 'Transacción actualizada',
