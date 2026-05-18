@@ -10,19 +10,25 @@ jobs:
   typecheck-and-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Use Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - uses: actions/checkout@v6
       - name: Install pnpm
-        run: npm i -g pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11
+      - name: Use Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'pnpm'
       - name: Install deps
         run: pnpm install
       - name: Typecheck
         run: pnpm tsc --noEmit
       - name: Run unit tests
         run: pnpm test -- --run
+      - name: Install Playwright browsers
+        run: |
+          pnpm exec playwright install chromium
+          pnpm exec playwright install-deps chromium
       - name: Run Playwright UI tests
         run: pnpm test:ui --reporter=list
