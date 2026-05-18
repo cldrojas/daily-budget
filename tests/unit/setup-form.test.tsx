@@ -11,10 +11,12 @@ vi.mock('@/components/date-picker', () => ({
       <input
         id="endDate"
         type="date"
-        value={date?.toISOString().split('T')[0] || ''}
+        value={date ? date.toISOString().split('T')[0] : ''}
         onChange={(e) => {
           if (e.target.value) {
-            setDate(new Date(e.target.value))
+            // Use local time to avoid timezone issues
+            const [year, month, day] = e.target.value.split('-')
+            setDate(new Date(Number(year), Number(month) - 1, Number(day)))
           }
         }}
         data-testid="date-input"
@@ -171,7 +173,7 @@ describe('SetupForm', () => {
       fireEvent.change(dateInput, { target: { value: futureDate } })
 
       // The date should be displayed (format may vary by locale)
-      expect(screen.getByText(/12\/30\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
+      expect(screen.getByText(/12\/31\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
     })
 
     it('should handle date clearing', async () => {
@@ -182,13 +184,13 @@ describe('SetupForm', () => {
       // Select a date first
       const futureDate = '2024-12-31'
       fireEvent.change(dateInput, { target: { value: futureDate } })
-      expect(screen.getByText(/12\/30\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
+      expect(screen.getByText(/12\/31\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
 
       // Clear the date
       fireEvent.change(dateInput, { target: { value: '' } })
 
       // Should show the date
-      expect(screen.getByText(/12\/30\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
+      expect(screen.getByText(/12\/31\/2024|Dec 30, 2024|30\/12\/2024/)).toBeInTheDocument()
     })
   })
 
@@ -288,7 +290,7 @@ describe('SetupForm', () => {
       // Should call onSetup with correct data
       expect(mockOnSetup).toHaveBeenCalledWith({
         startAmount: 1000, // Should be Int type
-        endDate: new Date(futureDate)
+        endDate: new Date(2024, 11, 31)
       })
     })
 
@@ -312,7 +314,7 @@ describe('SetupForm', () => {
       // Should call onSetup with correct data
       expect(mockOnSetup).toHaveBeenCalledWith({
         startAmount: 1000000, // Should be Int type
-        endDate: new Date(futureDate)
+        endDate: new Date(2024, 11, 31)
       })
     })
   })
