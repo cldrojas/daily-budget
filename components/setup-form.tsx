@@ -52,7 +52,7 @@ export function SetupForm({
               autoFocus
               value={startAmount ?? ''}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setStartAmount(toInt(e.target.valueAsNumber) || null)
+                setStartAmount(toInt(e.target.valueAsNumber) ?? null)
               }
               required
             />
