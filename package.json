@@ -11,7 +11,8 @@
     "test": "vitest",
     "test:ui": "playwright test",
     "test:ui:headed": "playwright test --headed",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "prepare": "husky"
   },
   "dependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -77,6 +78,7 @@
     "@vitejs/plugin-react": "^4.1.0",
     "eslint": "^9.31.0",
     "eslint-config-next": "16.2.6",
+    "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "playwright": "^1.43.0",
     "postcss": "^8",
