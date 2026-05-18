@@ -26,5 +26,9 @@ jobs:
         run: pnpm tsc --noEmit
       - name: Run unit tests
         run: pnpm test -- --run
+      - name: Install Playwright browsers
+        run: |
+          pnpm exec playwright install chromium
+          pnpm exec playwright install-deps chromium
       - name: Run Playwright UI tests
         run: pnpm test:ui --reporter=list
