@@ -47,6 +47,7 @@ export const translations = {
     transfer: 'Transfer',
     accounts: 'Accounts',
     history: 'History',
+    income: 'Income',
 
     // Transaction Form
     addIncome: 'Add Income',
@@ -67,6 +68,7 @@ export const translations = {
     recentExpensesDescription: 'Your latest recorded expenses',
     noExpenses: 'No expenses yet',
     transactionType: 'Transaction Type',
+    whatIncomeFor: 'What is this income for?',
 
     // Transfer Form
     transferFunds: 'Transfer Funds',
@@ -113,6 +115,8 @@ export const translations = {
     // Toasts
     expenseAdded: 'Expense Added',
     expenseAddedDescription: '{amount} was added.',
+    incomeAdded: 'Income Added',
+    incomeAddedDescription: '{amount} was added.',
     transactionUpdated: 'Transaction Updated',
     transactionUpdatedDescription: '{amount} was updated.',
     invalidAmount: 'Invalid Amount',
@@ -176,6 +180,7 @@ export const translations = {
     transfer: 'Transferencias',
     accounts: 'Cuentas',
     history: 'Historial',
+    income: 'Ingresos',
 
     // Transaction Form
     addIncome: 'Agregar ingreso',
@@ -191,6 +196,7 @@ export const translations = {
     selectAccount: 'Selecciona una cuenta',
     expenseExceedsWarning: 'Este gasto excede tu presupuesto diario.',
     whatExpenseFor: '¿Para qué es este gasto?',
+    whatIncomeFor: '¿Para qué es este ingreso?',
     unnamedExpense: 'Gasto sin nombre',
     recentExpenses: 'Gastos recientes',
     recentExpensesDescription: 'Tus gastos más recientes',
@@ -242,6 +248,8 @@ export const translations = {
     // Toasts
     expenseAdded: 'Gasto registrado',
     expenseAddedDescription: '{amount} fue agregado.',
+    incomeAdded: 'Ingreso registrado',
+    incomeAddedDescription: '{amount} fue registrado.',
     transactionUpdated: 'Transacción actualizada',
     transactionUpdatedDescription: '{amount} fue actualizado.',
     invalidAmount: 'Monto inválido',
