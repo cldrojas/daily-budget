@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Account, Int, toInt } from '@/types'
+import { Account, Budget, Int, toInt } from '@/types'
 import {
   PlusCircle,
   Wallet,
@@ -77,6 +77,7 @@ const iconMap = {
 
 interface AccountsListProps {
   accounts: Account[]
+  budget: Budget
   onAddAccount: (account: Omit<Account, 'id'>) => void
   onUpdateAccount: (account: Account) => void
   onDeleteAccount: (accountId: string) => boolean
@@ -84,6 +85,7 @@ interface AccountsListProps {
 
 export function AccountsList({
   accounts,
+  budget,
   onAddAccount,
   onUpdateAccount,
   onDeleteAccount
@@ -99,6 +101,12 @@ export function AccountsList({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState<Account | null>(null)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+  // Filter accounts based on mode (hide savings in track mode)
+  const isTrackMode = budget.mode === 'track' || (!budget.mode && !budget.endDate)
+  const filteredAccounts = isTrackMode
+    ? accounts.filter(acc => acc.id !== 'savings')
+    : accounts
 
   const handleAddAccount = (e: React.FormEvent) => {
     e.preventDefault()
@@ -177,7 +185,7 @@ export function AccountsList({
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {accounts.map((account) => (
+        {filteredAccounts.map((account) => (
           <Card key={account.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{account.name}</CardTitle>

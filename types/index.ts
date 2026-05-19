@@ -67,6 +67,7 @@ export type Budget = {
   startDate: Date | undefined
   endDate: Date | undefined
   autoSave: boolean
+  mode?: 'daily' | 'track'
 }
 
 export type Account = {

@@ -4,9 +4,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { CircularProgress } from '@/components/circular-progress'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
-import type { Account } from '@/types'
+import type { Account, Budget } from '@/types'
 
 interface DailyBudgetStatusProps {
+  budget: Budget
   dailyAllowance: number
   remainingToday: number
   progress: number
@@ -16,6 +17,7 @@ interface DailyBudgetStatusProps {
 
 /**
  * Component to display the daily budget status.
+ * @param budget - The budget object containing mode information.
  * @param dailyAllowance - The daily allowance amount.
  * @param remainingToday - The remaining amount for today.
  * @param progress - The progress percentage.
@@ -24,6 +26,7 @@ interface DailyBudgetStatusProps {
  * @returns JSX element for the daily budget status.
  * @example
  * <DailyBudgetStatus
+ *   budget={budget}
  *   dailyAllowance={100}
  *   remainingToday={50}
  *   progress={50}
@@ -32,6 +35,7 @@ interface DailyBudgetStatusProps {
  * />
  */
 export function DailyBudgetStatus({
+  budget,
   dailyAllowance,
   remainingToday,
   progress,
@@ -41,10 +45,31 @@ export function DailyBudgetStatus({
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
 
+  // Determine mode from budget
+  const isTrackMode = budget.mode === 'track' || (!budget.mode && !budget.endDate)
+
   // Find the daily budget account
   const dailyAccount = accounts.find(acc => acc.id === 'daily')
   const totalBudget = dailyAccount ? dailyAccount.balance : 0
 
+  // Track mode: show total balance only
+  if (isTrackMode) {
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <div>
+            <CardTitle>{t('totalBalance') || 'Total Balance'}</CardTitle>
+            <CardDescription>{t('trackModeDescription') || 'Track your spending'}</CardDescription>
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-col items-center space-y-6 py-8">
+          <p className="text-5xl font-bold">{formatCurrency(totalBudget)}</p>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  // Daily mode: show full budget status
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between pb-2">

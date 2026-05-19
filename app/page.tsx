@@ -82,7 +82,9 @@ export default function DailyBudgetApp() {
         <main className="container px-4 py-6 md:py-10 space-y-8">
           {!isSetup ? (
             <ErrorBoundary>
-              <SetupForm onSetup={setupBudget} />
+              <SetupForm onSetup={({ startAmount, endDate, mode }) => {
+                setupBudget({ startAmount, endDate: endDate!, mode })
+              }} />
             </ErrorBoundary>
           ) : (
             <ErrorBoundary>
@@ -103,6 +105,7 @@ export default function DailyBudgetApp() {
                 <>
                   <ErrorBoundary>
                     <DailyBudgetStatus
+                      budget={budget}
                       dailyAllowance={dailyAllowance}
                       remainingToday={remainingToday}
                       progress={progress}
@@ -164,6 +167,7 @@ export default function DailyBudgetApp() {
                         <ErrorBoundary>
                           <AccountsList
                             accounts={accounts}
+                            budget={budget}
                             onAddAccount={addAccount}
                             onUpdateAccount={updateAccount}
                             onDeleteAccount={deleteAccount}

@@ -290,7 +290,8 @@ describe('SetupForm', () => {
       // Should call onSetup with correct data
       expect(mockOnSetup).toHaveBeenCalledWith({
         startAmount: 1000, // Should be Int type
-        endDate: new Date(2024, 11, 31)
+        endDate: new Date(2024, 11, 31),
+        mode: 'daily'
       })
     })
 
@@ -314,7 +315,8 @@ describe('SetupForm', () => {
       // Should call onSetup with correct data
       expect(mockOnSetup).toHaveBeenCalledWith({
         startAmount: 1000000, // Should be Int type
-        endDate: new Date(2024, 11, 31)
+        endDate: new Date(2024, 11, 31),
+        mode: 'daily'
       })
     })
   })
