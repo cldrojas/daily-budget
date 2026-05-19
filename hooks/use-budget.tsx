@@ -39,6 +39,15 @@ export function useBudget() {
     return startOfDay(new Date())
   }, [])
 
+  // Helper functions to check budget mode
+  const isDailyMode = useCallback(() => {
+    return budget.mode === 'daily' || budget.mode === undefined
+  }, [budget.mode])
+
+  const isTrackMode = useCallback(() => {
+    return budget.mode === 'track'
+  }, [budget.mode])
+
   // Load data from localStorage on initial render
   useEffect(() => {
     const savedData = localStorage.getItem(LOCAL_STORAGE_KEY)
@@ -54,6 +63,11 @@ export function useBudget() {
       }
       if (parsedData.lastCheckedDay) {
         parsedData.lastCheckedDay = new Date(parsedData.lastCheckedDay)
+      }
+
+      // Add default mode if not present (backwards compatibility)
+      if (parsedData.budget && !parsedData.budget.mode) {
+        parsedData.budget.mode = parsedData.budget.endDate ? 'daily' : 'track'
       }
 
       setBudget(parsedData.budget || budget)
@@ -97,6 +111,9 @@ export function useBudget() {
 
   // Calculate daily allowance based on remaining amount and days
   const calculateDailyAllowance = useCallback(() => {
+    // Track mode doesn't have daily allowance
+    if (isTrackMode()) return
+
     if (!budget.endDate) return
 
     const daysRemaining = differenceInDays(budget.endDate, today) + 1
@@ -130,8 +147,8 @@ export function useBudget() {
 
     // If this is the first check or a new day has started
     if (!lastCheckedDay || !isSameDay(today, lastCheckedDay)) {
-      // If there was a previous day, move remaining amount to savings
-      if (lastCheckedDay && remainingToday > 0) {
+      // If there was a previous day, move remaining amount to savings (only in daily mode)
+      if (lastCheckedDay && remainingToday > 0 && isDailyMode() && budget.autoSave) {
         // Add remaining amount to savings and discount from daily
         const updatedAccounts = accounts.map((account) => {
           if (account.id === 'savings') {
@@ -177,10 +194,12 @@ export function useBudget() {
   // Set up initial budget
   const setupBudget = ({
     startAmount,
-    endDate
+    endDate,
+    mode = 'daily'
   }: {
     startAmount: Int
-    endDate: Date
+    endDate?: Date
+    mode?: 'daily' | 'track'
   }) => {
 
     // Create initial budget
@@ -188,16 +207,23 @@ export function useBudget() {
       startAmount,
       startDate: today,
       endDate,
-      autoSave: true
+      autoSave: true,
+      mode
     }
 
     // Update daily account with starting amount
-    const updatedAccounts = accounts.map((account) => {
+    // In track mode, don't include savings account
+    let updatedAccounts = accounts.map((account) => {
       if (account.id === 'daily') {
         return { ...account, balance: startAmount }
       }
       return account
     })
+
+    // Remove savings account in track mode
+    if (mode === 'track') {
+      updatedAccounts = updatedAccounts.filter(acc => acc.id !== 'savings')
+    }
 
     // Record the initial deposit transaction
     const initialTransaction: Transaction = {
@@ -215,12 +241,19 @@ export function useBudget() {
     setLastCheckedDay(startOfDay(today))
     setIsSetup(true)
 
-    // Calculate initial daily allowance
-    const daysRemaining = differenceInDays(endDate, today) + 1
-    const newDailyAllowance = startAmount / daysRemaining
-    setDailyAllowance(newDailyAllowance)
-    setRemainingToday(newDailyAllowance)
-    setProgress(100)
+    // Calculate initial daily allowance only in daily mode with endDate
+    if (mode === 'daily' && endDate) {
+      const daysRemaining = differenceInDays(endDate, today) + 1
+      const newDailyAllowance = startAmount / daysRemaining
+      setDailyAllowance(newDailyAllowance)
+      setRemainingToday(newDailyAllowance)
+      setProgress(100)
+    } else {
+      // Track mode or no endDate
+      setDailyAllowance(0)
+      setRemainingToday(0)
+      setProgress(100)
+    }
   }
 
   // Add a new expense by default
@@ -545,35 +578,59 @@ export function useBudget() {
   // Update budget configuration
   const updateConfig = ({
     startAmount,
-    endDate
+    endDate,
+    mode,
+    autoSave
   }: {
-    startAmount: Int
-    endDate: Date
+    startAmount?: Int
+    endDate?: Date | undefined
+    mode?: 'daily' | 'track'
+    autoSave?: boolean
   }) => {
     // Get current daily account balance
     const dailyAccount = accounts.find((a) => a.id === 'daily')
     const currentBalance = dailyAccount ? dailyAccount.balance : 0
 
-    // Calculate difference to add or subtract
-    const balanceDifference = toInt(startAmount - budget.startAmount) ?? 0 as Int
+    // Calculate difference to add or subtract (if startAmount changed)
+    const balanceDifference = startAmount !== undefined
+      ? toInt(startAmount - budget.startAmount) ?? 0 as Int
+      : 0 as Int
+
+    // Determine new mode: explicit or derive from endDate
+    const newMode = mode ?? (endDate === undefined ? 'track' : 'daily')
 
     // Update budget
     const updatedBudget = {
       ...budget,
-      startAmount,
-      endDate
+      startAmount: startAmount ?? budget.startAmount,
+      endDate,
+      mode: newMode,
+      autoSave: autoSave ?? budget.autoSave
     }
 
-    // Update daily account balance
-    const updatedAccounts = accounts.map((account) => {
-      if (account.id === 'daily') {
-        return { ...account, balance: toInt(currentBalance + balanceDifference) ?? 0 as Int }
-      }
-      return account
-    })
+    // Update accounts based on mode change
+    let updatedAccounts = [...accounts]
 
-    // Create transaction if balance changed
+    // If switching to track mode, remove savings account
+    if (newMode === 'track' && accounts.some(acc => acc.id === 'savings')) {
+      updatedAccounts = updatedAccounts.filter(acc => acc.id !== 'savings')
+    }
+
+    // If switching from track to daily, add savings account if missing
+    if (newMode === 'daily' && !accounts.some(acc => acc.id === 'savings')) {
+      updatedAccounts.push({ id: 'savings', name: 'Savings', type: 'savings', balance: 0 as Int, icon: 'piggybank' })
+    }
+
+    // Update daily account balance if startAmount changed
     if (balanceDifference !== 0) {
+      updatedAccounts = updatedAccounts.map((account) => {
+        if (account.id === 'daily') {
+          return { ...account, balance: toInt(currentBalance + balanceDifference) ?? 0 as Int }
+        }
+        return account
+      })
+
+      // Create transaction
       const transaction: Transaction = {
         id: uuidv4(),
         type: 'transfer',
@@ -588,13 +645,19 @@ export function useBudget() {
     setBudget(updatedBudget)
     setAccounts(updatedAccounts)
 
-    // Recalculate daily allowance
-    const daysRemaining = differenceInDays(endDate, today) + 1
-
-    if (daysRemaining > 0) {
-      const newDailyAllowance = (currentBalance + (balanceDifference ?? 0)) / daysRemaining
-      setDailyAllowance(newDailyAllowance)
-      setRemainingToday(newDailyAllowance)
+    // Recalculate daily allowance only in daily mode with endDate
+    if (newMode === 'daily' && endDate) {
+      const daysRemaining = differenceInDays(endDate, today) + 1
+      if (daysRemaining > 0) {
+        const newDailyAllowance = (currentBalance + balanceDifference) / daysRemaining
+        setDailyAllowance(newDailyAllowance)
+        setRemainingToday(newDailyAllowance)
+        setProgress(100)
+      }
+    } else {
+      // Track mode or no endDate
+      setDailyAllowance(0)
+      setRemainingToday(0)
       setProgress(100)
     }
   }

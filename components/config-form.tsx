@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Settings } from "lucide-react"
+import { Settings, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,9 +16,10 @@ import { Checkbox } from "./ui/checkbox"
 import { useBudget } from "@/hooks/use-budget"
 
 export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
-  budget: Budget, onClearData: () => void, onUpdateConfig: ({ startAmount, endDate, autoSave }: {
-    startAmount: Int;
-    endDate: Date;
+  budget: Budget, onClearData: () => void, onUpdateConfig: (config: {
+    startAmount?: Int;
+    endDate?: Date | undefined;
+    mode?: 'daily' | 'track';
     autoSave?: boolean
   }) => void,
 }) {
@@ -27,9 +28,11 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
   const { setLastCheckedDay } = useBudget()
   const [isOpen, setIsOpen] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showDeleteDateConfirm, setShowDeleteDateConfirm] = useState(false)
   const [autoSave, setAutoSave] = useState(budget.autoSave)
   const [startAmount, setStartAmount] = useState(budget.startAmount)
   const [endDate, setEndDate] = useState(budget.endDate)
+  const [mode, setMode] = useState<'daily' | 'track'>(budget.mode || (budget.endDate ? 'daily' : 'track'))
 
   const getYesterday = () => {
     const yesterday = new Date()
@@ -40,7 +43,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    if (!startAmount || !endDate) {
+    if (!startAmount || (mode === 'daily' && !endDate)) {
       toast({
         title: t("missingInformation"),
         description: t("missingInformationDescription"),
@@ -60,7 +63,8 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
 
     onUpdateConfig({
       startAmount: toInt(startAmount) ?? 0 as Int,
-      endDate,
+      endDate: mode === 'daily' ? endDate : undefined,
+      mode,
       autoSave
     })
 
@@ -70,6 +74,18 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
     toast({
       title: t("configUpdated"),
       description: t("configUpdatedDescription"),
+    })
+  }
+
+  const handleDeleteDate = () => {
+    // Switch to track mode when removing date
+    setMode('track')
+    setEndDate(undefined)
+    setShowDeleteDateConfirm(false)
+    onUpdateConfig({ mode: 'track', endDate: undefined })
+    toast({
+      title: t("modeChanged") || "Mode changed",
+      description: t("trackModeEnabled") || "Track mode enabled",
     })
   }
 
@@ -112,6 +128,27 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                 </Button>
               </div>
               <div className="space-y-2">
+                <Label>{t('selectMode') || 'Mode'}</Label>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant={mode === 'daily' ? 'default' : 'outline'}
+                    onClick={() => setMode('daily')}
+                    className="flex-1"
+                  >
+                    {t('dailyMode') || 'Daily Mode'}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={mode === 'track' ? 'default' : 'outline'}
+                    onClick={() => setMode('track')}
+                    className="flex-1"
+                  >
+                    {t('trackMode') || 'Track Mode'}
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="startAmount">{t("startingAmount")}</Label>
                 <Input
                   id="startAmount"
@@ -123,16 +160,40 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="endDate">{t("endDate")}</Label>
-                <DatePicker date={endDate} setDate={setEndDate} className="w-full" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="autosave">{t("toggleAutoSaving")}</Label>
-                <Checkbox className="ml-2" checked={autoSave} onCheckedChange={() => setAutoSave(!autoSave)} />
-              </div>
+              {mode === 'daily' && (
+                <div className="space-y-2">
+                  <Label htmlFor="endDate">{t("endDate")}</Label>
+                  {endDate ? (
+                    <div className="flex gap-2">
+                      <div className="flex-1">
+                        <DatePicker date={endDate} setDate={setEndDate} className="w-full" />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setShowDeleteDateConfirm(true)}
+                        title={t("removeDate") || "Remove date"}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">
+                      {t("needDateToCalculate") || "Necesito una fecha para poder calcular"}
+                    </p>
+                  )}
+                </div>
+              )}
+              {mode === 'daily' && (
+                <div className="space-y-2">
+                  <Label htmlFor="autosave">{t("toggleAutoSaving")}</Label>
+                  <Checkbox className="ml-2" checked={autoSave} onCheckedChange={() => setAutoSave(!autoSave)} />
+                </div>
+              )}
               <div>
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={() => setLastCheckedDay(getYesterday())}
                   title={t("close")}
@@ -155,8 +216,17 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
               open={showConfirm}
               onOpenChange={setShowConfirm}
               onConfirm={onClearData}
-              title={t('youSure')} // Confirm action (clear all data?, save changes?)
+              title={t('youSure')}
               description={t("undoable")}
+              confirmText={t("confirm")}
+              cancelText={t("cancel")}
+            />
+            <ConfirmDialog
+              open={showDeleteDateConfirm}
+              onOpenChange={setShowDeleteDateConfirm}
+              onConfirm={handleDeleteDate}
+              title={t('removeEndDate') || "Remove end date?"}
+              description={t('removeEndDateDescription') || "This will switch to track mode."}
               confirmText={t("confirm")}
               cancelText={t("cancel")}
             />

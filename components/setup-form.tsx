@@ -11,7 +11,7 @@ import { Int, toInt } from "@/types";
 
 /**
  * Component for setting up the initial budget.
- * @param onSetup - Callback function to handle setup with start amount and end date.
+ * @param onSetup - Callback function to handle setup with start amount, end date, and mode.
  * @returns JSX element for the setup form.
  * @example
  * <SetupForm onSetup={(data) => console.log(data)} />
@@ -19,19 +19,22 @@ import { Int, toInt } from "@/types";
 export function SetupForm({
   onSetup
 }: {
-  onSetup: (data: { startAmount: Int; endDate: Date }) => void
+  onSetup: (data: { startAmount: Int; endDate?: Date; mode: 'daily' | 'track' }) => void
 }) {
   const { t } = useLanguage()
   const [startAmount, setStartAmount] = useState<Int | null>(null)
   const [endDate, setEndDate] = useState<Date | undefined>(undefined)
+  const [mode, setMode] = useState<'daily' | 'track'>('daily')
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!startAmount || startAmount <= 0 || !endDate) return
+    if (!startAmount || startAmount <= 0) return
+    if (mode === 'daily' && !endDate) return
 
     onSetup({
       startAmount: startAmount,
-      endDate
+      endDate: mode === 'daily' ? endDate : undefined,
+      mode
     })
   }
 
@@ -43,6 +46,27 @@ export function SetupForm({
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>{t('selectMode') || 'Mode'}</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={mode === 'daily' ? 'default' : 'outline'}
+                onClick={() => setMode('daily')}
+                className="flex-1"
+              >
+                {t('dailyMode') || 'Daily Mode'}
+              </Button>
+              <Button
+                type="button"
+                variant={mode === 'track' ? 'default' : 'outline'}
+                onClick={() => setMode('track')}
+                className="flex-1"
+              >
+                {t('trackMode') || 'Track Mode'}
+              </Button>
+            </div>
+          </div>
           <div className="space-y-2">
             <Label htmlFor="startAmount">{t('startingAmount')}</Label>
             <Input
@@ -57,14 +81,16 @@ export function SetupForm({
               required
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="endDate">{t('endDate')}</Label>
-            <DatePicker
-              date={endDate}
-              setDate={setEndDate}
-              className="w-full"
-            />
-          </div>
+          {mode === 'daily' && (
+            <div className="space-y-2">
+              <Label htmlFor="endDate">{t('endDate')}</Label>
+              <DatePicker
+                date={endDate}
+                setDate={setEndDate}
+                className="w-full"
+              />
+            </div>
+          )}
         </CardContent>
         <CardFooter>
           <Button
