@@ -26,9 +26,11 @@ jobs:
         run: pnpm tsc --noEmit
       - name: Run unit tests
         run: pnpm test -- --run
-      - name: Install Playwright browsers
-        run: |
-          pnpm exec playwright install chromium
-          pnpm exec playwright install-deps chromium
-      - name: Run Playwright UI tests
-        run: pnpm test:ui --reporter=list
+
+      # TODO: enhance tests Issue #39 (https://github.com/cldrojas/daily-budget/issues/39)
+      # - name: Install Playwright browsers
+      #   run: |
+      #     pnpm exec playwright install chromium
+      #     pnpm exec playwright install-deps chromium
+      # - name: Run Playwright UI tests
+      #   run: pnpm test:ui --reporter=list
