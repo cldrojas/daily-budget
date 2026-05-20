@@ -1,8 +1,7 @@
 'use client'
 
-import { useState } from 'react'
 import { useTheme } from 'next-themes'
-import { Moon, Sun, Plus } from 'lucide-react'
+import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBudget } from '@/hooks/use-budget'
 import { ConfigForm } from '@/components/config-form'
@@ -59,13 +58,11 @@ export default function DailyBudgetApp() {
                 onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
                 title={isDarkMode ? t('lightMode') : t('darkMode')}
               >
-                {
-                  isDarkMode ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )
-                }
+                {isDarkMode ? (
+                  <Sun className="h-5 w-5" />
+                ) : (
+                  <Moon className="h-5 w-5" />
+                )}
               </Button>
             </div>
           </div>
@@ -74,20 +71,27 @@ export default function DailyBudgetApp() {
         <main className="container px-4 py-6 md:py-10 space-y-8">
           {!isSetup ? (
             <ErrorBoundary>
-              <SetupForm onSetup={({ startAmount, endDate, mode }) => {
-                setupBudget({ startAmount, endDate: endDate!, mode })
-              }} />
+              <SetupForm
+                onSetup={({ startAmount, endDate, mode }) => {
+                  setupBudget({ startAmount, endDate: endDate!, mode })
+                }}
+              />
             </ErrorBoundary>
           ) : (
             <ErrorBoundary>
               {accounts.length === 0 ? (
                 <EmptyState
                   title={t('noAccounts') || 'No accounts available'}
-                  description={t('noAccountsDescription') || 'Please add an account to get started with transfers.'}
+                  description={
+                    t('noAccountsDescription') ||
+                    'Please add an account to get started with transfers.'
+                  }
                   action={
-                    <Button onClick={() => {
-                      console.log('Add account clicked')
-                    }}>
+                    <Button
+                      onClick={() => {
+                        console.log('Add account clicked')
+                      }}
+                    >
                       {t('addAccount') || 'Add Account'}
                     </Button>
                   }

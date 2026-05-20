@@ -49,7 +49,7 @@ export function useBudget() {
   }, [budget.mode])
 
   // Load data from localStorage on initial render
-  // eslint-disable-next-line
+   
   useEffect(() => {
     const savedData = localStorage.getItem(LOCAL_STORAGE_KEY)
     if (savedData) {
@@ -143,7 +143,7 @@ export function useBudget() {
   }, [budget, accounts, today])
 
   // Check for day change and update budget
-  // eslint-disable-next-line
+   
   useEffect(() => {
     if (!isSetup) return
 

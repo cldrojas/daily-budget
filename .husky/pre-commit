@@ -1,2 +1,2 @@
 pnpm lint
-pnpm test -- --run
+pnpm test --test-timeout 5 --run

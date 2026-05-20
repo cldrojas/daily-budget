@@ -38,7 +38,6 @@ export default function Navbar({
   deleteAccount,
   addTransaction,
   updateTransaction,
-  removeTransaction,
   transferFunds
 }: NavbarProps) {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
@@ -72,7 +71,10 @@ export default function Navbar({
 
   return (
     <ErrorBoundary>
-      <Tabs defaultValue="accounts" className='relative'>
+      <Tabs
+        defaultValue="accounts"
+        className="relative"
+      >
         <TabsList className="grid w-full grid-cols-3 h-20 bg-slate-900/40">
           <TabsTrigger
             className="gap-2 min-h-full"
@@ -95,7 +97,7 @@ export default function Navbar({
             <HistoryIcon size={16}></HistoryIcon>Historial
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent
           value="accounts"
           className="mt-6"
@@ -119,8 +121,6 @@ export default function Navbar({
             <TransactionHistory transactions={transactions} />
           </ErrorBoundary>
         </TabsContent>
-
-        
       </Tabs>
 
       {/* Transaction Modal */}
