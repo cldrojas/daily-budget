@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Account, Budget, Int, toInt } from '@/types'
+import { Account, Budget } from '@/types'
 import {
-  PlusCircle,
   Wallet,
   PiggyBank,
   TrendingUp,
@@ -19,30 +18,20 @@ import {
   Plane,
   ShoppingBag,
   Smartphone,
-  Utensils
+  Utensils,
+  Plus
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@/components/ui/select'
-import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AccountEditModal } from './modals/account-edit-modal'
+import { AccountModal } from './modals/account-modal'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -92,11 +81,7 @@ export function AccountsList({
 }: AccountsListProps) {
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
-  const { toast } = useToast()
-  const [isAddingAccount, setIsAddingAccount] = useState(false)
-  const [newAccountName, setNewAccountName] = useState('')
-  const [newAccountType, setNewAccountType] = useState('savings')
-  const [newAccountIcon, setNewAccountIcon] = useState('piggybank')
+  const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [accountToDelete, setAccountToDelete] = useState<Account | null>(null)
@@ -107,38 +92,6 @@ export function AccountsList({
   const filteredAccounts = isTrackMode
     ? accounts.filter(acc => acc.id !== 'savings')
     : accounts
-
-  const handleAddAccount = (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (!newAccountName.trim()) {
-      toast({
-        title: t('invalidAccountName'),
-        description: t('invalidAccountNameDescription'),
-        variant: 'destructive'
-      })
-      return
-    }
-
-    onAddAccount({
-      name: newAccountName,
-      type: newAccountType,
-      icon: newAccountIcon,
-      balance: toInt(0) as Int
-    })
-
-    // Reset form
-    setNewAccountName('')
-    setNewAccountType('savings')
-    setNewAccountIcon('piggybank')
-    setIsAddingAccount(false)
-
-    // Show toast
-    toast({
-      title: t('accountAdded'),
-      description: t('accountAddedDescription', { name: newAccountName })
-    })
-  }
 
   const handleEditClick = (account: Account) => {
     setEditingAccount(account)
@@ -154,17 +107,14 @@ export function AccountsList({
     if (accountToDelete) {
       const success = onDeleteAccount(accountToDelete.id)
       if (success) {
-        toast({
-          title: t('accountDeleted'),
-          description: t('accountDeletedDescription', { name: accountToDelete.name })
-        })
+        // Toast handled by parent
       }
     }
     setIsDeleteDialogOpen(false)
     setAccountToDelete(null)
   }
 
-  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: Int; icon: string }) => {
+  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: any; icon: string }) => {
     if (editingAccount) {
       onUpdateAccount({
         ...editingAccount,
@@ -223,79 +173,29 @@ export function AccountsList({
             </CardContent>
           </Card>
         ))}
+
+        {/* Add new account button as li */}
+        <li className="list-none">
+          <Button
+            variant="outline"
+            className="w-full h-full min-h-[100px] flex flex-col items-center justify-center gap-2 border-dashed"
+            onClick={() => setIsAccountModalOpen(true)}
+          >
+            <Plus className="h-8 w-8" />
+            <span className="text-sm">{t('addNewAccount')}</span>
+          </Button>
+        </li>
       </div>
 
-      {isAddingAccount ? (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('addNewAccount')}</CardTitle>
-            <CardDescription>{t('createNewAccount')}</CardDescription>
-          </CardHeader>
-          <form onSubmit={handleAddAccount}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="accountName">{t('accountName')}</Label>
-                <Input
-                  id="accountName"
-                  placeholder="Vacation Fund"
-                  value={newAccountName}
-                  onChange={(e) => setNewAccountName(e.target.value)}
-                  required
-                />
-              </div>
+      {/* Account Creation Modal */}
+      <AccountModal
+        isOpen={isAccountModalOpen}
+        onClose={() => setIsAccountModalOpen(false)}
+        onAddAccount={onAddAccount}
+        accounts={accounts}
+      />
 
-              <div className="space-y-2">
-                <Label htmlFor="accountType">{t('accountType')}</Label>
-                <Select
-                  value={newAccountType}
-                  onValueChange={setNewAccountType}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('selectAccountType')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="savings">{t('savings')}</SelectItem>
-                    <SelectItem value="investment">{t('investment')}</SelectItem>
-                    <SelectItem value="expense">{t('expense')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label>{t('accountIcon')}</Label>
-                <div className="grid grid-cols-7 gap-2">
-                  {Object.entries(iconMap).map(([id, Icon]) => (
-                    <Button
-                      key={id}
-                      type="button"
-                      variant={newAccountIcon === id ? 'default' : 'outline'}
-                      className="h-10 w-10 p-0"
-                      onClick={() => setNewAccountIcon(id)}
-                    >
-                      <Icon className="h-5 w-5" />
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button
-                variant="outline"
-                onClick={() => setIsAddingAccount(false)}
-              >
-                {t('cancel')}
-              </Button>
-              <Button type="submit">{t('createAccount')}</Button>
-            </CardFooter>
-          </form>
-        </Card>
-      ) : (
-        <Button onClick={() => setIsAddingAccount(true)}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          {t('addNewAccount')}
-        </Button>
-      )}
-
+      {/* Account Edit Modal */}
       {editingAccount && (
         <AccountEditModal
           account={editingAccount}

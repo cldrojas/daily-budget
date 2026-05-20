@@ -4,20 +4,14 @@ import { useState } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Sun, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TransactionList } from '@/components/transactions-list'
-import { TransactionModal } from '@/components/modals/transaction-modal'
-import { AccountsList } from '@/components/accounts-list'
-import { TransactionHistory } from '@/components/transaction-history'
 import { useBudget } from '@/hooks/use-budget'
 import { ConfigForm } from '@/components/config-form'
-import { TransferForm } from '@/components/transfer-form'
 import { LanguageCurrencySelector } from '@/components/language-currency-selector'
 import { useLanguage } from '@/contexts/language-context'
-import { Transaction } from '@/types'
 import { SetupForm } from '@/components/setup-form'
 import { DailyBudgetStatus } from '@/components/daily-budget-status'
 import { ErrorBoundary, EmptyState } from '@/components/error-boundary'
+import Navbar from '@/components/navbar'
 
 /**
  * Main component for the Daily Budget application.
@@ -26,8 +20,6 @@ import { ErrorBoundary, EmptyState } from '@/components/error-boundary'
 export default function DailyBudgetApp() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const { t } = useLanguage()
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
-  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null)
 
   const {
     budget,
@@ -94,7 +86,6 @@ export default function DailyBudgetApp() {
                   description={t('noAccountsDescription') || 'Please add an account to get started with transfers.'}
                   action={
                     <Button onClick={() => {
-                      // TODO: Add account creation flow
                       console.log('Add account clicked')
                     }}>
                       {t('addAccount') || 'Add Account'}
@@ -124,94 +115,18 @@ export default function DailyBudgetApp() {
                     </ErrorBoundary>
                   </div>
 
-                  <ErrorBoundary>
-                    <Tabs defaultValue="accounts">
-                      <TabsList className="grid w-full grid-cols-4">
-                        {/* TODO: add a way to reorder tabs (drag&drop) */}
-                        <TabsTrigger value="accounts">{t('accounts')}</TabsTrigger>
-                        <TabsTrigger value="expenses">{t('expenses')}</TabsTrigger>
-                        <TabsTrigger value="transfer">{t('transfer')}</TabsTrigger>
-                        <TabsTrigger value="history">{t('history')}</TabsTrigger>
-                      </TabsList>
-                      <TabsContent
-                        value="expenses"
-                        className="mt-6"
-                      >
-                        <ErrorBoundary>
-                          <TransactionList
-                            transactions={transactions}
-                            onDelete={removeTransaction}
-                            openTransactionModal={(transactionId: string) => {
-                              const transaction = transactions.find(t => t.id === transactionId)
-                              setEditingTransaction(transaction || null)
-                              setIsTransactionModalOpen(true)
-                            }}
-                          />
-                        </ErrorBoundary>
-                      </TabsContent>
-                      <TabsContent
-                        value="transfer"
-                        className="mt-6"
-                      >
-                        <ErrorBoundary>
-                          <TransferForm
-                            accounts={accounts}
-                            onTransfer={transferFunds}
-                          />
-                        </ErrorBoundary>
-                      </TabsContent>
-                      <TabsContent
-                        value="accounts"
-                        className="mt-6"
-                      >
-                        <ErrorBoundary>
-                          <AccountsList
-                            accounts={accounts}
-                            budget={budget}
-                            onAddAccount={addAccount}
-                            onUpdateAccount={updateAccount}
-                            onDeleteAccount={deleteAccount}
-                          />
-                        </ErrorBoundary>
-                      </TabsContent>
-                      <TabsContent
-                        value="history"
-                        className="mt-6"
-                      >
-                        <ErrorBoundary>
-                          <TransactionHistory transactions={transactions} />
-                        </ErrorBoundary>
-                      </TabsContent>
-                    </Tabs>
-                  </ErrorBoundary>
-
-                  {/* Floating Action Button for adding expenses */}
-                  <Button
-                    className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg"
-                    onClick={() => {
-                      setEditingTransaction(null)
-                      setIsTransactionModalOpen(true)
-                    }}
-                    title={t('addExpense')}
-                  >
-                    <Plus className="h-6 w-6" />
-                  </Button>
-
-                  {/* Expense Modal */}
-                  <ErrorBoundary>
-                    <TransactionModal
-                      isOpen={isTransactionModalOpen}
-                      onClose={() => {
-                        setIsTransactionModalOpen(false)
-                        setEditingTransaction(null)
-                      }}
-                      onAddTransaction={addTransaction}
-                      onUpdateTransaction={updateTransaction}
-                      accounts={accounts}
-                      remainingToday={remainingToday}
-                      transaction={editingTransaction}
-                    />
-                  </ErrorBoundary>
+                  <Navbar
+                    accounts={accounts}
+                    budget={budget}
+                    transactions={transactions}
+                    addAccount={addAccount}
+                    updateAccount={updateAccount}
+                    deleteAccount={deleteAccount}
+                    addTransaction={addTransaction}
+                    updateTransaction={updateTransaction}
+                    removeTransaction={removeTransaction}
+                    transferFunds={transferFunds}
+                  />
                 </>
               )}
             </ErrorBoundary>
@@ -221,5 +136,3 @@ export default function DailyBudgetApp() {
     </ErrorBoundary>
   )
 }
-
-
