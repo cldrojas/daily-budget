@@ -1,20 +1,48 @@
-# Saldo Cero
+# 💸 Saldo Cero
 
-## Purpose
+> _Libera tu mente del estrés financiero._
 
-Saldo Cero is a minimalist finance app designed to eliminate the anxiety of money management. It provides users with a clear, daily spending allowance, removing the need for complex charts or accounting knowledge. The app’s goal is to offer financial peace of mind by showing exactly how much you can spend today—no guilt, no calculations.
+**Saldo Cero** es una app minimalista de finanzas personales diseñada para ayudarte a tomar decisiones con claridad. No necesitas conectar cuentas bancarias ni entender contabilidad: solo anota lo esencial y nosotros hacemos el resto.
 
 ---
 
-## Folder Structure
+## ✨ ¿Qué es Saldo Cero?
+
+Una herramienta simple y directa para:
+
+- 📌 Saber cuánto dinero tienes realmente  
+- 📅 Organizar tus pagos y cobros  
+- 🚨 Evitar olvidos y gastos fantasmas  
+- 📈 Tomar decisiones financieras sin ansiedad
+
+Sin curvas de aprendizaje. Sin publicidad. Sin humo.
+
+---
+
+## 🧠 Filosofía
+
+- **Menos fricción, más claridad**  
+- **Privacidad por defecto** (tus datos son tuyos)  
+- **Cero estrés, cero deudas, cero enredos**
+
+Pensada para personas que:
+
+- Se estresan al ver su cuenta
+- Quieren ahorrar pero no logran hacerlo
+- Sienten que su plata "se va sola"
+- Necesitan control, pero sin Excel ni apps bancarias confusas
+
+---
+
+## 🗂 Estructura del Proyecto
 
 ```
-/app            # Next.js app directory (pages, layouts, global styles)
+/app            # Directorio de Next.js (pages, layouts, estilos globales)
 |-- globals.css
 |-- layout.tsx
-|-- page.tsx    # Main DailyBudgetApp component
+|-- page.tsx    # Componente principal DailyBudgetApp
 
-/components     # UI and feature components
+/components     # Componentes de UI y funcionalidades
 |-- accounts-list.tsx
 |-- circular-progress.tsx
 |-- config-form.tsx
@@ -27,137 +55,115 @@ Saldo Cero is a minimalist finance app designed to eliminate the anxiety of mone
 |-- transaction-history.tsx
 |-- transactions-list.tsx
 |-- transfer-form.tsx
-/components/modals  # Modal components
-/components/ui      # UI primitives (buttons, dialogs, etc.)
+/components/modals  # Componentes modales
+/components/ui      # Primitivas de UI (buttons, dialogs, etc.)
 
-/contexts       # React context providers (currency, language)
+/contexts       # React Context providers (currency, language)
 /hooks          # Custom React hooks
-/lib            # Utility functions
+/lib            # Funciones utilitarias
 /public         # Static assets (icons, images)
-/styles         # Global styles
-/types          # TypeScript type definitions
-/tests          # Test files (unit and e2e)
+/styles         # Estilos globales
+/types          # Definiciones de tipos TypeScript
+/tests          # Archivos de tests (unit y e2e)
 ```
 
 ---
 
-## Technologies
+## 🛠 Tecnologías
 
 - **Frontend:** Next.js (React), Tailwind CSS, Radix UI, TypeScript
 - **State Management:** React Context, Custom Hooks
 - **Styling:** Tailwind CSS, PostCSS
 - **Icons & UI:** Lucide, Radix UI Primitives
-- **Testing:** (Cypress planned, not yet present)
-- **Backend:** (Pluggable, see architecture)
-- **Database:** (Pluggable, see architecture)
-- **Infrastructure:** Cloudflare Workers, Cloudflare D1 (planned)
+- **Testing:** Vitest (unit/integration), Playwright (UI)
+- **Backend:** Enchufe (serverless-first con Cloudflare Workers)
+- **Database:** Enchufe (Cloudflare D1 compatible con SQLite, opcional PostgreSQL)
+- **Infraestructura:** Cloudflare Workers, Cloudflare D1 (planificado)
 
 ---
 
-## Architecture
+## 🏗 Arquitectura
 
-- **Frontend:** Built with Next.js using the App Router and React Server Components for optimal performance and scalability.
-- **Componentization:** Modular UI components and hooks for maintainability and reusability.
-- **State:** Managed via React Context and custom hooks for budget, language, and currency.
-- **Backend:** Designed to be serverless-first (Cloudflare Workers), but can be adapted to any REST/GraphQL backend.
-- **Database:** Cloudflare D1 (SQLite-compatible, serverless), with the option to swap for PostgreSQL or other DBs.
-- **Security:** No user data is sold or shared; privacy is a core value.
-
----
-
-## Recent Improvements
-
-The codebase has been recently cleaned up and improved with the following enhancements:
-
-- **Code Quality**: Removed unused variables, imports, and duplicate code sections
-- **Documentation**: Added comprehensive JSDoc comments to all exported functions, hooks, and components
-- **Type Safety**: Fixed TypeScript 'any' warnings by adding proper type annotations and interfaces
-- **Bug Fixes**: Resolved hydration mismatches, input validation issues, and theme toggle problems
-- **Error Handling**: Added proper validation for transaction amounts and account data loading
-- **Performance**: Improved component structure and removed unnecessary re-renders
-
-All functionality has been maintained while significantly improving code quality and reliability.
+- **Frontend:** Construido con Next.js usando App Router y React Server Components para óptimo rendimiento y escalabilidad.
+- **Componentización:** Componentes UI modulares y hooks para mantenibilidad y reutilización.
+- **State:** Gestionado via React Context y custom hooks para budget, lenguaje y moneda.
+- **Backend:** Diseñado para ser serverless-first (Cloudflare Workers), adaptable a cualquier backend REST/GraphQL.
+- **Database:** Cloudflare D1 (SQLite-compatible, serverless), con opción de cambiar a PostgreSQL u otras bases de datos.
+- **Seguridad:** No se vende ni comparte datos de usuarios; la privacidad es un valor fundamental.
 
 ---
 
-## Setup Instructions
+## 🚀 Instrucciones de Configuración
 
-### Prerequisites
+### Prerrequisitos
 
-- Node.js (v18+ recommended)
-- pnpm (or npm/yarn)
-- Docker (for PostgreSQL, if backend is required)
-- (Planned) Cypress for E2E testing
+- Node.js (v18+ recomendado)
+- pnpm (o npm/yarn)
+- Docker (para PostgreSQL, si se requiere backend)
 
-### 1. Clone the Repository
+### 1. Clonar el Repositorio
 
 ```sh
 git clone https://github.com/cldrojas/daily-budget.git
 cd daily-budget
 ```
 
-### 2. Install Dependencies
+### 2. Instalar Dependencias
 
 ```sh
 pnpm install
-# or
+# o
 npm install
 ```
 
-### 3. Run the Frontend
+### 3. Ejecutar el Frontend
 
 ```sh
 pnpm dev
-# or
+# o
 npm run dev
 ```
 
-### 4. (Optional) Setup PostgreSQL with Docker
+### 4. (Opcional) Configurar PostgreSQL con Docker
 
-If you want to use PostgreSQL locally:
+Si quieres usar PostgreSQL localmente:
 
 ```sh
 docker run --name saldo-cero-db -e POSTGRES_PASSWORD=yourpassword -p 5432:5432 -d postgres
 ```
 
-Update your environment variables as needed.
+Actualiza tus variables de entorno según sea necesario.
 
-### 5. Run Tests
+### 5. Ejecutar Tests
 
-This repository uses Vitest for unit/integration tests and Playwright for UI tests.
+Este repositorio usa Vitest para tests unitarios/de integración y Playwright para tests de UI.
 
-- Run unit tests:
+- Ejecutar tests unitarios:
 
 ```sh
-pnpm test          # runs vitest (unit tests under tests/unit/**)
-pnpm test:coverage # run with coverage
+pnpm test          # ejecuta vitest (tests unitarios en tests/unit/**)
+pnpm test:coverage # ejecutar con coverage
 ```
 
-- Run Playwright UI tests (starts `pnpm dev` automatically):
+- Ejecutar tests de UI con Playwright (inicia `pnpm dev` automáticamente):
 
 ```sh
 pnpm test:ui
-pnpm test:ui:headed # run with browser UI
+pnpm test:ui:headed # ejecutar con navegador visible
 ```
 
-CI: There's a GitHub Actions workflow at `.github/workflows/tests.yml` that runs `pnpm tsc --noEmit`, unit tests, and Playwright UI tests on push/PR to main.
+CI: Hay un workflow de GitHub Actions en `.github/workflows/tests.yml` que ejecuta `pnpm tsc --noEmit`, tests unitarios y tests de UI de Playwright en push/PR a main.
 
 ---
 
-## Notes
+## 📝 Notas
 
-- The current implementation is frontend-focused. Backend and database integration are designed to be pluggable and serverless-friendly.
-- For production, consider deploying on Vercel, Cloudflare, or similar platforms.
+- La implementación actual está enfocada al frontend. La integración de backend y base de datos está diseñada para ser modificable y serverless-friendly.
+- Para producción, considera desplegar en Vercel, Cloudflare, o plataformas similares.
 
 ---
 
-## Custom Rules
+## 🧑‍💻 ¿Quién está detrás?
 
-This project uses custom rules for Kilo Code AI to enforce coding standards and security. See the following rule files:
-
-- [Naming Conventions](.kilocode/rules/naming-conventions.md)
-- [Restricted Files](.kilocode/rules/restricted-files.md)
-- [Documentation Requirements](.kilocode/rules/documentation.md)
-- [Testing Patterns](.kilocode/rules/testing.md)
-
-Global rules apply across projects: `~/.kilocode/rules/general-standards.md`.
+Proyecto personal de [Daniel](https://github.com/cldrojas), ingeniero informático con hambre de claridad financiera y diseño funcional.  
+Inspirado por el caos, construido con cariño.
