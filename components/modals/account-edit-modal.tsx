@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   Wallet,
   PiggyBank,
@@ -61,14 +61,6 @@ export function AccountEditModal({ account, isOpen, onClose, onSave }: {
   const [accountName, setAccountName] = useState(account?.name || '')
   const [accountBalance, setAccountBalance] = useState(toInt(account?.balance || 0))
   const [selectedIcon, setSelectedIcon] = useState(account?.icon || 'wallet')
-
-  useEffect(() => {
-    if (account) {
-      setAccountName(account.name)
-      setAccountBalance(account.balance)
-      setSelectedIcon(account.icon)
-    }
-  }, [account])
 
   const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault()

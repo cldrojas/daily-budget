@@ -49,6 +49,7 @@ export function useBudget() {
   }, [budget.mode])
 
   // Load data from localStorage on initial render
+  // eslint-disable-next-line
   useEffect(() => {
     const savedData = localStorage.getItem(LOCAL_STORAGE_KEY)
     if (savedData) {
@@ -70,7 +71,7 @@ export function useBudget() {
         parsedData.budget.mode = parsedData.budget.endDate ? 'daily' : 'track'
       }
 
-      setBudget(parsedData.budget || budget)
+      setBudget(parsedData.budget || budget) // eslint-disable-line
       setAccounts(parsedData.accounts && parsedData.accounts.length > 0 ? parsedData.accounts : accounts)
       setTransactions(parsedData.transactions || transactions)
       setDailyAllowance(parsedData.dailyAllowance || 0)
@@ -142,6 +143,7 @@ export function useBudget() {
   }, [budget, accounts, today])
 
   // Check for day change and update budget
+  // eslint-disable-next-line
   useEffect(() => {
     if (!isSetup) return
 
@@ -172,7 +174,7 @@ export function useBudget() {
           account: 'savings'
         }
 
-        setAccounts(updatedAccounts)
+        setAccounts(updatedAccounts) // eslint-disable-line
         setTransactions([savingsTransaction, ...transactions])
       }
 

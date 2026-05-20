@@ -135,6 +135,7 @@ export default function Navbar({
         accounts={accounts}
         remainingToday={remainingToday}
         transaction={editingTransaction}
+        key={editingTransaction?.id}
       />
 
       {/* Transfer Modal */}

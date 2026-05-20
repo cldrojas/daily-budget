@@ -114,7 +114,7 @@ export function AccountsList({
     setAccountToDelete(null)
   }
 
-  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: any; icon: string }) => {
+  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: number; icon: string }) => {
     if (editingAccount) {
       onUpdateAccount({
         ...editingAccount,
@@ -199,6 +199,7 @@ export function AccountsList({
       {editingAccount && (
         <AccountEditModal
           account={editingAccount}
+          key={editingAccount?.id}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSave={handleSaveEdit}

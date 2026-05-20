@@ -1,7 +1,7 @@
 'use client'
 
-import { FormEvent, useState, useEffect } from 'react'
-import { PlusCircle, Edit, ArrowUpLeft, ArrowDownRight } from 'lucide-react'
+import { FormEvent, useState } from 'react'
+import { Edit, ArrowUpLeft, ArrowDownRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -47,30 +47,13 @@ export function TransactionModal({
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
   const { toast } = useToast()
-  const [amount, setAmount] = useState(0)
-  const [description, setDescription] = useState('')
-  const [date, setDate] = useState(new Date())
-  const [account, setAccount] = useState('daily')
-  const [transactionType, setTransactionType] = useState<TransactionType>('expense')
 
-  // Reset form when modal opens/closes or transaction changes
-  useEffect(() => {
-    if (transaction) {
-      // Editing existing transaction
-      setAmount(Math.abs(transaction.amount))
-      setDescription(transaction.description)
-      setDate(new Date(transaction.date))
-      setAccount(transaction.account)
-      setTransactionType(transaction.type)
-    } else {
-      // Adding new transaction
-      setAmount(0)
-      setDescription('')
-      setDate(new Date())
-      setAccount('daily')
-      setTransactionType('expense')
-    }
-  }, [transaction, isOpen])
+  // Initialize state from transaction prop (works with component key remount)
+  const [amount, setAmount] = useState(() => transaction ? Math.abs(transaction.amount) : 0)
+  const [description, setDescription] = useState(() => transaction?.description || '')
+  const [date, setDate] = useState(() => transaction ? new Date(transaction.date) : new Date())
+  const [account, setAccount] = useState(() => transaction?.account || 'daily')
+  const [transactionType, setTransactionType] = useState<TransactionType>(() => transaction?.type || 'expense')
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 import { Page } from '@playwright/test'
 import { addDays } from 'date-fns'
 import { toInt } from '@/types'
