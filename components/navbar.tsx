@@ -8,8 +8,9 @@ import { TransactionModal } from './modals/transaction-modal'
 import { TransferModal } from './modals/transfer-modal'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { Button } from '@/components/ui/button'
-import { ArrowRightLeft, HistoryIcon, WalletIcon } from 'lucide-react'
+import { ArrowRightLeft, HistoryIcon, Plus, WalletIcon } from 'lucide-react'
 import { Account, Budget, Transaction, Int } from '@/types'
+import { useLanguage } from '@/contexts/language-context'
 
 interface NavbarProps {
   accounts: Account[]
@@ -44,6 +45,7 @@ export default function Navbar({
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null)
+  const { t } = useLanguage()
 
   // Calculate remainingToday for the transaction modal
   const today = new Date()
@@ -122,6 +124,19 @@ export default function Navbar({
           </ErrorBoundary>
         </TabsContent>
       </Tabs>
+
+
+      {/* Floating Action Button for adding transactions */}
+      <Button
+        className="fixed bottom-6 right-6 rounded-full h-14 w-14 shadow-lg z-50"
+        onClick={() => {
+          setEditingTransaction(null)
+          setIsTransactionModalOpen(true)
+        }}
+        title={t('addExpense')}
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
 
       {/* Transaction Modal */}
       <TransactionModal
