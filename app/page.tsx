@@ -58,11 +58,11 @@ export default function DailyBudgetApp() {
                 onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
                 title={isDarkMode ? t('lightMode') : t('darkMode')}
               >
-                {isDarkMode ? (
+                {/* {isDarkMode ? (
                   <Sun className="h-5 w-5" />
                 ) : (
-                  <Moon className="h-5 w-5" />
-                )}
+                )} */}
+                <Moon className="h-5 w-5" />
               </Button>
             </div>
           </div>

@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { ArrowRightLeft, HistoryIcon, Plus, WalletIcon } from 'lucide-react'
 import { Account, Budget, Transaction, Int } from '@/types'
 import { useLanguage } from '@/contexts/language-context'
+import { CustomTabTrigger } from './custom-tab-trigger'
 
 interface NavbarProps {
   accounts: Account[]
@@ -41,6 +42,7 @@ export default function Navbar({
   updateTransaction,
   transferFunds
 }: NavbarProps) {
+  const [activeTab, setActiveTab] = useState<string | undefined>()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] =
@@ -75,29 +77,36 @@ export default function Navbar({
     <ErrorBoundary>
       <Tabs
         defaultValue="accounts"
-        className="relative"
+        className="relative w-full"
+        onValueChange={(tab) => {
+          setActiveTab(tab)
+          console.log(`DEBUG:active tab on value change:`, tab)
+        }}
       >
-        <TabsList className="grid w-full grid-cols-3 h-20 bg-slate-900/40">
-          <TabsTrigger
-            className="gap-2 min-h-full"
-            value="accounts"
-          >
-            <WalletIcon size={16}></WalletIcon>
-            Cuentas
-          </TabsTrigger>
-          <Button
-            className="flex gap-4 rounded-full  "
-            onClick={() => setIsTransferModalOpen(true)}
-          >
-            <ArrowRightLeft className="h-5 w-5" />
-            <small className="font-bold">Transferir</small>
-          </Button>
-          <TabsTrigger
-            className="gap-2 min-h-full"
+        <TabsList className="grid h-20 grid-flow-col auto-cols-[repeat(auto-fit, minmax(250px, 1fr))] bg-slate-900/50 justify-around">
+          {/** falta centrar los tabs o agregar tamaño automatico
+             * 
+             * Este es el boton
+              * <Button
+                  className="flex gap-4 rounded-full absolute "
+                  onClick={() => {
+                    setIsTransferModalOpen(true)
+                  }}
+                >
+                  <ArrowRightLeft className="h-5 w-5" />
+                  <small className="font-bold">Transferir</small>
+                </Button>
+         */}
+          <CustomTabTrigger
+            title='Cuentas'
+            logo={WalletIcon}
+            value='accounts'
+          />
+          <CustomTabTrigger
+            title="Historial"
             value="history"
-          >
-            <HistoryIcon size={16}></HistoryIcon>Historial
-          </TabsTrigger>
+            logo={HistoryIcon}
+          />
         </TabsList>
 
         <TabsContent
@@ -105,13 +114,15 @@ export default function Navbar({
           className="mt-6"
         >
           <ErrorBoundary>
-            <AccountsList
-              accounts={accounts}
-              budget={budget}
-              onAddAccount={addAccount}
-              onUpdateAccount={updateAccount}
-              onDeleteAccount={deleteAccount}
-            />
+            <div className="flex">
+              <AccountsList
+                accounts={accounts}
+                budget={budget}
+                onAddAccount={addAccount}
+                onUpdateAccount={updateAccount}
+                onDeleteAccount={deleteAccount}
+              />
+            </div>
           </ErrorBoundary>
         </TabsContent>
 
@@ -124,7 +135,6 @@ export default function Navbar({
           </ErrorBoundary>
         </TabsContent>
       </Tabs>
-
 
       {/* Floating Action Button for adding transactions */}
       <Button

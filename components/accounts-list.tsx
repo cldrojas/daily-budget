@@ -22,12 +22,7 @@ import {
   Plus
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AccountEditModal } from './modals/account-edit-modal'
@@ -88,9 +83,10 @@ export function AccountsList({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   // Filter accounts based on mode (hide savings in track mode)
-  const isTrackMode = budget.mode === 'track' || (!budget.mode && !budget.endDate)
+  const isTrackMode =
+    budget.mode === 'track' || (!budget.mode && !budget.endDate)
   const filteredAccounts = isTrackMode
-    ? accounts.filter(acc => acc.id !== 'savings')
+    ? accounts.filter((acc) => acc.id !== 'savings')
     : accounts
 
   const handleEditClick = (account: Account) => {
@@ -114,7 +110,12 @@ export function AccountsList({
     setAccountToDelete(null)
   }
 
-  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: Int; icon: string }) => {
+  const handleSaveEdit = (updatedAccount: {
+    id?: string
+    name: string
+    balance: Int
+    icon: string
+  }) => {
     if (editingAccount) {
       onUpdateAccount({
         ...editingAccount,
@@ -124,7 +125,8 @@ export function AccountsList({
   }
 
   const getAccountIcon = (account: Account) => {
-    const IconComponent = iconMap[account.icon as keyof typeof iconMap] || Wallet
+    const IconComponent =
+      iconMap[account.icon as keyof typeof iconMap] || Wallet
     return <IconComponent className="h-5 w-5" />
   }
 
@@ -133,12 +135,14 @@ export function AccountsList({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="border border-red-400 space-y-6 max-h-full overflow-y-scroll">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 overflow-scroll">
         {filteredAccounts.map((account) => (
           <Card key={account.id}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
+              <CardTitle className="text-sm font-medium">
+                {account.name}
+              </CardTitle>
               <div className="flex items-center space-x-2">
                 <div className="h-5 w-5 text-muted-foreground">
                   {getAccountIcon(account)}
@@ -166,7 +170,9 @@ export function AccountsList({
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(account.balance)}</div>
+              <div className="text-2xl font-bold">
+                {formatCurrency(account.balance)}
+              </div>
               <p className="text-xs text-muted-foreground">
                 {t(account.type)} {t('account')}
               </p>
