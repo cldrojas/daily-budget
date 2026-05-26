@@ -54,6 +54,7 @@ Pensada para personas que:
 |-- theme-provider.tsx
 |-- transaction-history.tsx
 |-- transactions-list.tsx
+|-- custom-tab-trigger.tsx
 |-- transfer-form.tsx
 /components/modals  # Componentes modales
 /components/ui      # Primitivas de UI (buttons, dialogs, etc.)
@@ -70,6 +71,61 @@ Pensada para personas que:
 ---
 
 ## 🛠 Tecnologías
+
+---
+
+## 📋 Estado de Desarrollo
+
+### Rama activa: `wip/navbar-tabs-custom-trigger`
+
+#### Último cambio: Edit Modal Autofocus + Mobile UX ✅
+
+**Propósito**: Mejorar la experiencia mobile del modal de edición de cuentas y mover el autofocus al campo de balance.
+
+**Implementado:**
+- ✅ Autofocus ahora en el input de Balance (antes en nombre)
+- ✅ Grid de íconos responsive: 5 columnas en mobile, 7 en desktop (`grid-cols-5 sm:grid-cols-7`)
+- ✅ Padding responsive: `p-4` mobile / `p-6` desktop
+- ✅ Bugfix: Label de Balance ahora apunta al input correcto (`htmlFor`)
+- ✅ `data-testid="edit-account-balance"` para tests
+- ✅ Tests (TDD): 2 unit nuevos + 1 Playwright mobile viewport
+- ✅ 56/56 tests pasando
+- ✅ TypeScript clean (`tsc --noEmit`)
+
+#### Anterior: Account Cards Square Button ✅
+
+**Propósito**: Rediseñar las tarjetas de cuentas para que sean cuadradas, tipo botón, sin botones de acción internos.
+
+**Implementado:**
+- ✅ Cards cuadradas (`aspect-square`) con hover effects
+- ✅ Botones Edit/Trash2 eliminados de las tarjetas
+- ✅ Click en la card abre `AccountEditModal`
+- ✅ Botón "Delete Account" dentro del modal de edición
+- ✅ Botón "Add Account" en estilo cuadrado consistente
+- ✅ Tests (TDD/BDD): 10 unit + 4 E2E (Playwright)
+- ✅ 54/54 tests pasando
+- ✅ TypeScript clean (`tsc --noEmit`)
+
+**Pendiente en la rama:**
+- 🔲 Fix: botón Transferir comentado sin reemplazo
+- 🔲 Fix: toggle de tema roto (siempre muestra Moon)
+- 🔲 Bug: `CustomTabTrigger` siempre renderiza `HistoryIcon` en vez del ícono recibido
+
+**Cobertura de Tests:**
+| Archivo | Tests | Tipo |
+|---------|-------|------|
+| `tests/unit/accounts-list.test.tsx` | 12 | Unit (Vitest) |
+| `tests/ui/accounts-list.spec.ts` | 5 | E2E (Playwright) |- 🔲 Fix: botón Transferir comentado sin reemplazo
+- 🔲 Fix: toggle de tema roto (siempre muestra Moon)
+- 🔲 Bug: `CustomTabTrigger` siempre renderiza `HistoryIcon` en vez del ícono recibido
+
+**Cobertura de Tests:**
+| Archivo | Tests | Tipo |
+|---------|-------|------|
+| `tests/unit/accounts-list.test.tsx` | 10 | Unit (Vitest) |
+| `tests/ui/accounts-list.spec.ts` | 4 | E2E (Playwright) |
+
+---
 
 - **Frontend:** Next.js (React), Tailwind CSS, Radix UI, TypeScript
 - **State Management:** React Context, Custom Hooks

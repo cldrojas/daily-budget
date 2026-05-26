@@ -6,8 +6,6 @@ import {
   Wallet,
   PiggyBank,
   TrendingUp,
-  Edit,
-  Trash2,
   CreditCard,
   Building,
   Briefcase,
@@ -22,21 +20,11 @@ import {
   Plus
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { AccountEditModal } from './modals/account-edit-modal'
 import { AccountModal } from './modals/account-modal'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle
-} from '@/components/ui/alert-dialog'
 
 // Default account IDs that cannot be deleted
 const DEFAULT_ACCOUNT_IDS = ['daily', 'savings', 'investment']
@@ -79,8 +67,6 @@ export function AccountsList({
   const [isAccountModalOpen, setIsAccountModalOpen] = useState(false)
   const [editingAccount, setEditingAccount] = useState<Account | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
-  const [accountToDelete, setAccountToDelete] = useState<Account | null>(null)
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   // Filter accounts based on mode (hide savings in track mode)
   const isTrackMode =
@@ -92,22 +78,6 @@ export function AccountsList({
   const handleEditClick = (account: Account) => {
     setEditingAccount(account)
     setIsEditModalOpen(true)
-  }
-
-  const handleDeleteClick = (account: Account) => {
-    setAccountToDelete(account)
-    setIsDeleteDialogOpen(true)
-  }
-
-  const handleConfirmDelete = () => {
-    if (accountToDelete) {
-      const success = onDeleteAccount(accountToDelete.id)
-      if (success) {
-        // Toast handled by parent
-      }
-    }
-    setIsDeleteDialogOpen(false)
-    setAccountToDelete(null)
   }
 
   const handleSaveEdit = (updatedAccount: {
@@ -127,7 +97,7 @@ export function AccountsList({
   const getAccountIcon = (account: Account) => {
     const IconComponent =
       iconMap[account.icon as keyof typeof iconMap] || Wallet
-    return <IconComponent className="h-5 w-5" />
+    return <IconComponent className="h-10 w-10" />
   }
 
   const canDeleteAccount = (accountId: string) => {
@@ -135,62 +105,38 @@ export function AccountsList({
   }
 
   return (
-    <div className="border border-red-400 space-y-6 max-h-full overflow-y-scroll">
+    <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 overflow-scroll">
         {filteredAccounts.map((account) => (
-          <Card key={account.id}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {account.name}
-              </CardTitle>
-              <div className="flex items-center space-x-2">
-                <div className="h-5 w-5 text-muted-foreground">
-                  {getAccountIcon(account)}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6"
-                  onClick={() => handleEditClick(account)}
-                  title={t('editAccount')}
-                >
-                  <Edit className="h-3.5 w-3.5" />
-                </Button>
-                {canDeleteAccount(account.id) && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-6 w-6 text-destructive"
-                    onClick={() => handleDeleteClick(account)}
-                    title={t('deleteAccount')}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {formatCurrency(account.balance)}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t(account.type)} {t('account')}
-              </p>
-            </CardContent>
+          <Card
+            key={account.id}
+            className="cursor-pointer aspect-square flex flex-col items-center justify-center gap-2 p-6 hover:shadow-md hover:-translate-y-0.5 transition-all"
+            onClick={() => handleEditClick(account)}
+          >
+            <div className="h-10 w-10 text-muted-foreground">
+              {getAccountIcon(account)}
+            </div>
+            <span className="text-sm font-medium text-center truncate w-full">
+              {account.name}
+            </span>
+            <span className="text-2xl font-bold">
+              {formatCurrency(account.balance)}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {t(account.type)} {t('account')}
+            </span>
           </Card>
         ))}
 
-        {/* Add new account button as li */}
-        <li className="list-none">
-          <Button
-            variant="outline"
-            className="w-full h-full min-h-[100px] flex flex-col items-center justify-center gap-2 border-dashed"
-            onClick={() => setIsAccountModalOpen(true)}
-          >
-            <Plus className="h-8 w-8" />
-            <span className="text-sm">{t('addNewAccount')}</span>
-          </Button>
-        </li>
+        {/* Add new account button matching square card style */}
+        <Button
+          variant="outline"
+          className="aspect-square flex flex-col items-center justify-center gap-2 border-dashed h-auto"
+          onClick={() => setIsAccountModalOpen(true)}
+        >
+          <Plus className="h-8 w-8" />
+          <span className="text-sm">{t('addNewAccount')}</span>
+        </Button>
       </div>
 
       {/* Account Creation Modal */}
@@ -209,41 +155,10 @@ export function AccountsList({
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSave={handleSaveEdit}
+          onDeleteAccount={onDeleteAccount}
+          accountId={editingAccount.id}
+          canDelete={canDeleteAccount(editingAccount.id)}
         />
-      )}
-
-      {/* Delete Account Confirmation Dialog */}
-      {isDeleteDialogOpen && accountToDelete && (
-        <AlertDialog
-          open={isDeleteDialogOpen}
-          onOpenChange={setIsDeleteDialogOpen}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{t('deleteAccount')}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {t('deleteAccountConfirmation', { name: accountToDelete.name })}
-                {accountToDelete.balance > 0 && (
-                  <p className="mt-2 font-medium">
-                    {t('deleteAccountBalance', {
-                      balance: formatCurrency(accountToDelete.balance),
-                      savings: t('savings')
-                    })}
-                  </p>
-                )}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={handleConfirmDelete}
-                className="bg-destructive text-destructive-foreground"
-              >
-                {t('delete')}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       )}
     </div>
   )
