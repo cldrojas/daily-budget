@@ -32,8 +32,8 @@ export function TransactionList({
   // Set locale based on language
   const locale = language === 'es' ? es : undefined
 
-  // Filter only expense transactions (negative amounts)
-  const expenses = transactions.filter((transaction) => transaction.amount < 0)
+  // Filter only expense transactions (by type)
+  const expenses = transactions.filter((transaction) => transaction.type === 'expense')
 
   // Function to get a short name from description
   const getShortName = (description: string) => {

@@ -70,6 +70,15 @@ export const translations = {
     transactionType: 'Transaction Type',
     whatIncomeFor: 'What is this income for?',
 
+    // Delete Transaction
+    adjustmentDescription: 'Balance adjustment',
+    deleteTransactionTitle: 'Delete transaction',
+    deleteTransactionQuestion: 'What should happen to the balance?',
+    deleteAndRefund: 'Delete and refund',
+    deleteAndRefundDescription: 'Removes the transaction and returns the money to the account',
+    deleteKeepBalance: 'Delete, keep balance',
+    deleteKeepBalanceDescription: 'Removes the transaction without changing the balance',
+
     // Transfer Form
     transferFunds: 'Transfer Funds',
     transferDescription: 'Move money between your accounts',
@@ -202,6 +211,15 @@ export const translations = {
     recentExpensesDescription: 'Tus gastos más recientes',
     noExpenses: 'Aún no hay gastos',
     transactionType: 'Tipo de transacción',
+
+    // Delete Transaction
+    adjustmentDescription: 'Ajuste de saldo',
+    deleteTransactionTitle: 'Eliminar transacción',
+    deleteTransactionQuestion: '¿Qué hacer con el saldo?',
+    deleteAndRefund: 'Eliminar y devolver',
+    deleteAndRefundDescription: 'Elimina la transacción y devuelve el dinero a la cuenta',
+    deleteKeepBalance: 'Eliminar, mantener saldo',
+    deleteKeepBalanceDescription: 'Elimina la transacción sin modificar el saldo',
 
     // Transfer Form
     transferFunds: 'Transferir fondos',

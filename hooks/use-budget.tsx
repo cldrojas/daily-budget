@@ -379,27 +379,29 @@ export function useBudget() {
   }
 
   // Remove an existing transaction
-  const removeTransaction = (transactionId: string) => {
+  const removeTransaction = (transactionId: string, refund: boolean = true) => {
     // Get transaction object
     const transaction = transactions.find((t) => t.id === transactionId)
     if (transaction) {
-      const { account, amount } = transaction
-      // Update accounts based on expense logic
-      let updatedAccounts = [...accounts]
+      if (refund) {
+        const { account, amount } = transaction
+        // Update accounts based on expense logic
+        let updatedAccounts = [...accounts]
 
-      updatedAccounts = accounts.map((acc) => {
-        if (acc.id === account) {
-          return { ...acc, balance: toInt(acc.balance + Math.abs(amount)) ?? 0 as Int }
+        updatedAccounts = accounts.map((acc) => {
+          if (acc.id === account) {
+            return { ...acc, balance: toInt(acc.balance - amount) ?? 0 as Int }
+          }
+          return acc
+        })
+
+        if (isToday(transaction.date)) {
+          setRemainingToday(remainingToday - amount)
+          setProgress(((remainingToday - amount) / dailyAllowance) * 100)
         }
-        return acc
-      })
-
-      if (isToday(transaction.date)) {
-        setRemainingToday(remainingToday + Math.abs(amount))
-        setProgress(((remainingToday + Math.abs(amount)) / dailyAllowance) * 100)
+        setAccounts(updatedAccounts)
       }
       setTransactions(transactions.filter((transaction) => transaction.id !== transactionId))
-      setAccounts(updatedAccounts)
     }
   }
 
@@ -486,6 +488,9 @@ export function useBudget() {
 
   // Update an existing account
   const updateAccount = (updatedAccount: Account) => {
+    // Find the old account before updating
+    const oldAccount = accounts.find((a) => a.id === updatedAccount.id)
+
     const updatedAccounts = accounts.map((account) => {
       if (account.id === updatedAccount.id) {
         return { ...account, ...updatedAccount }
@@ -494,6 +499,22 @@ export function useBudget() {
     })
 
     setAccounts(updatedAccounts)
+
+    // Create adjustment transaction if the balance changed
+    if (oldAccount && oldAccount.balance !== updatedAccount.balance) {
+      const delta = toInt(updatedAccount.balance - oldAccount.balance) ?? 0 as Int
+      if (delta !== 0) {
+        const adjustmentTransaction: Transaction = {
+          id: uuidv4(),
+          type: 'adjustment',
+          amount: delta,
+          description: 'Balance adjustment',
+          account: updatedAccount.id,
+          date: today
+        }
+        setTransactions([adjustmentTransaction, ...transactions])
+      }
+    }
   }
 
   // Delete an account
