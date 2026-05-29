@@ -21,15 +21,21 @@ vi.mock('date-fns', () => ({
   isToday: vi.fn((date) => new Date().toDateString() === date.toDateString()),
 }))
 
-// Mock uuid
+// Mock uuid with unique IDs
+let uuidCounter = 0
 vi.mock('uuid', () => ({
-  v4: vi.fn(() => 'mock-uuid'),
+  v4: vi.fn(() => {
+    const id = `mock-uuid-${uuidCounter}`
+    uuidCounter++
+    return id
+  }),
 }))
 
 describe('useBudget hook', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorageMock.getItem.mockReturnValue(null)
+    uuidCounter = 0
   })
 
   it('initializes with default accounts and empty transactions', () => {
@@ -219,5 +225,234 @@ describe('useBudget hook', () => {
 
     // Account should still exist
     expect(result.current.accounts.find(a => a.id === 'daily')).toBeDefined()
+  })
+
+  describe('T-2: updateAccount creates adjustment transaction', () => {
+    it('creates adjustment transaction when balance increases', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      const dailyAccount = result.current.accounts.find(a => a.id === 'daily')!
+
+      act(() => {
+        result.current.updateAccount({ ...dailyAccount, balance: 1500 as any })
+      })
+
+      // Initial deposit + adjustment transaction
+      expect(result.current.transactions).toHaveLength(2)
+
+      const adjustmentTx = result.current.transactions[0]
+      expect(adjustmentTx.type).toBe('adjustment')
+      expect(adjustmentTx.amount).toBe(500) // 1500 - 1000
+      expect(adjustmentTx.description).toBe('Balance adjustment')
+      expect(adjustmentTx.account).toBe('daily')
+    })
+
+    it('creates adjustment transaction when balance decreases', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      const dailyAccount = result.current.accounts.find(a => a.id === 'daily')!
+
+      act(() => {
+        result.current.updateAccount({ ...dailyAccount, balance: 300 as any })
+      })
+
+      expect(result.current.transactions).toHaveLength(2)
+
+      const adjustmentTx = result.current.transactions[0]
+      expect(adjustmentTx.type).toBe('adjustment')
+      expect(adjustmentTx.amount).toBe(-700) // 300 - 1000 = -700
+    })
+
+    it('does not create adjustment transaction when balance unchanged', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      const dailyAccount = result.current.accounts.find(a => a.id === 'daily')!
+
+      act(() => {
+        result.current.updateAccount({ ...dailyAccount, balance: 1000 as any })
+      })
+
+      // Still only the initial deposit
+      expect(result.current.transactions).toHaveLength(1)
+    })
+  })
+
+  describe('T-5: removeTransaction with refund param', () => {
+    it('refunds balance when refund=true (default)', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      act(() => {
+        result.current.addTransaction({
+          type: 'expense',
+          amount: 200,
+          description: 'Test expense',
+          account: 'daily'
+        })
+      })
+
+      const dailyAccount = result.current.accounts.find(a => a.id === 'daily')!
+      expect(dailyAccount.balance).toBe(800) // 1000 - 200
+
+      // addTransaction inserts at the beginning, so expense is at index 0
+      const expenseTx = result.current.transactions[0]
+      expect(expenseTx.type).toBe('expense')
+
+      act(() => {
+        result.current.removeTransaction(expenseTx.id)
+      })
+
+      const dailyAccountAfter = result.current.accounts.find(a => a.id === 'daily')!
+      expect(dailyAccountAfter.balance).toBe(1000) // balance restored
+      expect(result.current.transactions).toHaveLength(1) // only initial deposit
+    })
+
+    it('does not refund balance when refund=false', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      act(() => {
+        result.current.addTransaction({
+          type: 'expense',
+          amount: 200,
+          description: 'Test expense',
+          account: 'daily'
+        })
+      })
+
+      const dailyAccount = result.current.accounts.find(a => a.id === 'daily')!
+      expect(dailyAccount.balance).toBe(800)
+
+      // addTransaction inserts at the beginning, so expense is at index 0
+      const expenseTx = result.current.transactions[0]
+      expect(expenseTx.type).toBe('expense')
+
+      act(() => {
+        result.current.removeTransaction(expenseTx.id, false)
+      })
+
+      const dailyAccountAfter = result.current.accounts.find(a => a.id === 'daily')!
+      expect(dailyAccountAfter.balance).toBe(800) // balance NOT restored
+      expect(result.current.transactions).toHaveLength(1) // transaction removed
+    })
+
+    it('deleting positive adjustment with refund=true reverses the effect (Scenario 3e)', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      const daily = result.current.accounts.find(a => a.id === 'daily')!
+      expect(daily.balance).toBe(1000)
+
+      // Increase balance to 1500 → creates +500 adjustment
+      act(() => {
+        result.current.updateAccount({ ...daily, balance: 1500 as any })
+      })
+
+      expect(result.current.accounts.find(a => a.id === 'daily')!.balance).toBe(1500)
+
+      const adjustmentTx = result.current.transactions[0]
+      expect(adjustmentTx.type).toBe('adjustment')
+      expect(adjustmentTx.amount).toBe(500)
+
+      // Delete adjustment with refund → balance should return to 1000
+      act(() => {
+        result.current.removeTransaction(adjustmentTx.id, true)
+      })
+
+      expect(result.current.accounts.find(a => a.id === 'daily')!.balance).toBe(1000)
+    })
+
+    it('deleting negative adjustment with refund=true reverses the effect', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      const daily = result.current.accounts.find(a => a.id === 'daily')!
+
+      // Decrease balance to 300 → creates -700 adjustment
+      act(() => {
+        result.current.updateAccount({ ...daily, balance: 300 as any })
+      })
+
+      expect(result.current.accounts.find(a => a.id === 'daily')!.balance).toBe(300)
+
+      const adjustmentTx = result.current.transactions[0]
+      expect(adjustmentTx.type).toBe('adjustment')
+      expect(adjustmentTx.amount).toBe(-700)
+
+      // Delete adjustment with refund → balance returns to 1000
+      act(() => {
+        result.current.removeTransaction(adjustmentTx.id, true)
+      })
+
+      expect(result.current.accounts.find(a => a.id === 'daily')!.balance).toBe(1000)
+    })
+
+    it('safely handles non-existent transaction id', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.setupBudget({
+          startAmount: 1000 as any,
+          endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        })
+      })
+
+      expect(() => {
+        act(() => {
+          result.current.removeTransaction('non-existent-id')
+        })
+      }).not.toThrow()
+
+      expect(() => {
+        act(() => {
+          result.current.removeTransaction('non-existent-id', false)
+        })
+      }).not.toThrow()
+    })
   })
 })

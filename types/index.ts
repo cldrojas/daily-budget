@@ -60,7 +60,7 @@ export type Transaction = {
   date: Date
 }
 
-export type TransactionType = 'expense' | 'transfer' | 'income'
+export type TransactionType = 'expense' | 'transfer' | 'income' | 'adjustment'
 
 export type Budget = {
   startAmount: Int
