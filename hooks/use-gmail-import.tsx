@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import { v4 as uuidv4 } from 'uuid'
 import type { ImportedTransaction } from '@/types'
 import type {
   ImportStats,
   SyncResponse,
-  ReviewRequest,
-  ReviewResponse
+  ReviewRequest
 } from '@/lib/import/types'
 import { createEmptyStats } from '@/lib/import/types'
 import {
@@ -202,53 +202,32 @@ export function useGmailImport(): UseGmailImportReturn {
 
   /**
    * Approve an imported transaction.
+   * Fully client-side — the data lives in localStorage, no server call needed.
    */
   const approve = useCallback(
     async (
       id: string,
-      account: string,
-      overrides?: ReviewRequest['overrides']
+      _account: string,
+      _overrides?: ReviewRequest['overrides']
     ): Promise<boolean> => {
       try {
-        const response = await fetch('/api/gmail/review', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id,
-            action: 'approve',
-            account,
-            overrides
-          } satisfies ReviewRequest)
+        const transactionId = uuidv4()
+
+        updateImportStatus(
+          id,
+          'approved',
+          new Date().toISOString(),
+          transactionId
+        )
+
+        const currentStats = getStats()
+        updateStats({
+          totalApproved: currentStats.totalApproved + 1,
+          totalPending: Math.max(0, currentStats.totalPending - 1)
         })
 
-        if (!response.ok) {
-          const errBody = await response
-            .json()
-            .catch(() => ({ error: 'Approval failed' }))
-          throw new Error(errBody.error ?? 'Approval failed')
-        }
-
-        const result: ReviewResponse = await response.json()
-
-        if (result.status === 'approved') {
-          updateImportStatus(
-            id,
-            'approved',
-            new Date().toISOString(),
-            result.transaction.id
-          )
-
-          const currentStats = getStats()
-          updateStats({
-            totalApproved: currentStats.totalApproved + 1,
-            totalPending: Math.max(0, currentStats.totalPending - 1)
-          })
-
-          refreshData()
-          return true
-        }
-
-        return false
+        refreshData()
+        return true
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Approval failed'
         setError(message)
@@ -260,23 +239,11 @@ export function useGmailImport(): UseGmailImportReturn {
 
   /**
    * Reject an imported transaction.
+   * Fully client-side — the data lives in localStorage, no server call needed.
    */
   const reject = useCallback(
     async (id: string): Promise<boolean> => {
       try {
-        const response = await fetch('/api/gmail/review', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ id, action: 'reject' } satisfies ReviewRequest)
-        })
-
-        if (!response.ok) {
-          const errBody = await response
-            .json()
-            .catch(() => ({ error: 'Rejection failed' }))
-          throw new Error(errBody.error ?? 'Rejection failed')
-        }
-
         updateImportStatus(id, 'rejected', new Date().toISOString(), null)
 
         const currentStats = getStats()

@@ -106,15 +106,8 @@ export function ImportReviewList({
   // Bulk actions
   const pendingItems = grouped.pending
   const handleApproveAll = () => {
-    console.log(`DEBUG:handleAproveAll: ${pendingItems}`)
     for (const txn of pendingItems) {
-      console.log(`DEBUG:txn:`, {
-        id: txn.id,
-        type: txn.parsedType,
-        ammount: txn.parsedAmount
-      })
       const accountId = selectedAccounts[txn.id]
-      console.log(`DEBUG:accountId:`, accountId)
       if (accountId) {
         onApprove(txn.id, accountId)
       }

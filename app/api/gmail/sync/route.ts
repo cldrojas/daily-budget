@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const result = await runSync(client, {
       senders: body.senders,
       maxResults: body.maxResults,
-      daysBack: body.daysBack,
+      daysBack: body.daysBack
     })
 
     return NextResponse.json(result)
@@ -42,9 +42,15 @@ export async function POST(request: NextRequest) {
     const err = error as { message?: string; status?: number }
 
     // Token expired / invalid grant
-    if (err.message?.includes('invalid_grant') || err.message?.includes('Token has expired')) {
+    if (
+      err.message?.includes('invalid_grant') ||
+      err.message?.includes('Token has expired')
+    ) {
       return NextResponse.json(
-        { error: 'Gmail connection expired. Please reconnect.', code: 'token_expired' },
+        {
+          error: 'Gmail connection expired. Please reconnect.',
+          code: 'token_expired'
+        },
         { status: 401 }
       )
     }
