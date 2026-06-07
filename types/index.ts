@@ -77,3 +77,38 @@ export type Account = {
   balance: Int
   icon: string
 }
+
+// ── Gmail Import ──────────────────────────────────────────────────
+
+export type ImportStatus = 'pending' | 'approved' | 'rejected' | 'unparsed'
+
+export type ImportedTransaction = {
+  id: string
+  gmailMessageId: string
+  threadId: string
+  sender: string
+  bankName: string | null
+
+  // Parsed data
+  parsedAmount: Int | null
+  parsedEntity: string | null
+  parsedDate: string | null
+  parsedType: TransactionType | null
+  confidence: number
+
+  // Raw email
+  rawSubject: string
+  rawSnippet: string
+  rawBody: string
+
+  // Review state
+  status: ImportStatus
+  reviewedAt: string | null
+
+  // Link to approved transaction
+  transactionId: string | null
+
+  // Timestamps
+  createdAt: string
+  updatedAt: string
+}

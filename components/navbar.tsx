@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { AccountsList } from './accounts-list'
 import { ErrorBoundary } from './error-boundary'
 import { TransactionHistory } from './transaction-history'
@@ -8,7 +9,7 @@ import { TransactionModal } from './modals/transaction-modal'
 import { TransferModal } from './modals/transfer-modal'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs'
 import { Button } from '@/components/ui/button'
-import { ArrowRightLeft, HistoryIcon, Plus, WalletIcon } from 'lucide-react'
+import { ArrowRightLeft, HistoryIcon, Plus, WalletIcon, Download } from 'lucide-react'
 import { Account, Budget, Transaction, Int } from '@/types'
 import { useLanguage } from '@/contexts/language-context'
 
@@ -46,6 +47,7 @@ export default function Navbar({
   const [editingTransaction, setEditingTransaction] =
     useState<Transaction | null>(null)
   const { t } = useLanguage()
+  const router = useRouter()
 
   // Calculate remainingToday for the transaction modal
   const today = new Date()
@@ -77,7 +79,7 @@ export default function Navbar({
         defaultValue="accounts"
         className="relative"
       >
-        <TabsList className="grid w-full grid-cols-3 h-20 bg-slate-900/40">
+        <TabsList className="grid w-full grid-cols-4 h-20 bg-slate-900/40">
           <TabsTrigger
             className="gap-2 min-h-full"
             value="accounts"
@@ -92,6 +94,13 @@ export default function Navbar({
             <ArrowRightLeft className="h-5 w-5" />
             <small className="font-bold">Transferir</small>
           </Button>
+          <TabsTrigger
+            className="gap-2 min-h-full"
+            value="import"
+            onClick={() => router.push('/import')}
+          >
+            <Download size={16}></Download>Importar
+          </TabsTrigger>
           <TabsTrigger
             className="gap-2 min-h-full"
             value="history"
