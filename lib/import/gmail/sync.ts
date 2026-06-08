@@ -8,9 +8,7 @@ import type { SyncResponse } from '../types'
 
 const DEFAULT_SENDERS = [
   'notificaciones@bancoestado.cl',
-  'no-reply@mercadopago.com',
-  'notificaciones@stp.com.mx',
-  'transferencia@stp.com.mx',
+  'info@mercadopago.com',
 ]
 
 const DEFAULT_DAYS_BACK = 90
@@ -24,7 +22,7 @@ function buildQuery(senders: string[], daysBack: number): string {
   date.setDate(date.getDate() - daysBack)
   const afterStr = date.toISOString().replace(/T.*$/, '')
 
-  const senderQueries = senders.map(s => `from:${s}`).join(' OR ')
+  const senderQueries = senders.map((s) => `from:${s}`).join(' OR ')
   return `(${senderQueries}) after:${afterStr}`
 }
 
@@ -37,7 +35,7 @@ export async function runSync(
     senders?: string[]
     maxResults?: number
     daysBack?: number
-  },
+  }
 ): Promise<SyncResponse> {
   const client = new GmailClient(auth)
   const registry = getDefaultRegistry()
@@ -52,8 +50,10 @@ export async function runSync(
   // 1. Get message headers
   const headers = await client.listMessages(query, maxResults)
 
+  console.log(`DEBUG:[sync.ts] runSync:`, {query, headers})
+
   // 2. Dedup check — skip already-imported messages
-  const newHeaders = headers.filter(h => !dedupSet.has(h.id))
+  const newHeaders = headers.filter((h) => !dedupSet.has(h.id))
   const skipped = headers.length - newHeaders.length
 
   // 3. Fetch and parse each new message
@@ -62,29 +62,39 @@ export async function runSync(
   for (const header of newHeaders) {
     try {
       const full = await client.getMessage(header.id)
-      const result = registry.parse(full.body, full.subject, full.snippet, full.from)
+      const sender = full.from.slice(
+        full.from.indexOf('<') + 1,
+        full.from.indexOf('>')
+      )
 
+      const result = registry.parse(
+        full.body,
+        full.subject,
+        full.snippet,
+        sender
+      )
+      // if (result) console.log(`DEBUG:result:`, result.imported)
       const now = new Date().toISOString()
 
       const txn: ImportedTransaction = {
         id: uuidv4(),
         gmailMessageId: full.id,
         threadId: full.threadId,
-        sender: full.from,
-        bankName: registry.getBankName(full.from),
-        parsedAmount: result.amount,
+        sender,
+        bankName: registry.getBankName(sender),
+        parsedAmount: result.amount, // TODO: implement registry.getAmmount(full.snippet)
         parsedEntity: result.entity,
         parsedDate: result.date,
         parsedType: result.type,
         confidence: result.confidence,
         rawSubject: full.subject,
         rawSnippet: full.snippet,
-        rawBody: full.body,
+        rawBody: '', // TODO: Use this full.body someway UPDATE: this could be deleted as not needed
         status: result.confidence === 0 ? 'unparsed' : 'pending',
         reviewedAt: null,
         transactionId: null,
         createdAt: now,
-        updatedAt: now,
+        updatedAt: now
       }
 
       imported.push(txn)
@@ -98,6 +108,6 @@ export async function runSync(
     total: headers.length,
     new: imported.length,
     skipped,
-    imported,
+    imported
   }
 }

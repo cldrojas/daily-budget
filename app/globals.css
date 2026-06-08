@@ -10,6 +10,30 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  /* Ensure minimum 44x44px touch targets for mobile accessibility */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent zoom on input focus on iOS */
+  @media screen and (max-width: 768px) {
+    input[type="number"],
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Better touch scrolling */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    overflow-scrolling: touch;
+  }
 }
 
 @layer base {

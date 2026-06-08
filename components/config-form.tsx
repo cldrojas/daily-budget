@@ -104,7 +104,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
             <CardDescription>{t("modifyBudgetConfig")}</CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-4 px-4 md:px-6">
               <div className="flex justify-between mb-4">
                 <Button
                   type="button"
@@ -128,23 +128,23 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                 </Button>
               </div>
               <div className="space-y-2">
-                <Label>{t('selectMode') || 'Mode'}</Label>
+                <Label>{t('selectMode')}</Label>
                 <div className="flex gap-2">
                   <Button
                     type="button"
                     variant={mode === 'daily' ? 'default' : 'outline'}
                     onClick={() => setMode('daily')}
-                    className="flex-1"
+                    className="flex-1 min-h-[44px] touch-target"
                   >
-                    {t('dailyMode') || 'Daily Mode'}
+                    {t('dailyMode')}
                   </Button>
                   <Button
                     type="button"
                     variant={mode === 'track' ? 'default' : 'outline'}
                     onClick={() => setMode('track')}
-                    className="flex-1"
+                    className="flex-1 min-h-[44px] touch-target"
                   >
-                    {t('trackMode') || 'Track Mode'}
+                    {t('trackMode')}
                   </Button>
                 </div>
               </div>

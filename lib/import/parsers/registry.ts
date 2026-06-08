@@ -39,6 +39,7 @@ export class ParserRegistry {
     const lower = sender.toLowerCase()
     for (const parser of this.parsers) {
       if (parser.senderPattern.test(lower)) {
+        console.log(`DEBUG:match sender ${sender}:`, parser)
         return parser
       }
     }
@@ -48,7 +49,12 @@ export class ParserRegistry {
   /**
    * Parse an email by matching the sender to a parser.
    */
-  parse(body: string, subject: string, snippet: string, sender: string): ParsedResult {
+  parse(
+    body: string,
+    subject: string,
+    snippet: string,
+    sender: string
+  ): ParsedResult {
     const parser = this.match(sender)
     return parser.parse(body, subject, snippet)
   }
@@ -66,7 +72,10 @@ export class ParserRegistry {
    * List all registered bank-specific parsers (excluding generic fallback).
    */
   getRegisteredBanks(): { bank: string; senderPattern: RegExp }[] {
-    return this.parsers.map(p => ({ bank: p.bank, senderPattern: p.senderPattern }))
+    return this.parsers.map((p) => ({
+      bank: p.bank,
+      senderPattern: p.senderPattern
+    }))
   }
 }
 

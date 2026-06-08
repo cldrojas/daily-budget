@@ -19,8 +19,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useLanguage } from '@/contexts/language-context'
+import { findAccountByEntity } from '@/lib/import/entity-matcher'
+
+const CREATE_SENTINEL = '__create__'
 
 export type ImportEditModalProps = {
   isOpen: boolean
@@ -33,6 +37,7 @@ export type ImportEditModalProps = {
     type: 'expense' | 'income'
   }, accountId: string) => void
   onClose: () => void
+  onAddAccount?: (entity: string) => void
 }
 
 export function ImportEditModal({
@@ -41,6 +46,7 @@ export function ImportEditModal({
   accounts,
   onSave,
   onClose,
+  onAddAccount,
 }: ImportEditModalProps) {
   const [amount, setAmount] = useState('')
   const [description, setDescription] = useState('')
@@ -57,9 +63,38 @@ export function ImportEditModal({
       setDescription(transaction.parsedEntity ?? '')
       setDate(transaction.parsedDate ?? new Date().toISOString().slice(0, 10))
       setType(transaction.parsedType === 'income' ? 'income' : 'expense')
+
+      // Auto-select matched account by entity
+      const entity = transaction.parsedEntity
+      const confidence = transaction.confidence
+      if (entity && confidence >= 0.5) {
+        const matched = findAccountByEntity(accounts, entity)
+        if (matched) {
+          setAccountId(matched.id)
+          return
+        }
+      }
       setAccountId(accounts[0]?.id ?? '')
     }
   }, [transaction, accounts])
+
+  const entity = transaction?.parsedEntity ?? ''
+  const matchedAccount = findAccountByEntity(accounts, entity)
+  const showCreateOption =
+    entity !== '' &&
+    !matchedAccount &&
+    (transaction?.confidence ?? 0) >= 0.5 &&
+    onAddAccount !== undefined
+
+  const handleAccountChange = (val: string) => {
+    if (val === CREATE_SENTINEL) {
+      if (entity && onAddAccount) {
+        onAddAccount(entity)
+      }
+      return
+    }
+    setAccountId(val)
+  }
 
   const handleSave = () => {
     if (!transaction || !accountId) return
@@ -153,7 +188,7 @@ export function ImportEditModal({
           {/* Account */}
           <div className="space-y-2">
             <Label htmlFor="account">{t('importAccount')}</Label>
-            <Select value={accountId} onValueChange={setAccountId}>
+            <Select value={accountId} onValueChange={handleAccountChange}>
               <SelectTrigger id="account">
                 <SelectValue placeholder={t('selectAccount')} />
               </SelectTrigger>
@@ -163,6 +198,14 @@ export function ImportEditModal({
                     {acc.name}
                   </SelectItem>
                 ))}
+                {showCreateOption && (
+                  <>
+                    <Separator className="my-1" />
+                    <SelectItem value={CREATE_SENTINEL}>
+                      {t('createAccountFor', { entity })}
+                    </SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>

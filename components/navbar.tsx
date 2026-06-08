@@ -79,33 +79,36 @@ export default function Navbar({
         defaultValue="accounts"
         className="relative"
       >
-        <TabsList className="grid w-full grid-cols-4 h-20 bg-slate-900/40">
+        <TabsList className="grid w-full grid-cols-4 h-20 bg-slate-900/40 min-h-[80px] touch-target">
           <TabsTrigger
-            className="gap-2 min-h-full"
+            className="gap-2 min-h-full flex flex-col items-center justify-center px-2 py-2"
             value="accounts"
           >
-            <WalletIcon size={16}></WalletIcon>
-            Cuentas
+            <WalletIcon size={20}></WalletIcon>
+            <span className="text-xs">{t('accounts')}</span>
           </TabsTrigger>
-          <Button
-            className="flex gap-4 rounded-full  "
+          <TabsTrigger
+            className="gap-2 min-h-full flex flex-col items-center justify-center px-2 py-2"
+            value="transfer"
             onClick={() => setIsTransferModalOpen(true)}
           >
             <ArrowRightLeft className="h-5 w-5" />
-            <small className="font-bold">Transferir</small>
-          </Button>
+            <span className="text-xs">{t('transfer')}</span>
+          </TabsTrigger>
           <TabsTrigger
-            className="gap-2 min-h-full"
+            className="gap-2 min-h-full flex flex-col items-center justify-center px-2 py-2"
             value="import"
             onClick={() => router.push('/import')}
           >
-            <Download size={16}></Download>Importar
+            <Download size={20}></Download>
+            <span className="text-xs">{t('import')}</span>
           </TabsTrigger>
           <TabsTrigger
-            className="gap-2 min-h-full"
+            className="gap-2 min-h-full flex flex-col items-center justify-center px-2 py-2"
             value="history"
           >
-            <HistoryIcon size={16}></HistoryIcon>Historial
+            <HistoryIcon size={20}></HistoryIcon>
+            <span className="text-xs">{t('history')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -122,6 +125,24 @@ export default function Navbar({
               onDeleteAccount={deleteAccount}
             />
           </ErrorBoundary>
+        </TabsContent>
+
+        <TabsContent
+          value="transfer"
+          className="mt-6"
+        >
+          <div className="text-center py-12 text-muted-foreground">
+            {t('transferDescription') || 'Use the button above to transfer funds'}
+          </div>
+        </TabsContent>
+
+        <TabsContent
+          value="import"
+          className="mt-6"
+        >
+          <div className="text-center py-12 text-muted-foreground">
+            {t('importDescription') || 'Navigate to the import page to sync transactions'}
+          </div>
         </TabsContent>
 
         <TabsContent

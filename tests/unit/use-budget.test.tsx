@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { generateSafeSlug } from '@/lib/import/entity-matcher'
 import { renderHook, act } from '@testing-library/react'
 import { useBudget } from '@/hooks/use-budget'
 
@@ -453,6 +454,63 @@ describe('useBudget hook', () => {
           result.current.removeTransaction('non-existent-id', false)
         })
       }).not.toThrow()
+    })
+  })
+
+  describe('T-10: duplicate slug detection in addAccount', () => {
+    it('appends -1 when adding two accounts with the same name', () => {
+      const { result } = renderHook(() => useBudget())
+
+      // First account with name "Netflix"
+      act(() => {
+        result.current.addAccount({
+          name: 'Netflix',
+          type: 'expense',
+          balance: 0 as any,
+          icon: 'wallet'
+        })
+      })
+
+      const firstAccount = result.current.accounts.find(a => a.name === 'Netflix')
+      expect(firstAccount).toBeDefined()
+      expect(firstAccount?.id).toBe('netflix')
+
+      // Second account with same name "Netflix"
+      act(() => {
+        result.current.addAccount({
+          name: 'Netflix',
+          type: 'expense',
+          balance: 0 as any,
+          icon: 'wallet'
+        })
+      })
+
+      const netflixAccounts = result.current.accounts.filter(a => a.name === 'Netflix')
+      expect(netflixAccounts).toHaveLength(2)
+
+      const secondAccount = netflixAccounts.find(a => a.id === 'netflix-1')
+      expect(secondAccount).toBeDefined()
+      expect(secondAccount?.id).toBe('netflix-1')
+    })
+
+    it('handles three identical names with sequential suffixes', () => {
+      const { result } = renderHook(() => useBudget())
+
+      act(() => {
+        result.current.addAccount({ name: 'Spotify', type: 'expense', balance: 0 as any, icon: 'music' })
+      })
+      act(() => {
+        result.current.addAccount({ name: 'Spotify', type: 'expense', balance: 0 as any, icon: 'music' })
+      })
+      act(() => {
+        result.current.addAccount({ name: 'Spotify', type: 'expense', balance: 0 as any, icon: 'music' })
+      })
+
+      const spotifyAccounts = result.current.accounts.filter(a => a.name === 'Spotify')
+      expect(spotifyAccounts).toHaveLength(3)
+
+      const ids = spotifyAccounts.map(a => a.id).sort()
+      expect(ids).toEqual(['spotify', 'spotify-1', 'spotify-2'])
     })
   })
 })

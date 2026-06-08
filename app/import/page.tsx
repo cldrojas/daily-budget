@@ -9,7 +9,7 @@ import { useBudget } from '@/hooks/use-budget'
 import { useLanguage } from '@/contexts/language-context'
 
 function ImportPageContent() {
-  const { accounts, addTransaction } = useBudget()
+  const { accounts, addTransaction, addAccount } = useBudget()
   const { t } = useLanguage()
 
   const handleTransactionApproved = useCallback(
@@ -23,6 +23,13 @@ function ImportPageContent() {
       })
     },
     [addTransaction],
+  )
+
+  const handleCreateAccount = useCallback(
+    (entity: string) => {
+      addAccount({ name: entity, type: 'expense', icon: 'wallet' })
+    },
+    [addAccount],
   )
 
   return (
@@ -44,6 +51,7 @@ function ImportPageContent() {
       <ImportDashboard
         accounts={accounts}
         onTransactionApproved={handleTransactionApproved}
+        onAddAccount={handleCreateAccount}
       />
     </div>
   )

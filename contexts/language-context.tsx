@@ -22,6 +22,9 @@ export const translations = {
     startingAmount: 'Starting Amount',
     endDate: 'End Date',
     startTracking: 'Start Now',
+    selectMode: 'Select Mode',
+    dailyMode: 'Daily Mode',
+    trackMode: 'Track Mode',
 
     // Dashboard
     dailyBudget: 'Daily Budget',
@@ -218,6 +221,7 @@ export const translations = {
     importNoApprovedTransactions: 'No approved transactions',
     importNoRejectedTransactions: 'No rejected transactions',
     importNoUnparsedTransactions: 'No unparsed transactions',
+    createAccountFor: 'Create {entity} account',
 
     // Date picker
     pickDate: 'Pick a date'
@@ -236,6 +240,9 @@ export const translations = {
     startingAmount: 'Monto inicial',
     endDate: 'Fecha final',
     startTracking: 'Comenzar ahora',
+    selectMode: 'Seleccionar modo',
+    dailyMode: 'Modo diario',
+    trackMode: 'Modo seguimiento',
 
     // Dashboard
     dailyBudget: 'Presupuesto Diario',
@@ -432,6 +439,7 @@ export const translations = {
     importNoApprovedTransactions: 'No hay transacciones aprobadas',
     importNoRejectedTransactions: 'No hay transacciones rechazadas',
     importNoUnparsedTransactions: 'No hay transacciones sin clasificar',
+    createAccountFor: 'Crear cuenta {entity}',
 
     // Date picker
     pickDate: 'Selecciona una fecha'
@@ -473,7 +481,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   // Function to get translation
   const t = (key: string, params?: Record<string, string | number>) => {
-    const translation = translations[language][key as keyof typeof translations[Language]] || key
+    const translation = translations[language][key as keyof typeof translations[typeof language]] || key
 
     if (params) {
       return Object.entries(params).reduce((acc, [paramKey, paramValue]) => {

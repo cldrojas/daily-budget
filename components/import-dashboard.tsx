@@ -9,8 +9,22 @@ import { ImportEditModal } from './modals/import-edit-modal'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { AlertCircle, Mail, RefreshCw, LogOut, Inbox, CheckCircle, XCircle } from 'lucide-react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
+import {
+  AlertCircle,
+  Mail,
+  RefreshCw,
+  LogOut,
+  Inbox,
+  CheckCircle,
+  XCircle
+} from 'lucide-react'
 
 export type ImportDashboardProps = {
   accounts: Account[]
@@ -21,9 +35,14 @@ export type ImportDashboardProps = {
     account: string
     date: string
   }) => void
+  onAddAccount?: (entity: string) => void
 }
 
-export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: ImportDashboardProps) {
+export function ImportDashboard({
+  accounts: _accounts,
+  onTransactionApproved,
+  onAddAccount
+}: ImportDashboardProps) {
   const {
     connection,
     syncStatus,
@@ -36,15 +55,19 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
     syncNow,
     approve,
     reject,
-    getImportsByStatus,
+    getImportsByStatus
   } = useGmailImport()
 
   const { t } = useLanguage()
 
-  const [selectedAccounts, setSelectedAccounts] = useState<Record<string, string>>({})
+  const [selectedAccounts, setSelectedAccounts] = useState<
+    Record<string, string>
+  >({})
   const [editingId, setEditingId] = useState<string | null>(null)
 
-  const editingTransaction = editingId ? imports.find(t => t.id === editingId) ?? null : null
+  const editingTransaction = editingId
+    ? imports.find((t) => t.id === editingId) ?? null
+    : null
 
   const handleAccountChange = useCallback((id: string, accountId: string) => {
     setSelectedAccounts((prev) => ({ ...prev, [id]: accountId }))
@@ -52,33 +75,42 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
 
   const handleApprove = useCallback(
     async (id: string, accountId: string) => {
-      const tx = imports.find(t => t.id === id)
+      const tx = imports.find((t) => t.id === id)
       const success = await approve(id, accountId)
       if (success && tx && onTransactionApproved) {
         onTransactionApproved({
-          type: (tx.parsedType === 'expense' || tx.parsedType === 'income') ? tx.parsedType : 'expense',
-          amount: tx.parsedAmount != null ? Math.abs(Number(tx.parsedAmount)) : 0,
+          type:
+            tx.parsedType === 'expense' || tx.parsedType === 'income'
+              ? tx.parsedType
+              : 'expense',
+          amount:
+            tx.parsedAmount != null ? Math.abs(Number(tx.parsedAmount)) : 0,
           description: tx.parsedEntity ?? tx.rawSubject ?? '',
           account: accountId,
-          date: tx.parsedDate ?? new Date().toISOString().split('T')[0],
+          date: tx.parsedDate ?? new Date().toISOString().split('T')[0]
         })
       }
     },
-    [approve, imports, onTransactionApproved],
+    [approve, imports, onTransactionApproved]
   )
 
   const handleReject = useCallback(
     (id: string) => {
       reject(id)
     },
-    [reject],
+    [reject]
   )
 
   const handleEditSave = useCallback(
     async (
       id: string,
-      overrides: { amount: number; description: string; date: string; type: 'expense' | 'income' },
-      accountId: string,
+      overrides: {
+        amount: number
+        description: string
+        date: string
+        type: 'expense' | 'income'
+      },
+      accountId: string
     ) => {
       const success = await approve(id, accountId, overrides)
       if (success && onTransactionApproved) {
@@ -87,11 +119,11 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
           amount: overrides.amount,
           description: overrides.description,
           account: accountId,
-          date: overrides.date,
+          date: overrides.date
         })
       }
     },
-    [approve, onTransactionApproved],
+    [approve, onTransactionApproved]
   )
 
   const pendingCount = getImportsByStatus('pending').length
@@ -107,12 +139,13 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
             <Mail className="h-12 w-12 text-muted-foreground" />
           </div>
           <CardTitle>{t('importTransactions')}</CardTitle>
-          <CardDescription>
-            {t('gmailConnectDescription')}
-          </CardDescription>
+          <CardDescription>{t('gmailConnectDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="flex justify-center pb-6">
-          <Button size="lg" onClick={connectGmail}>
+          <Button
+            size="lg"
+            onClick={connectGmail}
+          >
             <Mail className="h-4 w-4 mr-2" /> {t('connectGmail')}
           </Button>
         </CardContent>
@@ -133,7 +166,11 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
             <p className="text-sm font-medium">{error}</p>
           </div>
           {connection === 'expired' && (
-            <Button size="sm" variant="outline" onClick={connectGmail}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={connectGmail}
+            >
               {t('gmailReconnect')}
             </Button>
           )}
@@ -147,10 +184,17 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
             <div className="flex items-center gap-2">
               <Mail className="h-5 w-5 text-primary" />
               <div>
-                <CardTitle className="text-base">{t('gmailConnected')}</CardTitle>
+                <CardTitle className="text-base">
+                  {t('gmailConnected')}
+                </CardTitle>
               </div>
-              <Badge variant="secondary" className="ml-2">
-                {connection === 'expired' ? t('importExpired') : t('importActive')}
+              <Badge
+                variant="secondary"
+                className="ml-2"
+              >
+                {connection === 'expired'
+                  ? t('importExpired')
+                  : t('importActive')}
               </Badge>
             </div>
             <Button
@@ -167,14 +211,18 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               {connection === 'expired' && (
-                <p className="text-sm text-destructive">{t('sessionExpiredReconnect')}</p>
+                <p className="text-sm text-destructive">
+                  {t('sessionExpiredReconnect')}
+                </p>
               )}
             </div>
             <Button
-              onClick={() => syncNow(['Mercado Pago'])}
+              onClick={() => syncNow() /** TODO: crear un selector de bancos que pueda agregar mas correos */}
               disabled={isSyncing || connection === 'expired'}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`}
+              />
               {isSyncing ? t('syncing') : t('importSyncNow')}
             </Button>
           </div>
@@ -182,11 +230,16 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
           {/* Sync progress */}
           {isSyncing && (
             <div className="mt-4 space-y-2">
-              <Progress value={(progress.current / Math.max(progress.total, 1)) * 100} />
+              <Progress
+                value={(progress.current / Math.max(progress.total, 1)) * 100}
+              />
               <p className="text-xs text-muted-foreground text-right">
-{progress.total > 0
-                    ? t('processingEmails', { current: progress.current, total: progress.total })
-                    : t('searchingEmails')}
+                {progress.total > 0
+                  ? t('processingEmails', {
+                      current: progress.current,
+                      total: progress.total
+                    })
+                  : t('searchingEmails')}
               </p>
             </div>
           )}
@@ -202,7 +255,9 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
                 <Inbox className="h-5 w-5 text-blue-500" />
               </div>
               <p className="text-2xl font-bold">{pendingCount}</p>
-              <p className="text-xs text-muted-foreground">{t('importPending')}</p>
+              <p className="text-xs text-muted-foreground">
+                {t('importPending')}
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -211,7 +266,9 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
                 <CheckCircle className="h-5 w-5 text-green-500" />
               </div>
               <p className="text-2xl font-bold">{approvedCount}</p>
-              <p className="text-xs text-muted-foreground">{t('importApproved')}</p>
+              <p className="text-xs text-muted-foreground">
+                {t('importApproved')}
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -220,7 +277,9 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
                 <XCircle className="h-5 w-5 text-red-500" />
               </div>
               <p className="text-2xl font-bold">{rejectedCount}</p>
-              <p className="text-xs text-muted-foreground">{t('importRejected')}</p>
+              <p className="text-xs text-muted-foreground">
+                {t('importRejected')}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -247,6 +306,7 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
           onEdit={setEditingId}
           selectedAccounts={selectedAccounts}
           onAccountChange={handleAccountChange}
+          onAddAccount={onAddAccount}
         />
       )}
 
@@ -257,6 +317,7 @@ export function ImportDashboard({ accounts: _accounts, onTransactionApproved }: 
         accounts={_accounts}
         onSave={handleEditSave}
         onClose={() => setEditingId(null)}
+        onAddAccount={onAddAccount}
       />
     </div>
   )

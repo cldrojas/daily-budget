@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import type { ImportedTransaction, Account } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -10,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import {
   Collapsible,
   CollapsibleContent,
@@ -17,6 +19,9 @@ import {
 } from '@/components/ui/collapsible'
 import { Check, X, ChevronDown, ChevronUp, Edit, AlertTriangle } from 'lucide-react'
 import { useLanguage } from '@/contexts/language-context'
+import { findAccountByEntity } from '@/lib/import/entity-matcher'
+
+const CREATE_SENTINEL = '__create__'
 
 export type ImportReviewCardProps = {
   transaction: ImportedTransaction
@@ -26,6 +31,7 @@ export type ImportReviewCardProps = {
   onEdit: (id: string) => void
   selectedAccount?: string
   onAccountChange?: (id: string, accountId: string) => void
+  onAddAccount?: (entity: string) => void
 }
 
 const statusConfig = (t: (key: string, params?: Record<string, string | number>) => string) => ({
@@ -43,6 +49,7 @@ export function ImportReviewCard({
   onEdit,
   selectedAccount,
   onAccountChange,
+  onAddAccount,
 }: ImportReviewCardProps) {
   const { t } = useLanguage()
   const config = statusConfig(t)[transaction.status]
@@ -54,6 +61,42 @@ export function ImportReviewCard({
   const formattedAmount = transaction.parsedAmount
     ? `$${(Number(transaction.parsedAmount)).toLocaleString()}`
     : '—'
+
+  const entity = transaction.parsedEntity
+  const matchedAccount = findAccountByEntity(accounts, entity)
+  const showCreateOption =
+    entity != null &&
+    !matchedAccount &&
+    transaction.confidence >= 0.5 &&
+    onAddAccount !== undefined
+
+  // Auto-match entity to account on mount / when accounts change
+  const autoMatchedRef = useRef(false)
+  useEffect(() => {
+    if (
+      !autoMatchedRef.current &&
+      entity &&
+      transaction.confidence >= 0.5 &&
+      matchedAccount &&
+      onAccountChange &&
+      !selectedAccount
+    ) {
+      autoMatchedRef.current = true
+      onAccountChange(transaction.id, matchedAccount.id)
+    }
+  }, [entity, matchedAccount, onAccountChange, selectedAccount, transaction.confidence, transaction.id])
+
+  const handleSelectChange = (val: string) => {
+    if (val === CREATE_SENTINEL) {
+      if (entity && onAddAccount) {
+        onAddAccount(entity)
+      }
+      return
+    }
+    if (onAccountChange) {
+      onAccountChange(transaction.id, val)
+    }
+  }
 
   return (
     <div
@@ -131,7 +174,7 @@ export function ImportReviewCard({
             {onAccountChange && (
               <Select
                 value={selectedAccount}
-                onValueChange={(val) => onAccountChange(transaction.id, val)}
+                onValueChange={handleSelectChange}
               >
                 <SelectTrigger className="h-8 text-xs">
                   <SelectValue placeholder={t('selectAccount')} />
@@ -142,6 +185,14 @@ export function ImportReviewCard({
                       {acc.name}
                     </SelectItem>
                   ))}
+                  {showCreateOption && (
+                    <>
+                      <Separator className="my-1" />
+                      <SelectItem value={CREATE_SENTINEL}>
+                        {t('createAccountFor', { entity: entity ?? '' })}
+                      </SelectItem>
+                    </>
+                  )}
                 </SelectContent>
               </Select>
             )}

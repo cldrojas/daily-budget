@@ -29,6 +29,7 @@ export type ImportReviewListProps = {
   onEdit: (id: string) => void
   selectedAccounts: Record<string, string>
   onAccountChange: (id: string, accountId: string) => void
+  onAddAccount?: (entity: string) => void
 }
 
 type TabKey = 'pending' | 'approved' | 'rejected' | 'unparsed'
@@ -58,7 +59,8 @@ export function ImportReviewList({
   onReject,
   onEdit,
   selectedAccounts,
-  onAccountChange
+  onAccountChange,
+  onAddAccount,
 }: ImportReviewListProps) {
   const [activeTab, setActiveTab] = useState<TabKey>('pending')
   const [bankFilter, setBankFilter] = useState<string>('all')
@@ -106,6 +108,7 @@ export function ImportReviewList({
   // Bulk actions
   const pendingItems = grouped.pending
   const handleApproveAll = () => {
+    console.log(`DEBUG:EX:`, pendingItems.at(0))
     for (const txn of pendingItems) {
       const accountId = selectedAccounts[txn.id]
       if (accountId) {
@@ -230,6 +233,7 @@ export function ImportReviewList({
                   onEdit={onEdit}
                   selectedAccount={selectedAccounts[txn.id]}
                   onAccountChange={onAccountChange}
+                  onAddAccount={onAddAccount}
                 />
               ))
             )}

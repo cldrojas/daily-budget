@@ -37,6 +37,8 @@ export async function POST(request: NextRequest) {
       daysBack: body.daysBack
     })
 
+    console.log(`DEBUG:result:`, result)
+
     return NextResponse.json(result)
   } catch (error: unknown) {
     const err = error as { message?: string; status?: number }

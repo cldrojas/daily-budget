@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react'
 import { differenceInDays, startOfDay, isSameDay, isToday } from 'date-fns'
 import { v4 as uuidv4 } from 'uuid'
 import { Account, Budget, Int, toInt, Transaction, TransactionType } from '@/types'
+import { generateSafeSlug } from '@/lib/import/entity-matcher'
 
 // This would be replaced with actual KV database calls
 const LOCAL_STORAGE_KEY = 'daily-budget-data'
@@ -458,11 +459,13 @@ export function useBudget() {
   }: {
     name: string
     type: string
-    balance: Int
-    icon: string
+    balance?: Int
+    icon?: string
   }) => {
+    const existingSlugs = accounts.map((a) => a.id)
+    const safeId = generateSafeSlug(name, existingSlugs)
     const newAccount = {
-      id: name.toLowerCase().replace(/\s+/g, '-'),
+      id: safeId,
       name,
       type,
       balance,
