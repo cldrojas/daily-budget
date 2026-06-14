@@ -11,6 +11,7 @@ import { SetupForm } from '@/components/setup-form'
 import { DailyBudgetStatus } from '@/components/daily-budget-status'
 import { ErrorBoundary, EmptyState } from '@/components/error-boundary'
 import Navbar from '@/components/navbar'
+import { useEffect, useState } from 'react'
 
 /**
  * Main component for the Daily Budget application.
@@ -19,6 +20,12 @@ import Navbar from '@/components/navbar'
 export default function DailyBudgetApp() {
   const { theme, setTheme, resolvedTheme } = useTheme()
   const { t } = useLanguage()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setMounted(true), 0)
+    return () => clearTimeout(timer)
+  }, [])
 
   const {
     budget,
@@ -56,12 +63,16 @@ export default function DailyBudgetApp() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
-                title={isDarkMode ? t('lightMode') : t('darkMode')}
+                title={mounted ? (isDarkMode ? t('lightMode') : t('darkMode')) : ''}
               >
-                {isDarkMode ? (
-                  <Sun className="h-5 w-5" />
+                {mounted ? (
+                  isDarkMode ? (
+                    <Sun className="h-5 w-5" />
+                  ) : (
+                    <Moon className="h-5 w-5" />
+                  )
                 ) : (
-                  <Moon className="h-5 w-5" />
+                  <div className="h-5 w-5" />
                 )}
               </Button>
             </div>
