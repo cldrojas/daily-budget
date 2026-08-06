@@ -1,7 +1,15 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CircularProgress } from '@/components/circular-progress'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import type { Account, Budget } from '@/types'
@@ -14,6 +22,9 @@ interface DailyBudgetStatusProps {
   accounts: Account[]
   remainingDays: number
 }
+
+const SELECTED_BALANCE_ACCOUNT_KEY = 'dailyBudget:selectedBalanceAccount'
+const TOTAL_ACCOUNTS_VALUE = 'total'
 
 /**
  * Component to display the daily budget status.
@@ -48,12 +59,38 @@ export function DailyBudgetStatus({
   // Determine mode from budget
   const isTrackMode = budget.mode === 'track' || (!budget.mode && !budget.endDate)
 
-  // Find the daily budget account
+  // Which balance to display in track mode: a specific account id, or the total across all accounts.
+  const [selectedAccountId, setSelectedAccountId] = useState<string>(TOTAL_ACCOUNTS_VALUE)
+
+  useEffect(() => {
+    const stored = window.localStorage.getItem(SELECTED_BALANCE_ACCOUNT_KEY)
+    if (stored) {
+      setSelectedAccountId(stored)
+    }
+  }, [])
+
+  const handleSelectedAccountChange = (value: string) => {
+    setSelectedAccountId(value)
+    window.localStorage.setItem(SELECTED_BALANCE_ACCOUNT_KEY, value)
+  }
+
+  // Find the daily budget account (used for daily-mode totalBudget stat)
   const dailyAccount = accounts.find(acc => acc.id === 'daily')
   const totalBudget = dailyAccount ? dailyAccount.balance : 0
 
-  // Track mode: show total balance only
+  // Track mode: show either the total of all accounts or a single selected account
   if (isTrackMode) {
+    const selectedAccountExists =
+      selectedAccountId === TOTAL_ACCOUNTS_VALUE ||
+      accounts.some(acc => acc.id === selectedAccountId)
+
+    const effectiveAccountId = selectedAccountExists ? selectedAccountId : TOTAL_ACCOUNTS_VALUE
+
+    const displayedBalance =
+      effectiveAccountId === TOTAL_ACCOUNTS_VALUE
+        ? accounts.reduce((sum, acc) => sum + acc.balance, 0)
+        : accounts.find(acc => acc.id === effectiveAccountId)?.balance ?? 0
+
     return (
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -61,9 +98,24 @@ export function DailyBudgetStatus({
             <CardTitle>{t('totalBalance') || 'Total Balance'}</CardTitle>
             <CardDescription>{t('trackModeDescription') || 'Track your spending'}</CardDescription>
           </div>
+          {accounts.length > 0 && (
+            <Select value={effectiveAccountId} onValueChange={handleSelectedAccountChange}>
+              <SelectTrigger className="w-[180px]" aria-label={t('selectBalanceAccount')}>
+                <SelectValue placeholder={t('selectBalanceAccount')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={TOTAL_ACCOUNTS_VALUE}>{t('totalAllAccounts')}</SelectItem>
+                {accounts.map(account => (
+                  <SelectItem key={account.id} value={account.id}>
+                    {account.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </CardHeader>
         <CardContent className="flex flex-col items-center space-y-6 py-8">
-          <p className="text-5xl font-bold">{formatCurrency(totalBudget)}</p>
+          <p className="text-5xl font-bold">{formatCurrency(displayedBalance)}</p>
         </CardContent>
       </Card>
     )
