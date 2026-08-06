@@ -30,6 +30,9 @@ export const translations = {
     remainingToday: 'Remaining Today',
     progress: 'Progress',
     totalBudget: 'Total Budget',
+    totalAllAccounts: 'All accounts',
+    selectBalanceAccount: 'Show balance for',
+
     remainingDays: 'Days Remaining',
     days: 'days',
 
@@ -172,6 +175,9 @@ export const translations = {
     remainingToday: 'Disponible hoy',
     progress: 'Progreso',
     totalBudget: 'Presupuesto total',
+    totalAllAccounts: 'Todas las cuentas',
+    selectBalanceAccount: 'Mostrar balance de',
+
     remainingDays: 'Días restantes',
     days: 'días',
 
