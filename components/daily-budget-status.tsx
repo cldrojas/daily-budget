@@ -95,7 +95,7 @@ export function DailyBudgetStatus({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div>
-            <CardTitle>{t('totalBalance') || 'Total Balance'}</CardTitle>
+            <CardTitle>{t('totalBudget') || 'Total Balance'}</CardTitle>
             <CardDescription>{t('trackModeDescription') || 'Track your spending'}</CardDescription>
           </div>
           {accounts.length > 0 && (
