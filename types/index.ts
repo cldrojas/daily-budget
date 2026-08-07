@@ -76,4 +76,5 @@ export type Account = {
   type: string
   balance: Int
   icon: string
+  hidden?: boolean
 }
