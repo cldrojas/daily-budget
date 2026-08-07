@@ -6,6 +6,7 @@ All notable changes to the **Daily Budget** project will be documented in this f
 
 ### Features
 - Add new feature descriptions here
+- `lib/cashflow.ts`: daily balance calculation utility (`calculateDailyBalance`) with `DailyMovement`, `CashflowDayInput`, and `CashflowDayResult` interfaces
 
 ### Bug Fixes
 - Fix bug descriptions here
