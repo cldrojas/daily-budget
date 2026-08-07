@@ -111,6 +111,8 @@ export const translations = {
     delete: 'Delete',
     accountDeleted: 'Account Deleted',
     accountDeletedDescription: '{name} has been deleted.',
+    hideAccount: 'Hide from totals',
+    showAccount: 'Show in totals',
 
     // Account Types
     daily: 'Daily Budget',
@@ -256,6 +258,8 @@ export const translations = {
     delete: 'Eliminar',
     accountDeleted: 'Cuenta eliminada',
     accountDeletedDescription: 'La cuenta {name} ha sido eliminada.',
+    hideAccount: 'Ocultar de los totales',
+    showAccount: 'Mostrar en los totales',
 
     // Account Types
     daily: 'Presupuesto diario',

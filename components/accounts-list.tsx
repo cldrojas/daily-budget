@@ -7,6 +7,8 @@ import {
   PiggyBank,
   TrendingUp,
   Edit,
+  Eye,
+  EyeOff,
   Trash2,
   CreditCard,
   Building,
@@ -136,13 +138,22 @@ export function AccountsList({
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {filteredAccounts.map((account) => (
-          <Card key={account.id}>
+          <Card key={account.id} className={account.hidden ? 'opacity-50' : ''}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">{account.name}</CardTitle>
               <div className="flex items-center space-x-2">
                 <div className="h-5 w-5 text-muted-foreground">
                   {getAccountIcon(account)}
                 </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
+                  onClick={() => onUpdateAccount({ ...account, hidden: !account.hidden })}
+                  title={account.hidden ? t('showAccount') : t('hideAccount')}
+                >
+                  {account.hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                </Button>
                 <Button
                   variant="ghost"
                   size="icon"

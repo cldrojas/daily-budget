@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { CircularProgress } from '@/components/circular-progress'
 import {
@@ -60,14 +60,9 @@ export function DailyBudgetStatus({
   const isTrackMode = budget.mode === 'track' || (!budget.mode && !budget.endDate)
 
   // Which balance to display in track mode: a specific account id, or the total across all accounts.
-  const [selectedAccountId, setSelectedAccountId] = useState<string>(TOTAL_ACCOUNTS_VALUE)
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(SELECTED_BALANCE_ACCOUNT_KEY)
-    if (stored) {
-      setSelectedAccountId(stored)
-    }
-  }, [])
+  const [selectedAccountId, setSelectedAccountId] = useState<string>(
+    () => window.localStorage.getItem(SELECTED_BALANCE_ACCOUNT_KEY) || TOTAL_ACCOUNTS_VALUE
+  )
 
   const handleSelectedAccountChange = (value: string) => {
     setSelectedAccountId(value)
@@ -78,17 +73,19 @@ export function DailyBudgetStatus({
   const dailyAccount = accounts.find(acc => acc.id === 'daily')
   const totalBudget = dailyAccount ? dailyAccount.balance : 0
 
-  // Track mode: show either the total of all accounts or a single selected account
+  // Track mode: show either the total of all visible accounts or a single selected account
   if (isTrackMode) {
+    const visibleAccounts = accounts.filter(acc => !acc.hidden)
+
     const selectedAccountExists =
       selectedAccountId === TOTAL_ACCOUNTS_VALUE ||
-      accounts.some(acc => acc.id === selectedAccountId)
+      visibleAccounts.some(acc => acc.id === selectedAccountId)
 
     const effectiveAccountId = selectedAccountExists ? selectedAccountId : TOTAL_ACCOUNTS_VALUE
 
     const displayedBalance =
       effectiveAccountId === TOTAL_ACCOUNTS_VALUE
-        ? accounts.reduce((sum, acc) => sum + acc.balance, 0)
+        ? visibleAccounts.reduce((sum, acc) => sum + acc.balance, 0)
         : accounts.find(acc => acc.id === effectiveAccountId)?.balance ?? 0
 
     return (
@@ -105,7 +102,7 @@ export function DailyBudgetStatus({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={TOTAL_ACCOUNTS_VALUE}>{t('totalAllAccounts')}</SelectItem>
-                {accounts.map(account => (
+                {visibleAccounts.map(account => (
                   <SelectItem key={account.id} value={account.id}>
                     {account.name}
                   </SelectItem>
