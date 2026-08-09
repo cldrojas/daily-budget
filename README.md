@@ -156,6 +156,12 @@ CI: Hay un workflow de GitHub Actions en `.github/workflows/tests.yml` que ejecu
 
 ---
 
+## 🧩 Utilidades internas
+
+- [`lib/cashflow.ts`](./lib/cashflow.ts) — cálculo de saldo diario a partir de un saldo inicial y una lista de movimientos. Ver documentación completa en [docs/cashflow.md](./docs/cashflow.md).
+
+---
+
 ## 📝 Notas
 
 - La implementación actual está enfocada al frontend. La integración de backend y base de datos está diseñada para ser modificable y serverless-friendly.
