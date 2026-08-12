@@ -159,6 +159,7 @@ CI: Hay un workflow de GitHub Actions en `.github/workflows/tests.yml` que ejecu
 ## 🧩 Utilidades internas
 
 - [`lib/cashflow.ts`](./lib/cashflow.ts) — cálculo de saldo diario a partir de un saldo inicial y una lista de movimientos. Ver documentación completa en [docs/cashflow.md](./docs/cashflow.md).
+- [`components/cashflow-projection`](./components/cashflow-projection/index.tsx) — proyección de saldo configurable (reglas de ingreso/egreso, horizonte de tiempo). Ver [docs/cashflow-projection.md](./docs/cashflow-projection.md).
 
 ---
 
