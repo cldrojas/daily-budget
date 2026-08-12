@@ -79,8 +79,11 @@ export function RuleEditor({ rules, onChange }: RuleEditorProps) {
         )}
 
         {rules.map((rule) => (
-          <div key={rule.id} className="grid grid-cols-12 gap-2 items-end border-b pb-4">
-            <div className="col-span-3">
+          <div
+            key={rule.id}
+            className="grid grid-cols-2 sm:grid-cols-12 gap-3 sm:items-end border-b pb-4"
+          >
+            <div className="col-span-2 sm:col-span-3">
               <Label htmlFor={`label-${rule.id}`}>Concepto</Label>
               <Input
                 id={`label-${rule.id}`}
@@ -90,7 +93,7 @@ export function RuleEditor({ rules, onChange }: RuleEditorProps) {
               />
             </div>
 
-            <div className="col-span-2">
+            <div className="col-span-1 sm:col-span-2">
               <Label htmlFor={`amount-${rule.id}`}>Monto</Label>
               <Input
                 id={`amount-${rule.id}`}
@@ -101,7 +104,7 @@ export function RuleEditor({ rules, onChange }: RuleEditorProps) {
               <p className="text-xs text-muted-foreground mt-1">+ ingreso / - egreso</p>
             </div>
 
-            <div className="col-span-3">
+            <div className="col-span-1 sm:col-span-3">
               <Label htmlFor={`freq-${rule.id}`}>Frecuencia</Label>
               <Select
                 value={rule.frequency}
@@ -132,7 +135,7 @@ export function RuleEditor({ rules, onChange }: RuleEditorProps) {
               </Select>
             </div>
 
-            <div className="col-span-3">
+            <div className="col-span-2 sm:col-span-3">
               {rule.frequency === "weekly" && (
                 <>
                   <Label htmlFor={`dow-${rule.id}`}>Día de la semana</Label>
@@ -188,11 +191,11 @@ export function RuleEditor({ rules, onChange }: RuleEditorProps) {
               )}
 
               {rule.frequency === "daily-weekday" && (
-                <p className="text-xs text-muted-foreground pt-6">Se aplica lunes a viernes</p>
+                <p className="text-xs text-muted-foreground sm:pt-6">Se aplica lunes a viernes</p>
               )}
             </div>
 
-            <div className="col-span-1 flex justify-end">
+            <div className="col-span-2 sm:col-span-1 flex justify-end">
               <Button
                 size="icon"
                 variant="ghost"
