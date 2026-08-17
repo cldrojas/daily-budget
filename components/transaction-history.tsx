@@ -9,14 +9,22 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/contexts/language-context"
 import { useCurrency } from "@/contexts/currency-context"
-import { useBudget } from "@/hooks/use-budget"
-import { Transaction } from '@/types'
+import { Account, Transaction } from '@/types'
 import { DeleteTransactionModal } from "@/components/modals/delete-transaction-modal"
 
-export function TransactionHistory({ transactions }: { transactions: Transaction[] }) {
+interface TransactionHistoryProps {
+  accounts: Account[]
+  transactions: Transaction[]
+  removeTransaction: (transactionId: string, refund?: boolean) => void
+}
+
+export function TransactionHistory({
+  accounts,
+  transactions,
+  removeTransaction
+}: TransactionHistoryProps) {
   const { t, language } = useLanguage()
   const { formatCurrency } = useCurrency()
-  const { accounts, removeTransaction } = useBudget()
   const [deleteTarget, setDeleteTarget] = useState<{
     transaction: Transaction
     accountName: string
@@ -24,6 +32,11 @@ export function TransactionHistory({ transactions }: { transactions: Transaction
 
   // Set locale based on language
   const locale = language === "es" ? es : undefined
+  const formatTransactionDate = (date: Date | string) => {
+    const formattedDate = format(new Date(date), "d MMM", { locale }).replace(/\./g, "")
+    const [day, month] = formattedDate.split(" ")
+    return `${day} ${month.slice(0, 3)}`
+  }
 
   const handleDelete = (refund: boolean) => {
     if (!deleteTarget) return
@@ -61,7 +74,7 @@ export function TransactionHistory({ transactions }: { transactions: Transaction
 
                     return (
                       <TableRow key={transaction.id}>
-                        <TableCell>{format(new Date(transaction.date), "d MMM yyyy", { locale })}</TableCell>
+                        <TableCell>{formatTransactionDate(transaction.date)}</TableCell>
                         <TableCell>{description}</TableCell>
                         <TableCell className="capitalize">{accountName}</TableCell>
                         <TableCell className={`text-right ${transaction.amount < 0 ? "text-red-500" : ""}`}>
@@ -107,7 +120,7 @@ export function TransactionHistory({ transactions }: { transactions: Transaction
                         <p className="break-words font-medium leading-5">{description}</p>
                         <div className="mt-1 flex flex-wrap gap-x-2 gap-y-1 text-xs text-muted-foreground">
                           <time dateTime={new Date(transaction.date).toISOString()}>
-                            {format(new Date(transaction.date), "d MMM yyyy", { locale })}
+                            {formatTransactionDate(transaction.date)}
                           </time>
                           <span aria-hidden="true">•</span>
                           <span className="capitalize break-words">{accountName}</span>
@@ -121,8 +134,8 @@ export function TransactionHistory({ transactions }: { transactions: Transaction
                     <div className="mt-3 flex justify-end border-t pt-2">
                       <Button
                         variant="ghost"
-                        size="sm"
-                        className="h-8 px-2 text-muted-foreground hover:text-destructive"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         aria-label={`${t("delete")}: ${description}`}
                         title={`${t("delete")}: ${description}`}
                         onClick={() =>
@@ -132,8 +145,7 @@ export function TransactionHistory({ transactions }: { transactions: Transaction
                           })
                         }
                       >
-                        <Trash2 className="mr-2 h-3.5 w-3.5" />
-                        {t("delete")}
+                        <Trash2 className="h-3.5 w-3.5" />
                       </Button>
                     </div>
                   </article>

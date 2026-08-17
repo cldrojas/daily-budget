@@ -21,7 +21,7 @@ interface NavbarProps {
   deleteAccount: (accountId: string) => boolean
   addTransaction: (transaction: Omit<Transaction, 'id'>) => void
   updateTransaction: (transaction: Transaction) => void
-  removeTransaction: (transactionId: string) => void
+  removeTransaction: (transactionId: string, refund?: boolean) => void
   transferFunds: (transfer: {
     amount: Int
     fromAccount: string
@@ -39,6 +39,7 @@ export default function Navbar({
   deleteAccount,
   addTransaction,
   updateTransaction,
+  removeTransaction,
   transferFunds
 }: NavbarProps) {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false)
@@ -120,7 +121,11 @@ export default function Navbar({
           className="mt-6"
         >
           <ErrorBoundary>
-            <TransactionHistory transactions={transactions} />
+            <TransactionHistory
+              accounts={accounts}
+              transactions={transactions}
+              removeTransaction={removeTransaction}
+            />
           </ErrorBoundary>
         </TabsContent>
       </Tabs>
