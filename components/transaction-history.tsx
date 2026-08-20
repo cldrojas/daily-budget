@@ -39,10 +39,10 @@ export function TransactionHistory({
   // Set locale based on language
   const locale = language === "es" ? es : undefined
 
-  // Oldest -> newest, grouped by calendar day
+  // Newest -> oldest, grouped by calendar day
   const groupedTransactions = useMemo<TransactionGroup[]>(() => {
     const sorted = [...transactions].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     )
 
     const groups: TransactionGroup[] = []
