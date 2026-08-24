@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { useBudget } from '@/hooks/use-budget'
 import { ConfigForm } from '@/components/config-form'
 import { LanguageCurrencySelector } from '@/components/language-currency-selector'
+import { UserMenu } from '@/components/user-menu'
 import { useLanguage } from '@/contexts/language-context'
 import { SetupForm } from '@/components/setup-form'
 import { DailyBudgetStatus } from '@/components/daily-budget-status'
@@ -51,6 +52,7 @@ export default function DailyBudgetApp() {
           <div className="container flex items-center justify-between h-16 px-4">
             <h1 className="text-xl font-bold">{t('appName')}</h1>
             <div className="flex items-center space-x-2">
+              <UserMenu />
               <LanguageCurrencySelector />
               <Button
                 variant="ghost"

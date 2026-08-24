@@ -14,6 +14,26 @@ export default defineConfig({
     timeout: 120_000
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } }
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.ts/,
+      use: { ...devices['Desktop Chrome'] }
+    },
+    {
+      name: 'chromium',
+      // Specs de la app: requieren sesión (storageState del proyecto `setup`).
+      testIgnore: [/auth\.setup\.ts/, /auth\.spec\.ts/],
+      dependencies: ['setup'],
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'tests/ui/.auth/user.json'
+      }
+    },
+    {
+      name: 'chromium-auth',
+      // Flujos de auth: corren SIN sesión para probar redirect/validación/login.
+      testMatch: /auth\.spec\.ts/,
+      use: { ...devices['Desktop Chrome'] }
+    }
   ]
 })

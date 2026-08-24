@@ -153,7 +153,33 @@ export const translations = {
     configUpdatedDescription: 'Your settings were saved.',
 
     // Date picker
-    pickDate: 'Pick a date'
+    pickDate: 'Pick a date',
+
+    // Auth
+    authSignIn: 'Sign In',
+    authSignUp: 'Create Account',
+    authWelcomeBack: 'Welcome back',
+    authWelcomeBackDescription: 'Sign in to your account to continue.',
+    authCreateAccountTitle: 'Create your account',
+    authCreateAccountDescription: 'Sign up to start tracking your budget.',
+    authEmail: 'Email',
+    authEmailPlaceholder: 'you@example.com',
+    authPassword: 'Password',
+    authConfirmPassword: 'Confirm Password',
+    authInvalidEmail: 'Enter a valid email address.',
+    authPasswordMin: 'Password must be at least 8 characters.',
+    authPasswordRequired: 'Password is required.',
+    authPasswordMismatch: 'Passwords do not match.',
+    authSigningIn: 'Signing in...',
+    authCreatingAccount: 'Creating account...',
+    authInvalidCredentials: 'Invalid email or password.',
+    authEmailInUse: 'An account with this email already exists.',
+    authWeakPassword: 'Password is too weak.',
+    authGenericError: 'Something went wrong. Please try again.',
+    authRateLimit: 'Too many attempts. Please try again in a moment.',
+    authCheckEmail: 'Check your email to confirm your account, then sign in.',
+    authSignOut: 'Sign Out',
+    authLoading: 'Loading...'
   }, es: {
     // General
     appName: 'Saldo Cero',
@@ -179,6 +205,7 @@ export const translations = {
     totalBudget: 'Presupuesto total',
     totalAllAccounts: 'Todas las cuentas',
     selectBalanceAccount: 'Mostrar balance de',
+    trackModeDescription: 'Modo seguimiento',
 
     remainingDays: 'Días restantes',
     days: 'días',
@@ -300,7 +327,33 @@ export const translations = {
     configUpdatedDescription: 'Los cambios se guardaron correctamente.',
 
     // Date picker
-    pickDate: 'Selecciona una fecha'
+    pickDate: 'Selecciona una fecha',
+
+    // Auth
+    authSignIn: 'Iniciar sesión',
+    authSignUp: 'Crear cuenta',
+    authWelcomeBack: 'Bienvenido de nuevo',
+    authWelcomeBackDescription: 'Inicia sesión en tu cuenta para continuar.',
+    authCreateAccountTitle: 'Crea tu cuenta',
+    authCreateAccountDescription: 'Regístrate para comenzar a controlar tu presupuesto.',
+    authEmail: 'Correo electrónico',
+    authEmailPlaceholder: 'tu@ejemplo.com',
+    authPassword: 'Contraseña',
+    authConfirmPassword: 'Confirmar contraseña',
+    authInvalidEmail: 'Ingresa un correo electrónico válido.',
+    authPasswordMin: 'La contraseña debe tener al menos 8 caracteres.',
+    authPasswordRequired: 'La contraseña es obligatoria.',
+    authPasswordMismatch: 'Las contraseñas no coinciden.',
+    authSigningIn: 'Iniciando sesión...',
+    authCreatingAccount: 'Creando cuenta...',
+    authInvalidCredentials: 'Correo o contraseña inválidos.',
+    authEmailInUse: 'Ya existe una cuenta con este correo.',
+    authWeakPassword: 'La contraseña es demasiado débil.',
+    authGenericError: 'Algo salió mal. Inténtalo de nuevo.',
+    authRateLimit: 'Demasiados intentos. Inténtalo de nuevo en un momento.',
+    authCheckEmail: 'Revisa tu correo para confirmar tu cuenta y luego inicia sesión.',
+    authSignOut: 'Cerrar sesión',
+    authLoading: 'Cargando...'
   }
 }
 

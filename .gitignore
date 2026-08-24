@@ -34,3 +34,7 @@ next-env.d.ts
 
 # generated code for test context
 /test-results
+
+# supabase CLI local state
+supabase/.temp/
+tests/ui/.auth/

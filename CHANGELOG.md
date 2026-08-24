@@ -7,15 +7,19 @@ All notable changes to the **Daily Budget** project will be documented in this f
 ### Features
 - Add new feature descriptions here
 - `lib/cashflow.ts`: daily balance calculation utility (`calculateDailyBalance`) with `DailyMovement`, `CashflowDayInput`, and `CashflowDayResult` interfaces
+- Autenticación con Supabase (issue #40, change `supabase-auth-backend`): sesión con `@supabase/ssr` (cookies httpOnly + refresh en `proxy.ts`), clientes `lib/supabase/client.ts` y `server.ts`, `AuthProvider` global, página `/login` con tabs login/registro (react-hook-form + zod), sign out en menú de usuario del header
+- Schema remoto en proyecto Supabase dedicado (`whacwpjgizlxvnmckyli`): `profiles`, `accounts`, `transactions` + triggers (`handle_new_user`, `set_updated_at`) + RLS own-rows
+- Verificación de aislamiento RLS (`supabase/tests/rls_isolation.sql`)
 
 ### Bug Fixes
 - Fix bug descriptions here
 
 ### Improvements
 - Improvement descriptions here
+- `middleware.ts` renombrado a `proxy.ts` (Next 16.2 deprecó la convención `middleware`)
 
 ### Breaking Changes
-- Breaking change descriptions here
+- La app ahora requiere sesión: `/` redirige a `/login` sin autenticación (localStorage de la app no se ve afectado; `use-budget.tsx` sin cambios)
 
 ## [1.0.0] - 2024-01-01
 
