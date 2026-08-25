@@ -1,4 +1,9 @@
 import { defineConfig, devices } from '@playwright/test'
+import dotenv from 'dotenv'
+
+// Carga credenciales del usuario de prueba desde .env.e2e
+// (copiar .env.e2e.example → .env.e2e con los valores reales).
+dotenv.config({ path: '.env.e2e' })
 
 export default defineConfig({
   testDir: 'tests/ui',

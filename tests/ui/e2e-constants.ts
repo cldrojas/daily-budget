@@ -6,12 +6,15 @@ import type { Page } from '@playwright/test'
  * El usuario se crea en el proyecto Supabase remoto con email confirmado
  * (ver docs/migrations/2026-08-11-supabase-auth-backend.md). Es un fixture
  * de desarrollo, no una cuenta real: el password es deliberadamente simple.
+ *
+ * Las credenciales se leen de env vars para evitar hardcodear secrets.
+ * Copia .env.e2e.example → .env.e2e y completa los valores reales.
  */
 export const E2E_USER = {
-  email: 'rhys.e2e@gmail.com',
-  password: 'rhys-e2e-pass-2026',
+  email: process.env.E2E_USER_EMAIL!,
+  password: process.env.E2E_USER_PASSWORD!,
   /** Parte local del email (lo que muestra el trigger del menú de usuario). */
-  displayName: 'rhys'
+  displayName: process.env.E2E_USER_EMAIL!.split('@')[0]
 }
 
 /**
