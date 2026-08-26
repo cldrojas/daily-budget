@@ -1,12 +1,9 @@
 'use client'
 
-import { useTheme } from 'next-themes'
-import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useBudget } from '@/hooks/use-budget'
 import { ConfigForm } from '@/components/config-form'
-import { LanguageCurrencySelector } from '@/components/language-currency-selector'
-import { UserMenu } from '@/components/user-menu'
+import { HeaderMenu } from '@/components/header-menu'
 import { useLanguage } from '@/contexts/language-context'
 import { SetupForm } from '@/components/setup-form'
 import { DailyBudgetStatus } from '@/components/daily-budget-status'
@@ -18,7 +15,6 @@ import Navbar from '@/components/navbar'
  * @returns JSX element for the entire app.
  */
 export default function DailyBudgetApp() {
-  const { theme, setTheme, resolvedTheme } = useTheme()
   const { t } = useLanguage()
 
   const {
@@ -42,31 +38,13 @@ export default function DailyBudgetApp() {
     removeTransaction
   } = useBudget()
 
-  // Ensure theme is set on initial load
-  const isDarkMode = (theme || resolvedTheme) === 'dark'
-
   return (
     <ErrorBoundary>
       <div className="min-h-screen bg-background">
         <header className="border-b">
           <div className="container flex items-center justify-between h-16 px-4">
             <h1 className="text-xl font-bold">{t('appName')}</h1>
-            <div className="flex items-center space-x-2">
-              <UserMenu />
-              <LanguageCurrencySelector />
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setTheme(isDarkMode ? 'light' : 'dark')}
-                title={isDarkMode ? t('lightMode') : t('darkMode')}
-              >
-                {isDarkMode ? (
-                  <Sun className="h-5 w-5" />
-                ) : (
-                  <Moon className="h-5 w-5" />
-                )}
-              </Button>
-            </div>
+            <HeaderMenu />
           </div>
         </header>
 
