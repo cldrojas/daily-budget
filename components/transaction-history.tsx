@@ -43,6 +43,11 @@ export function TransactionHistory({
     accountName: string
   } | null>(null)
 
+  // Sort transactions by date descending (most recent first)
+  const sortedTransactions = transactions.toSorted(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
   // Set locale based on language
   const locale = language === 'es' ? es : undefined
   const formatTransactionDate = (date: Date | string) => {
@@ -85,7 +90,7 @@ export function TransactionHistory({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {transactions.map((transaction: Transaction) => {
+                  {sortedTransactions.map((transaction: Transaction) => {
                     const account = accounts.find(
                       (acc) => acc.id === transaction.account
                     )
@@ -131,7 +136,7 @@ export function TransactionHistory({
             </div>
 
             <div className="space-y-3 md:hidden">
-              {transactions.map((transaction: Transaction) => {
+              {sortedTransactions.map((transaction: Transaction) => {
                 const account = accounts.find(
                   (acc) => acc.id === transaction.account
                 )
