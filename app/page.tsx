@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button'
 import { useBudget } from '@/hooks/use-budget'
-import { ConfigForm } from '@/components/config-form'
 import { HeaderMenu } from '@/components/header-menu'
 import { useLanguage } from '@/contexts/language-context'
 import { SetupForm } from '@/components/setup-form'
@@ -44,7 +43,11 @@ export default function DailyBudgetApp() {
         <header className="border-b">
           <div className="container flex items-center justify-between h-16 px-4">
             <h1 className="text-xl font-bold">{t('appName')}</h1>
-            <HeaderMenu />
+            <HeaderMenu
+              budget={budget}
+              onUpdateConfig={updateConfig}
+              onClearData={clearData}
+            />
           </div>
         </header>
 
@@ -88,16 +91,6 @@ export default function DailyBudgetApp() {
                       remainingDays={getRemainingDays()}
                     />
                   </ErrorBoundary>
-
-                  <div className="mt-6">
-                    <ErrorBoundary>
-                      <ConfigForm
-                        budget={budget}
-                        onUpdateConfig={updateConfig}
-                        onClearData={clearData}
-                      />
-                    </ErrorBoundary>
-                  </div>
 
                   <Navbar
                     accounts={accounts}
