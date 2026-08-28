@@ -57,7 +57,7 @@ describe('DailyBudgetStatus hidden accounts', () => {
     const options = screen.getAllByRole('option')
     const labels = options.map((option) => option.textContent)
 
-    expect(labels).toContain('All accounts')
+    expect(labels).toContain('Total Budget')
     expect(labels).toContain('Daily Budget')
     expect(labels).toContain('Investment')
     expect(labels).not.toContain('Savings')

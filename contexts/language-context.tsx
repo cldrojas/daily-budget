@@ -32,6 +32,7 @@ export const translations = {
     totalBudget: 'Total Budget',
     totalAllAccounts: 'All accounts',
     selectBalanceAccount: 'Show balance for',
+    trackModeDescription: 'Track your spending',
 
     remainingDays: 'Days Remaining',
     days: 'days',
