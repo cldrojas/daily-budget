@@ -90,18 +90,17 @@ export function DailyBudgetStatus({
 
     return (
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <div>
-            <CardTitle>{t('totalBudget') || 'Total Balance'}</CardTitle>
-            <CardDescription>{t('trackModeDescription') || 'Track your spending'}</CardDescription>
-          </div>
-          {accounts.length > 0 && (
+        <CardHeader className="flex-col items-center pb-2">
+          {accounts.length > 0 ? (
             <Select value={effectiveAccountId} onValueChange={handleSelectedAccountChange}>
-              <SelectTrigger className="w-[180px]" aria-label={t('selectBalanceAccount')}>
+              <SelectTrigger
+                aria-label={t('selectBalanceAccount')}
+                className="h-auto w-auto cursor-pointer gap-1.5 rounded-none border-0 bg-transparent p-0 text-2xl font-semibold leading-none tracking-tight shadow-none transition-opacity hover:opacity-75 focus:ring-0 focus:ring-offset-0 data-[placeholder]:text-foreground [&>svg]:h-5 [&>svg]:w-5 [&>svg]:opacity-60 [&>svg]:transition-transform [&>svg]:duration-200 data-[state=open]:[&>svg]:rotate-180"
+              >
                 <SelectValue placeholder={t('selectBalanceAccount')} />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={TOTAL_ACCOUNTS_VALUE}>{t('totalAllAccounts')}</SelectItem>
+              <SelectContent className="min-w-[12rem]">
+                <SelectItem value={TOTAL_ACCOUNTS_VALUE}>{t('totalBudget')}</SelectItem>
                 {visibleAccounts.map(account => (
                   <SelectItem key={account.id} value={account.id}>
                     {account.name}
@@ -109,7 +108,10 @@ export function DailyBudgetStatus({
                 ))}
               </SelectContent>
             </Select>
+          ) : (
+            <CardTitle>{t('totalBudget') || 'Total Balance'}</CardTitle>
           )}
+          <CardDescription>{t('trackModeDescription') || 'Track your spending'}</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center space-y-6 py-8">
           <p className="text-5xl font-bold">{formatCurrency(displayedBalance)}</p>
