@@ -25,6 +25,7 @@ function loadLocalStorageData(): {
   lastCheckedDay: Date | null
   isSetup: boolean
 } | null {
+  if (typeof window === 'undefined') return null
   const savedData = localStorage.getItem(LOCAL_STORAGE_KEY)
   if (!savedData) return null
 
@@ -56,29 +57,41 @@ function loadLocalStorageData(): {
  * const { budget, accounts, transactions, setupBudget, addTransaction } = useBudget();
  */
 export function useBudget() {
-  // Load persisted data ONCE via lazy initializer to avoid setState-in-effect
-  const [persisted] = useState(() => loadLocalStorageData())
-
-  const [isSetup, setIsSetup] = useState(persisted?.isSetup ?? false)
-  const [budget, setBudget] = useState<Budget>(persisted?.budget ?? {
+  const [isSetup, setIsSetup] = useState(false)
+  const [budget, setBudget] = useState<Budget>({
     startAmount: 0,
     endDate: undefined,
     startDate: undefined,
     autoSave: true
   })
-  const [accounts, setAccounts] = useState<Account[]>(
-    persisted?.accounts && persisted.accounts.length > 0
-      ? persisted.accounts
-      : [
-          { id: 'daily', name: 'Daily Budget', type: 'daily', balance: 0, icon: 'wallet' },
-          { id: 'savings', name: 'Savings', type: 'savings', balance: 0, icon: 'piggybank' }
-        ]
-  )
-  const [transactions, setTransactions] = useState<Transaction[]>(persisted?.transactions ?? [])
-  const [dailyAllowance, setDailyAllowance] = useState(persisted?.dailyAllowance ?? 0)
-  const [remainingToday, setRemainingToday] = useState(persisted?.remainingToday ?? 0)
-  const [progress, setProgress] = useState(persisted?.progress ?? 100)
-  const [lastCheckedDay, setLastCheckedDay] = useState<Date | null>(persisted?.lastCheckedDay ?? null)
+  const [accounts, setAccounts] = useState<Account[]>([
+    { id: 'daily', name: 'Daily Budget', type: 'daily', balance: 0, icon: 'wallet' },
+    { id: 'savings', name: 'Savings', type: 'savings', balance: 0, icon: 'piggybank' }
+  ])
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [dailyAllowance, setDailyAllowance] = useState(0)
+  const [remainingToday, setRemainingToday] = useState(0)
+  const [progress, setProgress] = useState(100)
+  const [lastCheckedDay, setLastCheckedDay] = useState<Date | null>(null)
+
+  // Hydrate persisted state after mount. Effect (not a lazy initializer) is
+  // intentional: localStorage is client-only, so this must not run during SSR
+  // prerender, and hydrating post-mount avoids hydration mismatches.
+  /* eslint-disable react-hooks/set-state-in-effect -- client-only persisted hydration */
+  useEffect(() => {
+    const saved = loadLocalStorageData()
+    if (!saved) return
+
+    setIsSetup(saved.isSetup)
+    setBudget(saved.budget)
+    if (saved.accounts && saved.accounts.length > 0) setAccounts(saved.accounts)
+    setTransactions(saved.transactions ?? [])
+    setDailyAllowance(saved.dailyAllowance ?? 0)
+    setRemainingToday(saved.remainingToday ?? 0)
+    setProgress(saved.progress ?? 100)
+    if (saved.lastCheckedDay) setLastCheckedDay(saved.lastCheckedDay)
+  }, [])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const today = useMemo(() => {
     return startOfDay(new Date())

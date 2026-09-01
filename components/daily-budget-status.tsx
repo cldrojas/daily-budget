@@ -61,7 +61,7 @@ export function DailyBudgetStatus({
 
   // Which balance to display in track mode: a specific account id, or the total across all accounts.
   const [selectedAccountId, setSelectedAccountId] = useState<string>(
-    () => window.localStorage.getItem(SELECTED_BALANCE_ACCOUNT_KEY) || TOTAL_ACCOUNTS_VALUE
+    () => (typeof window !== 'undefined' ? window.localStorage.getItem(SELECTED_BALANCE_ACCOUNT_KEY) : null) || TOTAL_ACCOUNTS_VALUE
   )
 
   const handleSelectedAccountChange = (value: string) => {
