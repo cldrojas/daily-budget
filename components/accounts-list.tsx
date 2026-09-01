@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Account, Budget, Int } from '@/types'
+import { Account, Budget } from '@/types'
 import {
   Wallet,
   PiggyBank,
@@ -116,7 +116,7 @@ export function AccountsList({
     setAccountToDelete(null)
   }
 
-  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: Int; icon: string }) => {
+  const handleSaveEdit = (updatedAccount: { id?: string; name: string; balance: number; icon: string }) => {
     if (editingAccount) {
       onUpdateAccount({
         ...editingAccount,

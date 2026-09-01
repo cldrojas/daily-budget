@@ -19,12 +19,12 @@ import { useCurrency, type Currency, currencies } from "@/contexts/currency-cont
 import { UserMenu } from "@/components/user-menu"
 import { LanguageCurrencySelector } from "@/components/language-currency-selector"
 import { ConfigForm } from "@/components/config-form"
-import type { Budget, Int } from "@/types"
+import type { Budget } from "@/types"
 
 interface HeaderMenuProps {
   budget: Budget
   onUpdateConfig: (config: {
-    startAmount?: Int
+    startAmount?: number
     endDate?: Date | undefined
     mode?: "daily" | "track"
     autoSave?: boolean

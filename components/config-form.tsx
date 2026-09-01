@@ -10,14 +10,14 @@ import { DatePicker } from "@/components/date-picker"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { useToast } from "@/hooks/use-toast"
 import { useLanguage } from "@/contexts/language-context"
-import { toInt, type Budget, type Int } from "@/types"
+import { toInt, type Budget } from "@/types"
 import ConfirmDialog from "@/components/modals/confirm-dialog"
 import { Checkbox } from "./ui/checkbox"
 import { useBudget } from "@/hooks/use-budget"
 
 export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
   budget: Budget, onClearData: () => void, onUpdateConfig: (config: {
-    startAmount?: Int;
+    startAmount?: number;
     endDate?: Date | undefined;
     mode?: 'daily' | 'track';
     autoSave?: boolean
@@ -62,7 +62,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
     }
 
     onUpdateConfig({
-      startAmount: toInt(startAmount) ?? 0 as Int,
+      startAmount: toInt(startAmount) ?? 0,
       endDate: mode === 'daily' ? endDate : undefined,
       mode,
       autoSave
@@ -156,7 +156,7 @@ export function ConfigForm({ budget, onUpdateConfig, onClearData }: {
                   step="1"
                   placeholder="1000"
                   value={startAmount}
-                  onChange={(e) => setStartAmount(toInt(e.target.value) || 0 as Int)}
+                  onChange={(e) => setStartAmount(toInt(e.target.value) || 0)}
                   required
                 />
               </div>
