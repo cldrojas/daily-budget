@@ -51,17 +51,17 @@ Leyenda: `[x]` completado / `[ ]` pendiente
 
 ## Fase 4: Eliminación Supabase / Auth / Sheets (0.5 días)
 
-- [ ] 4.1 Eliminar archivos: `lib/supabase/client.ts`, `lib/supabase/server.ts`, `contexts/auth-context.tsx`, `app/login/page.tsx`, `proxy.ts`, y el directorio `supabase/`
-- [ ] 4.2 Modificar `app/layout.tsx`: quitar import + wrapper de `AuthProvider`
-- [ ] 4.3 `pnpm remove @supabase/ssr @supabase/supabase-js` (eliminar de `package.json`)
-- [ ] 4.4 Limpiar `.env.local` + `.env.local.example`: eliminar `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `GMAIL_CLIENT_ID` (y remanentes Supabase)
-- [ ] 4.5 Eliminar/archivar docs de auth+sync supersedidos: `docs/requirements/supabase-auth-backend*.md`, `docs/design/supabase-auth-backend-design.md`, `docs/tasks/supabase-auth-backend-tasks.md`, `docs/migrations/2026-08-11-supabase-auth-backend.md`, `docs/requirements/multi-device-sync.md`, `docs/design/multi-device-sync-design.md`, `docs/migrations/2026-08-27-multi-device-sync.md` (mover a `docs/archive/`; conservar git history)
-- [ ] 4.6 Verificar: `grep -r "supabase\|@supabase" lib/ app/ contexts/` → 0 resultados; `pnpm tsc --noEmit` pasa
+- [x] 4.1 Eliminar archivos: `lib/supabase/client.ts`, `lib/supabase/server.ts`, `contexts/auth-context.tsx`, `app/login/page.tsx`, `proxy.ts`, y el directorio `supabase/`
+- [x] 4.2 Modificar `app/layout.tsx`: quitar import + wrapper de `AuthProvider`
+- [x] 4.3 `pnpm remove @supabase/ssr @supabase/supabase-js` (eliminar de `package.json`); también `dotenv` (devDep sin uso tras limpiar playwright.config)
+- [x] 4.4 Limpiar `.env.local` + `.env.local.example`: eliminar `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `GMAIL_CLIENT_ID` (y remanentes Supabase). Adicional: eliminadas `GMAIL_CLIENT_SECRET`, `TOKEN_ENCRYPTION_KEY`, `NEXT_PUBLIC_APP_URL` (todas huérfanas — 0 usos en código)
+- [x] 4.5 Eliminar/archivar docs de auth+sync supersedidos: `docs/requirements/supabase-auth-backend*.md`, `docs/design/supabase-auth-backend-design.md`, `docs/tasks/supabase-auth-backend-tasks.md`, `docs/migrations/2026-08-11-supabase-auth-backend.md`, `docs/requirements/multi-device-sync.md`, `docs/migrations/2026-08-27-multi-device-sync.md` (mover a `docs/archive/`; conservar git history). Nota: `multi-device-sync-design.md` no existía.
+- [x] 4.6 Verificar: `grep -r "supabase\|@supabase" lib/ app/ contexts/` → 0 resultados; `pnpm tsc --noEmit` pasa. Verificado también: `pnpm build` (3 páginas → 2, sin `/login`), `pnpm vitest` 65/65, `pnpm eslint .` 0 issues
 
 ## Fase 5: Tests + Verificación (1 día)
 
-- [ ] 5.1 Re-escribir unit tests de hook: `use-budget.test.tsx` — **mockear el boundary de Server Actions** (no DB real en vitest/jsdom); verificar optimistic updates, rollback, derivation. Eliminar `auth-context.test.tsx` y `login-validation.test.tsx`. Actualizar `AppRender.test.tsx` (quitar mock de AuthProvider)
-- [ ] 5.2 E2E: eliminar `auth.spec.ts`, `auth.setup.ts`; actualizar `tests/ui/test-utils.ts` para hacer seed a SQLite (via `SQLITE_DB_PATH` override a DB de test); actualizar `home.spec.ts` y demás specs; eliminar `storageState`/auth project de `playwright.config.ts`; eliminar `.env.e2e`
+- [ ] 5.1 Re-escribir unit tests de hook: `use-budget.test.tsx` — **mockear el boundary de Server Actions** (no DB real en vitest/jsdom); verificar optimistic updates, rollback, derivation. ✓ (parte auth hecha) `auth-context.test.tsx` y `login-validation.test.tsx` eliminados; `AppRender.test.tsx` sin mock de AuthProvider
+- [ ] 5.2 E2E: ✓ (parte auth hecha) `auth.spec.ts`, `auth.setup.ts` eliminados; projects `setup`/`chromium-auth` y `storageState` removidos de `playwright.config.ts`; `E2E_USER` eliminado de `e2e-constants.ts`. Pendiente: actualizar `tests/ui/test-utils.ts` para hacer seed a SQLite (via `SQLITE_DB_PATH` override a DB de test); actualizar `home.spec.ts` y demás specs; eliminar `.env.e2e`
 - [ ] 5.3 Unit: frecuencias de proyección (3.5), idempotencia de migración (2.5), integración de Server Actions (CRUD completo contra SQLite temporal — `SQLITE_DB_PATH` a archivo temp, reset `globalThis.__db` entre tests)
 - [ ] 5.4 No-regresión: `pnpm test` en verde + `pnpm tsc --noEmit` en verde (pre-commit)
 
@@ -75,7 +75,7 @@ Leyenda: `[x]` completado / `[ ]` pendiente
 - [ ] `next.config.mjs` con `serverExternalPackages: ['better-sqlite3']`
 - [ ] Migración idempotente localStorage → SQLite que preserva accounts, transactions y budget (backup histórico conservado)
 - [ ] Estado derivado (`dailyAllowance`, `progress`, `lastCheckedDay`) calculado, no persistido; saldo de cuenta derivado de SUM(transactions)
-- [ ] Eliminación completa de Supabase/Auth/Sheets: dependencias, archivos, env vars, `proxy.ts`, `AuthProvider`
+- [x] Eliminación completa de Supabase/Auth/Sheets: dependencias, archivos, env vars, `proxy.ts`, `AuthProvider`
 - [ ] UI se comporta idéntica al estado actual (no-regresión funcional y visual)
 - [ ] `docs/migrations/2026-08-31-sqlite-local.md` presente (OBLIGATORIO)
 - [ ] `data/saldo-cero.db` en `.gitignore`
