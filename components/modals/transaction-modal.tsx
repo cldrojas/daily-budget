@@ -25,7 +25,7 @@ import { useToast } from '@/hooks/use-toast'
 import { useLanguage } from '@/contexts/language-context'
 import { useCurrency } from '@/contexts/currency-context'
 import { DatePicker } from '../date-picker'
-import { Transaction, TransactionType, toInt } from '@/types'
+import { Account, Transaction, TransactionType, toInt } from '@/types'
 
 export function TransactionModal({
   isOpen,
