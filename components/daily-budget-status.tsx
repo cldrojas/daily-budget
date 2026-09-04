@@ -61,7 +61,7 @@ export function DailyBudgetStatus({
 
   // Which balance to display in track mode: a specific account id, or the total across all accounts.
   const [selectedAccountId, setSelectedAccountId] = useState<string>(
-    () => window.localStorage.getItem(SELECTED_BALANCE_ACCOUNT_KEY) || TOTAL_ACCOUNTS_VALUE
+    () => (typeof window !== 'undefined' ? window.localStorage.getItem(SELECTED_BALANCE_ACCOUNT_KEY) : null) || TOTAL_ACCOUNTS_VALUE
   )
 
   const handleSelectedAccountChange = (value: string) => {
@@ -73,9 +73,13 @@ export function DailyBudgetStatus({
   const dailyAccount = accounts.find(acc => acc.id === 'daily')
   const totalBudget = dailyAccount ? dailyAccount.balance : 0
 
-  // Track mode: show either the total of all visible accounts or a single selected account
+  // Track mode: show either the total of visible spending accounts or a single selected account
   if (isTrackMode) {
-    const visibleAccounts = accounts.filter(acc => !acc.hidden)
+    // In track mode savings and investment are not part of spending — exclude them
+    // from the dropdown and from the total (same rule as the accounts list).
+    const visibleAccounts = accounts.filter(
+      acc => !acc.hidden && acc.type !== 'savings' && acc.type !== 'investment'
+    )
 
     const selectedAccountExists =
       selectedAccountId === TOTAL_ACCOUNTS_VALUE ||
